@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EstoqueIA — Política de Privacidade & Termos de Uso</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b14; --surface: #0d1220; --surface2: #131929;
+    --border: rgba(255,255,255,0.06); --accent: #3b82f6;
+    --accent-dim: rgba(59,130,246,0.1); --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1); --text: #e8eaf0; --text-2: #6b7280;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.06) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.04) 0%, transparent 50%);
+  }
+  header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--border); background: rgba(13,18,32,0.95);
+    backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10;
+  }
+  .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .logo-info h1 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 800; }
+  .logo-info p { font-size: 0.7rem; color: var(--text-2); }
+  .back-btn {
+    margin-left: auto; font-size: 0.75rem; color: var(--accent);
+    background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 20px; padding: 6px 14px; text-decoration: none;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+  }
+  .nav-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--surface); position: sticky; top: 67px;
+    z-index: 9; overflow-x: auto; scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 14px 24px; font-size: 0.82rem; font-weight: 600;
+    color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .content { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .page-title {
+    font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800;
+    margin-bottom: 6px; background: linear-gradient(135deg, var(--text), var(--accent));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .page-subtitle {
+    font-size: 0.8rem; color: var(--text-2); margin-bottom: 36px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  }
+  .update-badge {
+    display: inline-block; font-size: 0.68rem; font-weight: 600;
+    background: var(--green-dim); color: var(--green);
+    border: 1px solid rgba(16,185,129,0.2); border-radius: 20px;
+    padding: 3px 10px; margin-bottom: 12px;
+  }
+  .block {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+  }
+  .block-title {
+    font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .block-title .icon {
+    width: 28px; height: 28px; border-radius: 7px; background: var(--accent-dim);
+    display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;
+  }
+  .block p { font-size: 0.82rem; color: #9ca3af; line-height: 1.8; margin-bottom: 10px; }
+  .block p:last-child { margin-bottom: 0; }
+  .block ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .block ul li { font-size: 0.82rem; color: #9ca3af; line-height: 1.6; padding-left: 16px; position: relative; }
+  .block ul li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+  .highlight-block { background: var(--accent-dim); border-color: rgba(59,130,246,0.2); }
+  .highlight-block .block-title { color: #93c5fd; }
+  .highlight-block p { color: #bfdbfe; }
+  .green-block { background: var(--green-dim); border-color: rgba(16,185,129,0.2); }
+  .green-block .block-title { color: #6ee7b7; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tag.green {
+    font-size: 0.72rem; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+    background: var(--green-dim); border: 1px solid rgba(16,185,129,0.2); color: #6ee7b7;
+  }
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📦</div>
+  <div class="logo-info"><h1>EstoqueIA</h1><p>Gestão inteligente</p></div>
+  <a href="index.html" class="back-btn">← Voltar ao app</a>
+</header>
+
+<div class="nav-tabs">
+  <div class="tab active" onclick="trocarTab('privacidade',this)">🔒 Política de Privacidade</div>
+  <div class="tab" onclick="trocarTab('termos',this)">📄 Termos de Uso</div>
+  <div class="tab" onclick="trocarTab('dados',this)">💾 Armazenamento</div>
+</div>
+
+<div class="content">
+
+  <!-- ── PRIVACIDADE ── -->
+  <div class="section active" id="privacidade">
+    <div class="update-badge">✓ Atualizado em junho de 2025</div>
+    <div class="page-title">Política de Privacidade</div>
+    <div class="page-subtitle">Como o EstoqueIA coleta, usa e protege suas informações.</div>
+
+    <div class="block highlight-block">
+      <div class="block-title"><span class="icon">💡</span> Resumo simples</div>
+      <p>O EstoqueIA <strong>não coleta seus dados em servidores externos</strong>. Tudo que você registra fica salvo <strong>apenas no seu próprio dispositivo</strong>. Não temos acesso a essas informações.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">📋</span> 1. Quais dados são armazenados</div>
+      <p>O aplicativo armazena localmente no seu navegador:</p>
+      <ul>
+        <li>Produtos: nome, quantidade, preço de custo e venda, consumo diário</li>
+        <li>Histórico de vendas registradas</li>
+        <li>Dados financeiros: gastos mensais e lucros</li>
+        <li>Contatos: nome, cargo e número de WhatsApp</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🤖</span> 2. Uso da Inteligência Artificial (Groq)</div>
+      <p>As mensagens do chat são processadas pela API da <strong>Groq</strong>, que executa o modelo <strong>LLaMA 3.3</strong>. As mensagens trafegam via HTTPS de forma segura através de um backend que protege a chave de API.</p>
+      <p>Não inclua dados pessoais sensíveis (CPF, senhas, dados bancários) nas mensagens. A Groq tem sua própria política em <strong>groq.com</strong>.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">📲</span> 3. WhatsApp</div>
+      <p>A função de mensagem abre o WhatsApp com texto pré-preenchido. <strong>Nenhuma mensagem é enviada automaticamente</strong> — você sempre confirma antes. Os números ficam apenas no seu dispositivo.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🔗</span> 4. Compartilhamento de dados</div>
+      <p>O EstoqueIA <strong>não vende, aluga nem compartilha</strong> seus dados. Os únicos dados que saem do dispositivo são as mensagens enviadas à API da Groq para processamento da IA.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🛡️</span> 5. Segurança</div>
+      <p>Toda comunicação é feita via <strong>HTTPS (criptografado)</strong>. A chave de API fica em variáveis de ambiente seguras no servidor, nunca exposta ao navegador.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">⚖️</span> 6. Seus direitos (LGPD)</div>
+      <p>Em conformidade com a <strong>Lei nº 13.709/2018 (LGPD)</strong>, você tem direito a:</p>
+      <ul>
+        <li>Acessar todos os dados armazenados (visíveis diretamente no app)</li>
+        <li>Corrigir dados incorretos a qualquer momento</li>
+        <li>Excluir todos os dados limpando o localStorage do navegador</li>
+        <li>Exportar seus dados via a função "Planilha"</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">✏️</span> 7. Alterações nesta política</div>
+      <p>Esta política pode ser atualizada periodicamente. A data no topo indica a versão vigente.</p>
+    </div>
+  </div>
+
+  <!-- ── TERMOS ── -->
+  <div class="section" id="termos">
+    <div class="update-badge">✓ Atualizado em junho de 2025</div>
+    <div class="page-title">Termos de Uso</div>
+    <div class="page-subtitle">Ao utilizar o EstoqueIA, você concorda com os termos abaixo.</div>
+
+    <div class="block">
+      <div class="block-title"><span class="icon">📌</span> 1. Aceitação dos Termos</div>
+      <p>Ao acessar e usar o EstoqueIA, você declara ter lido e concordado com estes Termos. Se não concordar, recomendamos não utilizar o aplicativo.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🎯</span> 2. Finalidade do aplicativo</div>
+      <p>O EstoqueIA é uma ferramenta de <strong>gestão de estoque assistida por IA</strong> para controle de produtos, vendas e análise financeira básica.</p>
+      <p>As sugestões da IA são de caráter <strong>orientativo</strong> e não substituem decisões gerenciais ou consultas profissionais.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">✅</span> 3. Uso permitido</div>
+      <ul>
+        <li>Uso pessoal ou empresarial para gestão do próprio negócio</li>
+        <li>Registro de produtos, vendas e contatos do seu estabelecimento</li>
+        <li>Exportação de dados para uso próprio via planilha</li>
+        <li>Envio de mensagens WhatsApp para contatos do seu negócio</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🚫</span> 4. Uso proibido</div>
+      <ul>
+        <li>Atividades ilegais ou que violem direitos de terceiros</li>
+        <li>Tentar burlar ou sobrecarregar o sistema</li>
+        <li>Usar a IA para gerar conteúdo enganoso ou fraudulento</li>
+        <li>Cadastrar dados de terceiros sem consentimento</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">⚠️</span> 5. Limitação de responsabilidade</div>
+      <p>O EstoqueIA é fornecido "no estado em que se encontra". Não nos responsabilizamos por:</p>
+      <ul>
+        <li>Decisões de negócio baseadas nas sugestões da IA</li>
+        <li>Perda de dados por limpeza de cache ou troca de dispositivo</li>
+        <li>Instabilidades ou indisponibilidade da API da Groq</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">💾</span> 6. Responsabilidade pelos dados</div>
+      <p>Como os dados ficam no <strong>seu dispositivo</strong>, você é responsável por fazer backups regulares usando "Exportar Planilha". Limpar o cache apagará todos os dados.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">⚖️</span> 7. Lei aplicável</div>
+      <p>Estes termos são regidos pelas leis brasileiras. Qualquer disputa será submetida ao foro da comarca do desenvolvedor.</p>
+    </div>
+    <div class="divider"></div>
+    <div class="block green-block">
+      <div class="block-title"><span class="icon">✓</span> Resumo dos seus direitos</div>
+      <div class="tag-row">
+        <span class="tag green">✓ Dados são seus</span>
+        <span class="tag green">✓ Pode exportar</span>
+        <span class="tag green">✓ Pode deletar</span>
+        <span class="tag green">✓ Sem anúncios</span>
+        <span class="tag green">✓ Sem venda de dados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ARMAZENAMENTO ── -->
+  <div class="section" id="dados">
+    <div class="update-badge">✓ Atualizado em junho de 2025</div>
+    <div class="page-title">Armazenamento de Dados</div>
+    <div class="page-subtitle">O EstoqueIA não usa cookies de rastreamento.</div>
+
+    <div class="block highlight-block">
+      <div class="block-title"><span class="icon">🍪</span> Sem cookies de rastreamento</div>
+      <p>O EstoqueIA <strong>não utiliza cookies</strong> de rastreamento, analytics ou publicidade. Não há pixels de rastreamento nem scripts de coleta de comportamento.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">💾</span> localStorage — onde seus dados ficam</div>
+      <p>Usamos o <strong>localStorage</strong> do navegador. Os seguintes itens são salvos:</p>
+      <ul>
+        <li><strong>estoque_db</strong> — lista de produtos cadastrados</li>
+        <li><strong>contatos_db</strong> — contatos de WhatsApp</li>
+        <li><strong>gastos_mensais</strong> — gastos mensais informados</li>
+        <li><strong>lucros_mensais</strong> — lucro do mês atual</li>
+        <li><strong>lucros_mes_anterior</strong> — lucro do mês passado</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🗑️</span> Como apagar seus dados</div>
+      <ul>
+        <li>Chrome: Configurações → Privacidade → Limpar dados de navegação → Dados de sites</li>
+        <li>Firefox: Configurações → Privacidade → Limpar dados → Conteúdo web em cache</li>
+        <li>Safari: Configurações → Safari → Limpar histórico e dados de sites</li>
+      </ul>
+      <p style="margin-top:10px;">⚠️ Limpar os dados apagará permanentemente todos os produtos, vendas e contatos do app.</p>
+    </div>
+    <div class="block">
+      <div class="block-title"><span class="icon">🌐</span> Conexões externas do app</div>
+      <ul>
+        <li><strong>Google Fonts</strong> — carregamento das fontes (apenas exibição)</li>
+        <li><strong>cdnjs.cloudflare.com</strong> — biblioteca XLSX para planilhas</li>
+        <li><strong>Netlify Functions (backend seguro)</strong> — processamento das mensagens de IA</li>
+        <li><strong>wa.me</strong> — redirecionamento para WhatsApp quando você aprova envio</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function trocarTab(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
