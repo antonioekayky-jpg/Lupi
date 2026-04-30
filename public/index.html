@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EstoqueIA — Fase 2</title>
+<title>LupiAI — Gestão Inteligente de Estoque</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1068,7 +1069,7 @@
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">📦</div>
-    <div class="login-titulo">EstoqueIA</div>
+    <div class="login-titulo">LupiAI</div>
     <div class="login-sub">Entre com sua conta Google para salvar seu estoque, contatos e histórico financeiro de forma segura.</div>
 
     <button class="login-google-btn" onclick="iniciarLoginGoogle()">
@@ -1096,8 +1097,8 @@
 <header>
   <div class="logo">📦</div>
   <div class="header-info">
-    <h1>EstoqueIA</h1>
-    <p>Gestão inteligente</p>
+    <h1>LupiAI</h1>
+    <p>Evite perder dinheiro desnecessário</p>
   </div>
   <div class="header-btns">
     <button class="hbtn hbtn-blue"   onclick="document.getElementById('modalRegistro').style.display='flex'">📦 Produto</button>
@@ -1148,7 +1149,7 @@
       </svg>
     </button>
   </div>
-  <div class="hint">Powered by Groq · LLaMA 3.3 · Fase 2 — Ações para aprovação</div>
+  <div class="hint">Powered by Groq · LLaMA 3.3 · LupiAI · <a href="politica.html" style="color:var(--accent);text-decoration:none;">Política de Privacidade</a></div>
 </div>
 
 <div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;">
@@ -1478,7 +1479,7 @@
   const API_KEY = ""; // chave gerenciada pelo Netlify Function
   const API_URL = "/chat";
 
-  const SYSTEM_PROMPT = `Você é o EstoqueIA — assistente de estoque esperto, direto e gente boa. Fala como um sócio de confiança: natural, sem enrolação, sem papo corporativo.
+  const SYSTEM_PROMPT = `Você é o LupiAI — assistente de estoque esperto, direto e gente boa. Fala como um sócio de confiança: natural, sem enrolação, sem papo corporativo.
 
 ⚠️ REGRA ABSOLUTA DE FORMATO — NUNCA QUEBRE ISSO:
 Sua resposta deve ser APENAS um objeto JSON válido. Nada antes, nada depois. Zero texto fora do JSON.
@@ -1683,7 +1684,7 @@ A mensagem deve:
 
     const label = document.createElement("div");
     label.className = "msg-label";
-    label.textContent = "EstoqueIA";
+    label.textContent = "LupiAI";
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -1730,7 +1731,7 @@ A mensagem deve:
     const contatosInfo = dbContatos.length
       ? dbContatos.map(c => `${c.nome} (${c.cargo})`).join(", ")
       : "Nenhum contato cadastrado";
-    return `Você é o EstoqueIA — assistente esperto de gestão de estoque com personalidade.
+    return `Você é o LupiAI — assistente esperto de gestão de estoque com personalidade.
 
 CONTEXTO DO NEGÓCIO:
 - Estoque: ${estoqueInfo}
@@ -1939,7 +1940,7 @@ ${SYSTEM_PROMPT}`;
 
     const label = document.createElement("div");
     label.className = "msg-label";
-    label.textContent = remetente === "user" ? "Você" : "EstoqueIA";
+    label.textContent = remetente === "user" ? "Você" : "LupiAI";
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -1980,7 +1981,7 @@ ${SYSTEM_PROMPT}`;
 
     const label = document.createElement("div");
     label.className = "msg-label";
-    label.textContent = "EstoqueIA";
+    label.textContent = "LupiAI";
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -2395,7 +2396,7 @@ ${SYSTEM_PROMPT}`;
 
     // ── ABA 1: Estoque Atual ──────────────────────────────────────────────
     const estoqueRows = [
-      [`EstoqueIA — Relatório de Estoque  |  Gerado em: ${hoje}`],
+      [`LupiAI — Relatório de Estoque  |  Gerado em: ${hoje}`],
       [],
       ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)", "Ação Recomendada"]
     ];
@@ -2517,7 +2518,7 @@ ${SYSTEM_PROMPT}`;
     XLSX.utils.book_append_sheet(wb, ws4, "📈 Histórico Vendas");
 
     // ── Download ──────────────────────────────────────────────────────────
-    const nomeArq = `EstoqueIA_${hoje.replace(/\//g, "-")}.xlsx`;
+    const nomeArq = `LupiAI_${hoje.replace(/\//g, "-")}.xlsx`;
     XLSX.writeFile(wb, nomeArq);
 
     adicionarMsg(
