@@ -8,29 +8,21 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
+  <!-- Firebase Compat SDK (funciona com JS normal) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBg9qEWHAqDOD8GwfywA5syIG8dRPYye3g",
+      apiKey: "AIzaSyBg9qEWHAqD0D8GwfywA5syIG8dRPYye3g",
       authDomain: "lupi-ai-2846f.firebaseapp.com",
       projectId: "lupi-ai-2846f",
       storageBucket: "lupi-ai-2846f.firebasestorage.app",
       messagingSenderId: "376572426861",
       appId: "1:376572426861:web:03e75339bac14d9c7f9d64"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    window._firestoreDb = db;
-    window._firestoreLib = { doc, getDoc, setDoc, collection, getDocs, deleteDoc };
-    window._firebaseAuth = auth;
-    window._GoogleAuthProvider = GoogleAuthProvider;
-    window._signInWithCredential = signInWithCredential;
-    window.dispatchEvent(new Event("firebaseReady"));
+    firebase.initializeApp(firebaseConfig);
+    window._db = firebase.firestore();
+    console.log("Firebase inicializado com sucesso!");
   </script>
 <style>
   :root {
@@ -54,11 +46,6 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  html {
-    overflow: hidden;
-    height: 100%;
-  }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -67,7 +54,6 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: relative;
     background-image: radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.06) 0%, transparent 60%),
                       radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.04) 0%, transparent 50%);
   }
@@ -92,7 +78,6 @@
     gap: 6px;
     overflow-x: auto;
     flex: 1;
-    min-width: 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 2px;
@@ -669,19 +654,6 @@
     margin-top: 6px;
   }
 
-  /* Garantia de renderização dos modais no mobile */
-  #modalRegistro, #modalFinanceiro, #modalVenda,
-  #modalContatos, #modalMensagem, #modalFluxo {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 9999 !important;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
-
   /* Modal */
   #modalRegistro {
     display: none;
@@ -1042,6 +1014,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-left: auto;
     flex-shrink: 0;
   }
 
@@ -1355,7 +1328,7 @@
     });
   }
 
-  async function onGoogleSignIn(credentialResponse) {
+  function onGoogleSignIn(credentialResponse) {
     try {
       // Decodifica o JWT (payload apenas — sem validação de assinatura no client)
       const payload = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
@@ -1365,15 +1338,6 @@
         email: payload.email,
         foto: payload.picture || null,
       };
-
-      // Autentica também no Firebase Auth para que o Firestore aceite as requisições
-      try {
-        const firebaseCredential = window._GoogleAuthProvider.credential(credentialResponse.credential);
-        await window._signInWithCredential(window._firebaseAuth, firebaseCredential);
-      } catch (authErr) {
-        console.warn("Firebase Auth signIn falhou (dados ainda serão salvos se as regras permitirem):", authErr);
-      }
-
       salvarSessao(usuarioAtual);
       entrarNoApp();
     } catch (e) {
@@ -1415,9 +1379,6 @@
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("loginScreen").classList.remove("hide");
     document.getElementById("userBadge").style.display = "none";
-    // Restaura o texto do header
-    const headerInfo = document.querySelector(".header-info");
-    if (headerInfo) headerInfo.style.display = "";
     // Limpa mensagens do chat
     const feed = document.getElementById("mensagens");
     feed.innerHTML = `<div class="welcome" id="welcome">
@@ -1433,34 +1394,25 @@
   }
 
   // ─── FIREBASE HELPERS ──────────────────────────────────────────────────────
-
-  function esperarFirebase() {
-    return new Promise((resolve) => {
-      if (window._firestoreLib && window._firestoreDb) { resolve(); return; }
-      window.addEventListener("firebaseReady", () => resolve(), { once: true });
-      // Timeout de segurança: 5 segundos
-      setTimeout(() => resolve(), 5000);
-    });
-  }
-
   async function fbSalvar(colecao, dados) {
     try {
-      await esperarFirebase();
-      const db = window._firestoreDb;
-      const { doc, setDoc } = window._firestoreLib;
-      const uid = usuarioAtual.id;
-      await setDoc(doc(db, "usuarios", uid, colecao, "dados"), { valor: JSON.stringify(dados) });
+      if (!window._db || !usuarioAtual?.id) return;
+      await window._db
+        .collection("usuarios").doc(usuarioAtual.id)
+        .collection(colecao).doc("dados")
+        .set({ valor: JSON.stringify(dados) });
+      console.log("Firebase salvo:", colecao);
     } catch(e) { console.warn("Erro ao salvar no Firebase:", e); }
   }
 
   async function fbCarregar(colecao) {
     try {
-      await esperarFirebase();
-      const db = window._firestoreDb;
-      const { doc, getDoc } = window._firestoreLib;
-      const uid = usuarioAtual.id;
-      const snap = await getDoc(doc(db, "usuarios", uid, colecao, "dados"));
-      if (snap.exists()) return JSON.parse(snap.data().valor);
+      if (!window._db || !usuarioAtual?.id) return null;
+      const snap = await window._db
+        .collection("usuarios").doc(usuarioAtual.id)
+        .collection(colecao).doc("dados")
+        .get();
+      if (snap.exists) return JSON.parse(snap.data().valor);
     } catch(e) { console.warn("Erro ao carregar do Firebase:", e); }
     return null;
   }
@@ -1502,17 +1454,13 @@
     nome.textContent = usuarioAtual.nome.split(" ")[0];
     badge.style.display = "flex";
 
-    // Esconde o texto do header para dar espaço aos botões no mobile
-    const headerInfo = document.querySelector(".header-info");
-    if (headerInfo) headerInfo.style.display = "none";
-
     // Esconde tela de login com animação
     const loginScreen = document.getElementById("loginScreen");
     loginScreen.classList.add("hide");
     setTimeout(() => { loginScreen.style.display = "none"; }, 450);
 
     // Atualiza alertas de estoque
-    setTimeout(() => { if (typeof verificarAlertasAutomaticos === 'function') verificarAlertasAutomaticos(); }, 600);
+    setTimeout(() => atualizarAlertas(), 600);
   }
 
   // Inicializa: verifica se já tem sessão salva
