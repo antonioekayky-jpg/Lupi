@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LupiAI — Gestão Inteligente de Estoque</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Apple SF Pro system font stack -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase SDK -->
@@ -26,22 +26,22 @@
   </script>
 <style>
   :root {
-    --bg: #070b14;
-    --surface: #0d1220;
-    --surface2: #131929;
-    --border: rgba(255,255,255,0.06);
-    --accent: #3b82f6;
-    --accent-dim: rgba(59,130,246,0.1);
-    --accent-glow: rgba(59,130,246,0.2);
-    --green: #10b981;
-    --green-dim: rgba(16,185,129,0.1);
+    --bg: #000000;
+    --surface: #1C1C1E;
+    --surface2: #2C2C2E;
+    --border: rgba(255,255,255,0.08);
+    --accent: #0A84FF;
+    --accent-dim: rgba(10,132,255,0.12);
+    --accent-glow: rgba(10,132,255,0.2);
+    --green: #30D158;
+    --green-dim: rgba(48,209,88,0.12);
     --red: #ef4444;
     --red-dim: rgba(239,68,68,0.1);
     --yellow: #f59e0b;
     --yellow-dim: rgba(245,158,11,0.1);
-    --text: #e8eaf0;
-    --text-2: #6b7280;
-    --text-3: #374151;
+    --text: #F5F5F7;
+    --text-2: #8E8E93;
+    --text-3: #3A3A3C;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -49,13 +49,12 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background-image: radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.06) 0%, transparent 60%),
-                      radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.04) 0%, transparent 50%);
+    background-image: none;
   }
 
   header {
@@ -64,7 +63,7 @@
     align-items: center;
     gap: 10px;
     border-bottom: 1px solid var(--border);
-    background: rgba(13,18,32,0.95);
+    background: rgba(28,28,30,0.92);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
@@ -86,24 +85,25 @@
 
   .hbtn {
     flex-shrink: 0;
-    border-radius: 20px;
-    padding: 5px 11px;
-    font-size: 0.68rem;
-    font-weight: 600;
+    border-radius: 8px;
+    padding: 6px 13px;
+    font-size: 0.72rem;
+    font-weight: 500;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     white-space: nowrap;
-    border: 1px solid transparent;
-    transition: opacity 0.15s;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: -0.01em;
   }
-  .hbtn:active { opacity: 0.7; }
-  .hbtn-blue   { background: rgba(59,130,246,0.2);  border-color: rgba(59,130,246,0.3);  color: #3b82f6; }
-  .hbtn-green  { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3);  color: #10b981; }
-  .hbtn-purple { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.3);  color: #a855f7; }
-  .hbtn-wa     { background: rgba(37,211,102,0.12); border-color: rgba(37,211,102,0.3);  color: #25d366; }
-  .hbtn-yellow { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3);  color: #f59e0b; }
-  .hbtn-teal   { background: rgba(20,184,166,0.15); border-color: rgba(20,184,166,0.3);  color: #14b8a6; }
-  .hbtn-cash   { background: rgba(34,197,94,0.15);  border-color: rgba(34,197,94,0.3);   color: #22c55e; }
+  .hbtn:active { opacity: 0.6; transform: scale(0.97); }
+  .hbtn-blue   { background: #0A84FF; color: #ffffff; }
+  .hbtn-green  { background: #30D158; color: #000000; }
+  .hbtn-purple { background: #BF5AF2; color: #ffffff; }
+  .hbtn-wa     { background: #25d366; color: #000000; }
+  .hbtn-yellow { background: #FFD60A; color: #000000; }
+  .hbtn-teal   { background: #5AC8FA; color: #000000; }
+  .hbtn-cash   { background: #30D158; color: #000000; }
 
   /* ── FLUXO DE CAIXA MODAL ── */
   #modalFluxo {
@@ -116,9 +116,9 @@
   }
 
   .fluxo-sheet {
-    background: #0d1220;
+    background: #1C1C1E;
     border-radius: 22px 22px 0 0;
-    border: 1px solid #1f2937;
+    border: 1px solid rgba(255,255,255,0.08);
     border-bottom: none;
     width: 100%;
     max-width: 500px;
@@ -143,7 +143,7 @@
   }
 
   .fluxo-titulo {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-size: 1.1rem;
     font-weight: 700;
     color: #e8eaf0;
@@ -152,7 +152,7 @@
 
   .fluxo-sub {
     font-size: 0.72rem;
-    color: #6b7280;
+    color: #8E8E93;
     margin: 0 0 16px;
   }
 
@@ -170,15 +170,15 @@
   .saldo-card.negativo { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.25); }
   .saldo-card.neutro   { background: rgba(107,114,128,0.1);border: 1px solid rgba(107,114,128,0.2); }
 
-  .saldo-label { font-size: 0.72rem; color: #6b7280; margin-bottom: 4px; }
+  .saldo-label { font-size: 0.72rem; color: #8E8E93; margin-bottom: 4px; }
   .saldo-valor {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-size: 1.6rem;
     font-weight: 700;
   }
   .saldo-card.positivo .saldo-valor { color: #22c55e; }
   .saldo-card.negativo .saldo-valor { color: #ef4444; }
-  .saldo-card.neutro   .saldo-valor { color: #9ca3af; }
+  .saldo-card.neutro   .saldo-valor { color: #8E8E93; }
 
   .saldo-pills { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
   .saldo-pill  {
@@ -193,7 +193,7 @@
     display: flex;
     gap: 0;
     margin: 0 16px 12px;
-    background: #111827;
+    background: #2C2C2E;
     border-radius: 10px;
     padding: 3px;
     flex-shrink: 0;
@@ -201,7 +201,7 @@
   .fluxo-tab {
     flex: 1; padding: 7px 0;
     border: none; background: none;
-    color: #6b7280; font-family: 'DM Sans', sans-serif;
+    color: #8E8E93; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.78rem; font-weight: 600;
     border-radius: 8px; cursor: pointer;
     transition: all 0.2s;
@@ -225,7 +225,7 @@
   .tipo-btn {
     flex: 1; padding: 10px 0;
     border-radius: 10px; border: 1px solid transparent;
-    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; font-size: 0.82rem;
     font-weight: 600; cursor: pointer;
     transition: all 0.15s;
   }
@@ -236,11 +236,11 @@
 
   .fluxo-form input, .fluxo-form select {
     width: 100%; padding: 10px 12px;
-    background: #131929; border: 1px solid #1f2937;
+    background: #1C1C1E; border: 1px solid rgba(255,255,255,0.08);
     border-radius: 10px; color: #e8eaf0;
-    font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; font-size: 0.85rem; outline: none;
   }
-  .fluxo-form select option { background: #131929; }
+  .fluxo-form select option { background: #1C1C1E; }
 
   /* Lista de lançamentos */
   .fluxo-lista {
@@ -258,8 +258,8 @@
     gap: 10px;
     padding: 10px 12px;
     border-radius: 10px;
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #2C2C2E;
+    border: 1px solid rgba(255,255,255,0.08);
   }
 
   .lanc-icone {
@@ -272,7 +272,7 @@
 
   .lanc-info { flex: 1; min-width: 0; }
   .lanc-desc { font-size: 0.8rem; color: #e8eaf0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lanc-meta { font-size: 0.68rem; color: #6b7280; margin-top: 1px; }
+  .lanc-meta { font-size: 0.68rem; color: #8E8E93; margin-top: 1px; }
 
   .lanc-valor { font-size: 0.88rem; font-weight: 700; flex-shrink: 0; }
   .lanc-valor.entrada { color: #22c55e; }
@@ -284,37 +284,46 @@
   .fluxo-vazio { text-align: center; padding: 24px 0; color: #4b5563; font-size: 0.8rem; }
 
   .logo {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    background: var(--accent-dim);
-    border: 1px solid rgba(59,130,246,0.25);
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
     flex-shrink: 0;
+    font-size: 0;
+    position: relative;
+  }
+  .logo::after {
+    content: '';
+    width: 16px; height: 16px;
+    background: white;
+    clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
+    display: block;
   }
 
   .header-info h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #F5F5F7;
   }
 
   .header-info p {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-2);
+    letter-spacing: 0.01em;
   }
 
   .fase-badge {
     margin-left: auto;
     font-size: 0.65rem;
     font-weight: 600;
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     background: linear-gradient(135deg, var(--accent), var(--green));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    border: 1px solid rgba(59,130,246,0.2);
+    border: 1px solid rgba(10,132,255,0.2);
     border-radius: 20px;
     padding: 3px 10px;
     white-space: nowrap;
@@ -370,7 +379,7 @@
   .welcome-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
 
   .welcome h2 {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-size: 1.05rem;
     font-weight: 700;
     margin-bottom: 6px;
@@ -392,19 +401,20 @@
   }
 
   .chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 9px 13px;
-    font-size: 0.76rem;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-size: 0.8rem;
     color: var(--text-2);
     text-align: left;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     line-height: 1.4;
+    letter-spacing: -0.01em;
   }
 
-  .chip:active { background: var(--accent-dim); border-color: rgba(59,130,246,0.3); color: var(--accent); }
+  .chip:active { background: var(--accent-dim); border-color: rgba(10,132,255,0.3); color: var(--accent); opacity: 0.8; }
 
   .msg {
     display: flex;
@@ -440,15 +450,16 @@
   }
 
   .msg.user .bubble {
-    background: var(--accent-dim);
-    border: 1px solid rgba(59,130,246,0.2);
-    border-bottom-right-radius: 3px;
+    background: #0A84FF;
+    color: #ffffff;
+    border: none;
+    border-bottom-right-radius: 4px;
   }
 
   .msg.ai .bubble {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 3px;
+    background: #2C2C2E;
+    border: none;
+    border-bottom-left-radius: 4px;
   }
 
   .action-card {
@@ -456,7 +467,7 @@
     width: 100%;
     max-width: 320px;
     background: var(--surface2);
-    border: 1px solid rgba(59,130,246,0.25);
+    border: 1px solid rgba(10,132,255,0.25);
     border-radius: 14px;
     overflow: hidden;
     animation: up 0.35s ease both;
@@ -484,7 +495,7 @@
   .action-icon.comunicado { background: var(--green-dim); }
 
   .action-title {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-size: 0.78rem;
     font-weight: 700;
     flex: 1;
@@ -528,7 +539,7 @@
     padding: 8px;
     border-radius: 8px;
     border: none;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
@@ -542,7 +553,7 @@
   .btn-aprovar {
     background: var(--green-dim);
     color: var(--green);
-    border: 1px solid rgba(16,185,129,0.25);
+    border: 1px solid rgba(48,209,88,0.25);
   }
 
   .btn-recusar {
@@ -551,11 +562,11 @@
     border: 1px solid rgba(239,68,68,0.2);
   }
 
-  .btn-aprovar:active { background: rgba(16,185,129,0.2); }
+  .btn-aprovar:active { background: rgba(48,209,88,0.2); }
   .btn-recusar:active { background: rgba(239,68,68,0.15); }
 
   .action-card.aprovado {
-    border-color: rgba(16,185,129,0.3);
+    border-color: rgba(48,209,88,0.3);
     opacity: 0.7;
   }
 
@@ -597,7 +608,7 @@
 
   .input-area {
     padding: 10px 14px 18px;
-    background: rgba(13,18,32,0.95);
+    background: rgba(28,28,30,0.92);
     border-top: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -613,7 +624,7 @@
     transition: border-color 0.2s;
   }
 
-  .input-row:focus-within { border-color: rgba(59,130,246,0.3); }
+  .input-row:focus-within { border-color: rgba(10,132,255,0.3); }
 
   textarea {
     flex: 1;
@@ -621,7 +632,7 @@
     border: none;
     outline: none;
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.88rem;
     resize: none;
     max-height: 90px;
@@ -667,16 +678,16 @@
   }
 
   .modal-inner {
-    background: #0d1220;
+    background: #1C1C1E;
     border-radius: 20px;
     padding: 24px;
     width: 90%;
     max-width: 350px;
-    border: 1px solid rgba(59,130,246,0.3);
+    border: 1px solid rgba(10,132,255,0.3);
   }
 
   .modal-inner h3 {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     margin-bottom: 16px;
   }
 
@@ -684,16 +695,16 @@
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    background: #131929;
-    border: 1px solid #1f2937;
+    background: #1C1C1E;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px;
     color: white;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.85rem;
     outline: none;
   }
 
-  .modal-inner input:focus { border-color: rgba(59,130,246,0.4); }
+  .modal-inner input:focus { border-color: rgba(10,132,255,0.4); }
 
   .modal-btns { display: flex; gap: 10px; }
 
@@ -702,13 +713,13 @@
     padding: 10px;
     border: none;
     border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     cursor: pointer;
     font-size: 0.85rem;
   }
 
-  .btn-salvar { background: #3b82f6; color: white; }
+  .btn-salvar { background: #0A84FF; color: white; }
   .btn-cancelar { background: #1f2937; color: white; }
 
   /* Alertas de Margem / Lucro */
@@ -779,8 +790,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #0d1220;
-    border: 1px solid #1f2937;
+    background: #1C1C1E;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 10px;
     padding: 9px 12px;
   }
@@ -788,8 +799,8 @@
   .contato-avatar {
     width: 32px; height: 32px;
     border-radius: 50%;
-    background: rgba(59,130,246,0.15);
-    border: 1px solid rgba(59,130,246,0.25);
+    background: rgba(10,132,255,0.15);
+    border: 1px solid rgba(10,132,255,0.25);
     display: flex; align-items: center; justify-content: center;
     font-size: 14px;
     flex-shrink: 0;
@@ -797,7 +808,7 @@
 
   .contato-info { flex: 1; min-width: 0; }
   .contato-nome { font-size: 0.8rem; font-weight: 600; color: #e8eaf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .contato-cargo { font-size: 0.68rem; color: #6b7280; }
+  .contato-cargo { font-size: 0.68rem; color: #8E8E93; }
   .contato-fone  { font-size: 0.68rem; color: #4b5563; }
 
   .contato-del {
@@ -816,9 +827,9 @@
 
   .contatos-form input, .contatos-form select {
     width: 100%; padding: 9px 10px;
-    background: #131929; border: 1px solid #1f2937;
+    background: #1C1C1E; border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px; color: white;
-    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; font-size: 0.82rem; outline: none;
   }
 
   /* Modal de confirmação de mensagem WA */
@@ -843,8 +854,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #0d1220;
-    border: 1px solid #1f2937;
+    background: #1C1C1E;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 10px;
     padding: 9px 12px;
     margin-bottom: 4px;
@@ -852,7 +863,7 @@
 
   .wa-dest-info { flex: 1; }
   .wa-dest-nome { font-size: 0.82rem; font-weight: 600; }
-  .wa-dest-fone { font-size: 0.7rem; color: #6b7280; }
+  .wa-dest-fone { font-size: 0.7rem; color: #8E8E93; }
 
   .alerta-banner .alerta-txt { flex: 1; }
 
@@ -875,8 +886,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: var(--bg);
-    background-image: radial-gradient(ellipse at 20% 10%, rgba(59,130,246,0.12) 0%, transparent 55%),
-                      radial-gradient(ellipse at 80% 90%, rgba(16,185,129,0.08) 0%, transparent 50%);
+    background-image: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -906,7 +916,7 @@
 
   .login-card {
     background: rgba(13,18,32,0.97);
-    border: 1px solid rgba(59,130,246,0.2);
+    border: 1px solid rgba(10,132,255,0.2);
     border-radius: 24px;
     padding: 36px 28px 32px;
     width: 100%;
@@ -922,20 +932,20 @@
   .login-logo {
     width: 56px; height: 56px;
     border-radius: 16px;
-    background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.3);
+    background: rgba(10,132,255,0.12);
+    border: 1px solid rgba(10,132,255,0.3);
     display: flex; align-items: center; justify-content: center;
     font-size: 26px;
     margin-bottom: 18px;
   }
 
   .login-titulo {
-    font-family: 'Syne', sans-serif;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.03em;
     margin-bottom: 6px;
-    background: linear-gradient(135deg, #e8eaf0 30%, rgba(59,130,246,0.8));
+    color: #ffffff;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -958,7 +968,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
     color: #1a1a2e;
@@ -994,13 +1004,13 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     color: var(--text-2);
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
   }
-  .login-demo-btn:hover { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: var(--text); }
+  .login-demo-btn:hover { background: rgba(10,132,255,0.08); border-color: rgba(10,132,255,0.2); color: var(--text); }
 
   .login-footer {
     margin-top: 22px;
@@ -1022,14 +1032,14 @@
     width: 28px; height: 28px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid rgba(59,130,246,0.3);
+    border: 1px solid rgba(10,132,255,0.3);
   }
 
   .user-avatar-placeholder {
     width: 28px; height: 28px;
     border-radius: 50%;
-    background: rgba(59,130,246,0.15);
-    border: 1px solid rgba(59,130,246,0.3);
+    background: rgba(10,132,255,0.15);
+    border: 1px solid rgba(10,132,255,0.3);
     display: flex; align-items: center; justify-content: center;
     font-size: 12px;
     flex-shrink: 0;
@@ -1053,7 +1063,7 @@
     font-size: 0.6rem;
     color: #ef4444;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     transition: all 0.15s;
   }
@@ -1098,12 +1108,12 @@
     <p>Evite perder dinheiro desnecessário</p>
   </div>
   <div class="header-btns">
-    <button class="hbtn hbtn-blue"   onclick="document.getElementById('modalRegistro').style.display='flex'">📦 Produto</button>
-    <button class="hbtn hbtn-green"  onclick="abrirModalVenda()">🛒 Venda</button>
-    <button class="hbtn hbtn-purple" onclick="abrirModalContatos()">👥 Contatos</button>
-    <button class="hbtn hbtn-wa"     onclick="abrirSeletorContato()">📲 Mensagem</button>
+    <button class="hbtn hbtn-blue"   onclick="document.getElementById('modalRegistro').style.display='flex'">Produto</button>
+    <button class="hbtn hbtn-green"  onclick="abrirModalVenda()">Venda</button>
+    <button class="hbtn hbtn-purple" onclick="abrirModalContatos()">Contatos</button>
+    <button class="hbtn hbtn-wa"     onclick="abrirSeletorContato()">Mensagem</button>
     <button class="hbtn hbtn-yellow" onclick="document.getElementById('modalFinanceiro').style.display='flex'">💰 Finanças</button>
-    <button class="hbtn hbtn-teal"   onclick="gerarPlanilha()">📊 Planilha</button>
+    <button class="hbtn hbtn-teal"   onclick="gerarPlanilha()">Planilha</button>
     <button class="hbtn hbtn-cash"   onclick="abrirFluxo()">💵 Caixa</button>
   </div>
   <div class="user-badge" id="userBadge" style="display:none;">
@@ -1125,9 +1135,9 @@
 
 <div id="mensagens">
   <div class="welcome" id="welcome">
-    <span class="welcome-icon">🤖</span>
-    <h2>E aí! Sou seu assistente de estoque.</h2>
-    <p>Me conta o que tá acontecendo no negócio — posso analisar, alertar e propor ações pra você aprovar.</p>
+    
+    <h2>Assistente de Estoque</h2>
+    <p>Analise, controle e otimize seu estoque com inteligência artificial.</p>
     <div class="chips">
       <div class="chip" onclick="usarChip(this)">📉 Filtro de óleo tá acabando, só tenho 8 unidades</div>
       <div class="chip" onclick="usarChip(this)">📦 Sandália feminina parada há 2 meses sem vender nada</div>
@@ -1197,7 +1207,7 @@
 <!-- Modal Contatos -->
 <div id="modalContatos" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;">
   <div class="modal-inner contatos-inner">
-    <h3>👥 Contatos</h3>
+    <h3>Contatos</h3>
     <p style="font-size:0.72rem;color:#6b7280;margin:6px 0 12px;">Adicione supervisores, fornecedores e equipe para receber mensagens automáticas.</p>
     <div class="contato-lista" id="contatoLista"></div>
     <div class="contatos-form">
@@ -1271,7 +1281,7 @@
       <input type="text"   id="lancDesc"   placeholder="Descrição (ex: Venda de filtro, Aluguel...)">
       <input type="number" id="lancValor"  placeholder="Valor (R$)" step="0.01" min="0.01">
       <select id="lancCategoria">
-        <option value="Venda">🛒 Venda</option>
+        <option value="Venda">Venda</option>
         <option value="Fornecedor">🏭 Fornecedor</option>
         <option value="Aluguel">🏠 Aluguel</option>
         <option value="Energia">⚡ Energia</option>
@@ -1382,9 +1392,9 @@
     // Limpa mensagens do chat
     const feed = document.getElementById("mensagens");
     feed.innerHTML = `<div class="welcome" id="welcome">
-      <span class="welcome-icon">🤖</span>
-      <h2>E aí! Sou seu assistente de estoque.</h2>
-      <p>Me conta o que tá acontecendo no negócio — posso analisar, alertar e propor ações pra você aprovar.</p>
+      
+      <h2>Assistente de Estoque</h2>
+      <p>Analise, controle e otimize seu estoque com inteligência artificial.</p>
       <div class="chips">
         <div class="chip" onclick="usarChip(this)">📉 Filtro de óleo tá acabando, só tenho 8 unidades</div>
         <div class="chip" onclick="usarChip(this)">📦 Sandália feminina parada há 2 meses sem vender nada</div>
@@ -1607,7 +1617,7 @@ REGRAS:
     const url  = `https://wa.me/55${fone}?text=${encodeURIComponent(waTextoAtual)}`;
     window.open(url, "_blank");
     fecharModalMensagem();
-    adicionarMsg(`📲 Mensagem para ${waContatoAtual.nome} aberta no WhatsApp.`, "ai");
+    adicionarMsg(`Mensagem para ${waContatoAtual.nome} aberta no WhatsApp.`, "ai");
   }
 
   // Gera mensagem automática com base nos alertas e situação atual
@@ -1670,7 +1680,7 @@ A mensagem deve:
   // Painel de seleção de contato para envio
   function abrirSeletorContato() {
     if (dbContatos.length === 0) {
-      adicionarMsg("⚠️ Nenhum contato cadastrado. Clique em 👥 Contatos para adicionar.", "ai");
+      adicionarMsg("⚠️ Nenhum contato cadastrado. Clique em Contatos para adicionar.", "ai");
       return;
     }
     // Exibe mini-painel na conversa
@@ -1849,7 +1859,7 @@ ${SYSTEM_PROMPT}`;
     verificarAlertasAutomaticos();
     const diasRestantes = calcularDiasRestantes(item);
     const diasTxt = diasRestantes !== null ? ` Estoque estimado para ${diasRestantes} dia(s).` : "";
-    adicionarMsg(`🛒 Venda de ${qtd} un. de "${item.produto}" registrada. Estoque atual: ${item.quantidade} un.${diasTxt}`, "ai");
+    adicionarMsg(`Venda de ${qtd} un. de "${item.produto}" registrada. Estoque atual: ${item.quantidade} un.${diasTxt}`, "ai");
   }
 
   // ─── CÁLCULO DE CONSUMO E DIAS RESTANTES ──────────────────────────────────
@@ -1955,10 +1965,10 @@ ${SYSTEM_PROMPT}`;
       sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:0 4px;";
       sugestoes.forEach(s => {
         const sbtn = document.createElement("button");
-        sbtn.style.cssText = "background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:9px 13px;color:#93c5fd;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;transition:background 0.15s;";
+        sbtn.style.cssText = "background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:10px;padding:9px 13px;color:#64B5F6;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;transition:background 0.15s;";
         sbtn.textContent = s;
-        sbtn.onmouseenter = () => sbtn.style.background = "rgba(59,130,246,0.16)";
-        sbtn.onmouseleave = () => sbtn.style.background = "rgba(59,130,246,0.08)";
+        sbtn.onmouseenter = () => sbtn.style.background = "rgba(10,132,255,0.16)";
+        sbtn.onmouseleave = () => sbtn.style.background = "rgba(10,132,255,0.08)";
         sbtn.onclick = () => {
           input.value = s;
           sugsWrap.remove();
@@ -2522,7 +2532,7 @@ ${SYSTEM_PROMPT}`;
     XLSX.writeFile(wb, nomeArq);
 
     adicionarMsg(
-      `📊 Planilha "${nomeArq}" gerada com ${dbEstoque.length} produto(s) e ${criticos.length} alerta(s)! Verifique seus downloads.`,
+      `Planilha "${nomeArq}" gerada com ${dbEstoque.length} produto(s) e ${criticos.length} alerta(s)! Verifique seus downloads.`,
       "ai",
       ["Ver alertas críticos", "Analisar margem de lucro", "Como melhorar meu estoque?"]
     );
