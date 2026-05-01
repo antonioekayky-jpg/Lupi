@@ -882,17 +882,15 @@
   }
 
   /* ── TELA DE LOGIN ── */
+  /* ── LOGIN SCREEN ── */
   #loginScreen {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--bg);
-    background-image: none;
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    flex-direction: column;
-    padding: 24px;
     animation: fadeIn 0.4s ease;
   }
 
@@ -901,66 +899,115 @@
     to   { opacity: 1; }
   }
 
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
   #loginScreen.hide {
     animation: loginHide 0.45s ease forwards;
+    pointer-events: none;
   }
   @keyframes loginHide {
     from { opacity: 1; transform: scale(1); }
-    to   { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    to   { opacity: 0; transform: scale(1.03); }
   }
 
-  .login-card {
-    background: rgba(13,18,32,0.97);
-    border: 1px solid rgba(10,132,255,0.2);
+  /* Container split screen */
+  .login-container {
+    background: #1C1C1E;
     border-radius: 24px;
-    padding: 36px 28px 32px;
-    width: 100%;
-    max-width: 360px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+    position: relative;
+    overflow: hidden;
+    width: 720px;
+    max-width: calc(100vw - 32px);
+    min-height: 440px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* Form panels */
+  .lp-form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lp-sign-in {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+  }
+
+  .login-container.active .lp-sign-in {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .lp-sign-up {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .login-container.active .lp-sign-up {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: lpMove 0.6s;
+  }
+
+  @keyframes lpMove {
+    0%, 49.99% { opacity: 0; z-index: 1; }
+    50%, 100%  { opacity: 1; z-index: 5; }
+  }
+
+  /* Inner form */
+  .lp-form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 40px 36px;
+    width: 100%;
     text-align: center;
-    animation: slideUp 0.5s ease 0.1s both;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
   }
 
-  .login-logo {
-    width: 56px; height: 56px;
-    border-radius: 16px;
-    background: rgba(10,132,255,0.12);
-    border: 1px solid rgba(10,132,255,0.3);
+  .lp-logo {
+    width: 48px; height: 48px;
+    border-radius: 13px;
+    background: #0A84FF;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .lp-logo::after {
+    content: '';
+    width: 22px; height: 22px;
+    background: white;
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+    display: block;
   }
 
-  .login-titulo {
+  .lp-titulo {
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: 1.4rem;
+    font-weight: 700;
     letter-spacing: -0.03em;
-    margin-bottom: 6px;
-    color: #ffffff;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #F5F5F7;
+    margin-bottom: 4px;
   }
 
-  .login-sub {
-    font-size: 0.8rem;
-    color: var(--text-2);
+  .lp-sub {
+    font-size: 0.75rem;
+    color: #8E8E93;
     line-height: 1.6;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    max-width: 240px;
   }
 
   .login-google-btn {
     width: 100%;
-    padding: 13px 18px;
+    padding: 12px 18px;
     background: #fff;
     border: none;
     border-radius: 12px;
@@ -969,55 +1016,157 @@
     justify-content: center;
     gap: 10px;
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: #1a1a2e;
+    color: #1a1a1a;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   }
+  .login-google-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+  .login-google-btn:active { transform: scale(0.98); }
+  .login-google-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-  .login-google-btn:hover { background: #f5f5f5; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(0,0,0,0.25); }
-  .login-google-btn:active { transform: translateY(0); }
-
-  .login-google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-
-  .login-divider {
+  .lp-divider {
     width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 18px 0;
+    margin: 16px 0;
   }
-  .login-divider::before, .login-divider::after {
+  .lp-divider::before, .lp-divider::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: rgba(255,255,255,0.08);
   }
-  .login-divider span { font-size: 0.72rem; color: var(--text-2); white-space: nowrap; }
+  .lp-divider span { font-size: 0.68rem; color: #48484A; white-space: nowrap; }
 
   .login-demo-btn {
     width: 100%;
-    padding: 12px 18px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    padding: 11px 18px;
+    background: #2C2C2E;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
-    color: var(--text-2);
+    color: #8E8E93;
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.83rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
   }
-  .login-demo-btn:hover { background: rgba(10,132,255,0.08); border-color: rgba(10,132,255,0.2); color: var(--text); }
+  .login-demo-btn:hover { background: #3A3A3C; color: #F5F5F7; }
 
-  .login-footer {
-    margin-top: 22px;
-    font-size: 0.68rem;
-    color: var(--text-3);
+  .lp-footer {
+    margin-top: 18px;
+    font-size: 0.63rem;
+    color: #48484A;
     line-height: 1.6;
+    max-width: 240px;
   }
+
+  /* Toggle / right panel */
+  .lp-toggle-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 0 24px 24px 0;
+    z-index: 1000;
+  }
+
+  .login-container.active .lp-toggle-container {
+    transform: translateX(-100%);
+    border-radius: 24px 0 0 24px;
+  }
+
+  .lp-toggle {
+    background: linear-gradient(145deg, #0A84FF 0%, #0060C7 100%);
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+  }
+
+  .login-container.active .lp-toggle {
+    transform: translateX(50%);
+  }
+
+  .lp-toggle-panel {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 40px 32px;
+    text-align: center;
+  }
+
+  .lp-toggle-panel h2 {
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .lp-toggle-panel p {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .lp-toggle-btn {
+    padding: 10px 30px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 100px;
+    background: transparent;
+    color: #fff;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lp-toggle-btn:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+
+  .lp-toggle-left {
+    transform: translateX(-200%);
+    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .login-container.active .lp-toggle-left { transform: translateX(0); }
+
+  .lp-toggle-right {
+    transform: translateX(0);
+    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .login-container.active .lp-toggle-right { transform: translateX(200%); }
+
+  /* Mobile: stack vertically */
+  @media (max-width: 560px) {
+    .login-container {
+      min-height: unset;
+      border-radius: 20px;
+    }
+    .lp-form-container { position: relative; width: 100%; }
+    .lp-sign-in, .lp-sign-up { position: relative; left: 0; width: 100%; opacity: 1; }
+    .lp-sign-up { display: none; }
+    .lp-toggle-container { display: none; }
+    .login-container.active .lp-sign-in { transform: none; opacity: 1; }
+  }
+
+  .login-footer { display: none; }
 
   /* ── USER BADGE NO HEADER ── */
   .user-badge {
@@ -1074,30 +1223,73 @@
 
 <!-- ── TELA DE LOGIN ── -->
 <div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">📦</div>
-    <div class="login-titulo">LupiAI</div>
-    <div class="login-sub">Entre com sua conta Google para salvar seu estoque, contatos e histórico financeiro de forma segura.</div>
+  <div class="login-container" id="loginContainer">
 
-    <button class="login-google-btn" onclick="iniciarLoginGoogle()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Entrar com Google
-    </button>
+    <!-- Painel: Entrar -->
+    <div class="lp-form-container lp-sign-in">
+      <div class="lp-form">
+        <div class="lp-logo"></div>
+        <div class="lp-titulo">LupiAI</div>
+        <div class="lp-sub">Entre com sua conta Google e acesse seu estoque em qualquer dispositivo.</div>
 
-    <div class="login-divider"><span>ou</span></div>
+        <button class="login-google-btn" onclick="iniciarLoginGoogle()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Entrar com Google
+        </button>
 
-    <button class="login-demo-btn" onclick="loginDemo()">
-      👀 Usar em modo demonstração
-    </button>
+        <div class="lp-divider"><span>ou</span></div>
 
-    <div class="login-footer">
-      🔒 Seus dados ficam salvos localmente no dispositivo, separados por conta Google. Nenhuma informação é enviada para servidores externos.
+        <button class="login-demo-btn" onclick="loginDemo()">Usar em modo demonstração</button>
+
+        <div class="lp-footer">Seus dados ficam protegidos e sincronizados com sua conta Google.</div>
+      </div>
     </div>
+
+    <!-- Painel: Demo info (lado esquerdo quando ativo) -->
+    <div class="lp-form-container lp-sign-up">
+      <div class="lp-form">
+        <div class="lp-logo"></div>
+        <div class="lp-titulo">Modo Demo</div>
+        <div class="lp-sub">Explore todas as funcionalidades com dados de exemplo, sem precisar de uma conta.</div>
+        <button class="login-demo-btn" onclick="loginDemo()">Entrar no modo demonstração</button>
+        <div class="lp-divider"><span>ou</span></div>
+        <button class="login-google-btn" onclick="iniciarLoginGoogle()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Usar conta Google
+        </button>
+        <div class="lp-footer">Os dados do modo demo não são salvos permanentemente.</div>
+      </div>
+    </div>
+
+    <!-- Painel deslizante azul -->
+    <div class="lp-toggle-container">
+      <div class="lp-toggle">
+
+        <div class="lp-toggle-panel lp-toggle-left">
+          <h2>Bem-vindo de volta</h2>
+          <p>Entre com sua conta Google para acessar seu estoque de qualquer lugar.</p>
+          <button class="lp-toggle-btn" id="lpLoginBtn">Fazer login</button>
+        </div>
+
+        <div class="lp-toggle-panel lp-toggle-right">
+          <h2>Explorar sem conta</h2>
+          <p>Teste todas as funcionalidades do LupiAI antes de criar sua conta.</p>
+          <button class="lp-toggle-btn" id="lpDemoBtn">Ver modo demo</button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1523,6 +1715,14 @@ REGRAS:
   let pendentes = 0;
   let ultimoPendente = null;
   let ultimoContextoUsuario = ""; // Guarda o que o usuário pediu para usar na mensagem WhatsApp
+
+
+  // ── LOGIN TOGGLE ANIMATION ──
+  const loginContainer = document.getElementById('loginContainer');
+  const lpDemoBtn = document.getElementById('lpDemoBtn');
+  const lpLoginBtn = document.getElementById('lpLoginBtn');
+  if (lpDemoBtn) lpDemoBtn.addEventListener('click', () => loginContainer.classList.add('active'));
+  if (lpLoginBtn) lpLoginBtn.addEventListener('click', () => loginContainer.classList.remove('active'));
 
   // ─── BANCO DE DADOS LOCAL ─────────────────────────────────────────────────
   // Os dados são inicializados vazios — serão carregados em entrarNoApp() com a chave do usuário
