@@ -1698,11 +1698,13 @@ SCHEMA OBRIGATÓRIO:
   }
 }
 
-REGRAS:
-- "sugestoes": array com 2-3 perguntas ou ações que o usuário pode fazer a seguir. Sempre inclua, são botões clicáveis no chat.
+REGRAS CRÍTICAS:
+- "resposta": SEMPRE dê uma resposta completa e concreta. NUNCA termine só com uma pergunta. Se o usuário pediu algo, entregue a resposta — não fique pedindo mais informações em loop.
+- "sugestoes": array com 2-3 AÇÕES CONCRETAS que avançam a conversa. NUNCA coloque perguntas genéricas como "Definir público-alvo" ou "Analisar concorrência". Coloque ações específicas baseadas no contexto atual do estoque do usuário, como "Ver produtos com estoque crítico", "Registrar venda de [produto]", "Calcular lucro do mês".
 - "acao": inclua só quando houver algo concreto a fazer. Para WhatsApp, use tipo "mensagem". Se não precisar, coloque null.
-- NUNCA coloque texto fora do JSON. NUNCA repita o JSON depois de escrever a resposta. NUNCA use markdown fora do JSON.
-- A "resposta" deve ser amigável, como um sócio que entende do negócio. Use os dados do estoque ativamente.`;
+- NUNCA coloque texto fora do JSON. NUNCA repita o JSON. NUNCA use markdown fora do JSON.
+- Se não tiver dados suficientes, trabalhe com o que tem e peça no máximo UMA informação específica — nunca várias de uma vez.
+- NUNCA entre em loop de perguntas. Máximo de 1 pergunta por resposta, e só se for absolutamente necessário.`;
 
 
   // ─── ELEMENTOS ────────────────────────────────────────────────────────────
