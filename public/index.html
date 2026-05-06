@@ -900,12 +900,12 @@
   }
 
   #loginScreen.hide {
-    animation: loginHide 0.45s ease forwards;
+    animation: slideOutLogin 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
     pointer-events: none;
   }
-  @keyframes loginHide {
-    from { opacity: 1; transform: scale(1); }
-    to   { opacity: 0; transform: scale(1.03); }
+  @keyframes slideOutLogin {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(-100vw); opacity: 1; }
   }
 
   /* Container split screen */
