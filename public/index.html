@@ -58,16 +58,17 @@
   }
 
   header {
-    padding: 10px 14px;
+    padding: 8px 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     border-bottom: 1px solid var(--border);
     background: rgba(28,28,30,0.92);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
     position: relative;
     z-index: 10;
+    min-width: 0;
   }
 
   .header-info { flex-shrink: 0; }
@@ -900,12 +901,12 @@
   }
 
   #loginScreen.hide {
-    animation: loginHide 0.45s ease forwards;
+    animation: slideOutLogin 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
     pointer-events: none;
   }
-  @keyframes loginHide {
-    from { opacity: 1; transform: scale(1); }
-    to   { opacity: 0; transform: scale(1.03); }
+  @keyframes slideOutLogin {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(-100vw); opacity: 1; }
   }
 
   /* Container split screen */
@@ -1172,49 +1173,57 @@
   .user-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-left: auto;
+    gap: 4px;
     flex-shrink: 0;
+    margin-left: 4px;
   }
 
   .user-avatar {
-    width: 28px; height: 28px;
+    width: 26px; height: 26px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid rgba(10,132,255,0.3);
+    flex-shrink: 0;
   }
 
   .user-avatar-placeholder {
-    width: 28px; height: 28px;
+    width: 26px; height: 26px;
     border-radius: 50%;
     background: rgba(10,132,255,0.15);
     border: 1px solid rgba(10,132,255,0.3);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
     flex-shrink: 0;
   }
 
   .user-name-short {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 600;
     color: var(--text-2);
-    max-width: 70px;
+    max-width: 52px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* Esconde nome em telas pequenas para sobrar espaço nos botões */
+  @media (max-width: 420px) {
+    .user-name-short { display: none; }
   }
 
   .btn-logout {
     background: none;
     border: 1px solid rgba(239,68,68,0.2);
     border-radius: 6px;
-    padding: 3px 7px;
-    font-size: 0.6rem;
+    padding: 3px 6px;
+    font-size: 0.58rem;
     color: #ef4444;
     cursor: pointer;
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     transition: all 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .btn-logout:hover { background: rgba(239,68,68,0.1); }
 </style>
@@ -1620,7 +1629,29 @@
   }
 
   async function entrarNoApp() {
-    // Recarrega dados do usuário logado do Firebase
+    // 1. Dispara slide IMEDIATAMENTE
+    const loginScreen = document.getElementById("loginScreen");
+    loginScreen.classList.add("hide");
+    setTimeout(() => { loginScreen.style.display = "none"; }, 650);
+
+    // 2. Badge do usuário já aparece
+    const badge   = document.getElementById("userBadge");
+    const avatarI = document.getElementById("userAvatarImg");
+    const avatarP = document.getElementById("userAvatarPlaceholder");
+    const nome    = document.getElementById("userNameShort");
+    if (usuarioAtual.foto) {
+      avatarI.src = usuarioAtual.foto;
+      avatarI.style.display = "block";
+      avatarP.style.display = "none";
+    } else {
+      avatarI.style.display = "none";
+      avatarP.style.display = "flex";
+      avatarP.textContent = usuarioAtual.nome.charAt(0).toUpperCase();
+    }
+    nome.textContent = usuarioAtual.nome.split(" ")[0];
+    badge.style.display = "flex";
+
+    // 3. Carrega Firebase em paralelo (não bloqueia animação)
     const [estoque, contatos, fluxo] = await Promise.all([
       fbCarregar("estoque_db"),
       fbCarregar("contatos_db"),
@@ -1638,31 +1669,8 @@
     if (lucrosFb   !== null) localStorage.setItem(getStorageKey("lucros_mensais"), lucrosFb);
     if (lucrosAntFb !== null) localStorage.setItem(getStorageKey("lucros_mes_anterior"), lucrosAntFb);
 
-    // Atualiza badge no header
-    const badge   = document.getElementById("userBadge");
-    const avatarI = document.getElementById("userAvatarImg");
-    const avatarP = document.getElementById("userAvatarPlaceholder");
-    const nome    = document.getElementById("userNameShort");
-
-    if (usuarioAtual.foto) {
-      avatarI.src = usuarioAtual.foto;
-      avatarI.style.display = "block";
-      avatarP.style.display = "none";
-    } else {
-      avatarI.style.display = "none";
-      avatarP.style.display = "flex";
-      avatarP.textContent = usuarioAtual.nome.charAt(0).toUpperCase();
-    }
-    nome.textContent = usuarioAtual.nome.split(" ")[0];
-    badge.style.display = "flex";
-
-    // Esconde tela de login com animação
-    const loginScreen = document.getElementById("loginScreen");
-    loginScreen.classList.add("hide");
-    setTimeout(() => { loginScreen.style.display = "none"; }, 450);
-
-    // Atualiza alertas de estoque
-    setTimeout(() => atualizarAlertas(), 600);
+    // 4. Alertas após carregar
+    setTimeout(() => verificarAlertasAutomaticos(), 200);
   }
 
   // Inicializa: verifica se já tem sessão salva
