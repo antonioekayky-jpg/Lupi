@@ -58,10 +58,10 @@
   }
 
   header {
-    padding: 10px 14px;
+    padding: 10px 14px 0;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 0;
     border-bottom: 1px solid var(--border);
     background: rgba(28,28,30,0.92);
     backdrop-filter: blur(10px);
@@ -70,16 +70,24 @@
     z-index: 10;
   }
 
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding-bottom: 8px;
+  }
+
   .header-info { flex-shrink: 0; }
 
   .header-btns {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    flex: 1;
+    width: 100%;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: 2px;
+    padding: 0 0 10px 0;
   }
   .header-btns::-webkit-scrollbar { display: none; }
 
@@ -1294,10 +1302,20 @@
 </div>
 
 <header>
-  <div class="logo">📦</div>
-  <div class="header-info">
-    <h1>LupiAI</h1>
-    <p>Evite perder dinheiro desnecessário</p>
+  <div class="header-top">
+    <div class="logo">📦</div>
+    <div class="header-info">
+      <h1>LupiAI</h1>
+      <p>Evite perder dinheiro desnecessário</p>
+    </div>
+    <div style="margin-left:auto;">
+      <div class="user-badge" id="userBadge" style="display:none;">
+        <div class="user-avatar-placeholder" id="userAvatarPlaceholder">👤</div>
+        <img class="user-avatar" id="userAvatarImg" style="display:none;" src="" alt="">
+        <span class="user-name-short" id="userNameShort"></span>
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </div>
+    </div>
   </div>
   <div class="header-btns">
     <button class="hbtn hbtn-blue"   onclick="document.getElementById('modalRegistro').style.display='flex'">Produto</button>
@@ -1307,12 +1325,6 @@
     <button class="hbtn hbtn-yellow" onclick="document.getElementById('modalFinanceiro').style.display='flex'">💰 Finanças</button>
     <button class="hbtn hbtn-teal"   onclick="gerarPlanilha()">Planilha</button>
     <button class="hbtn hbtn-cash"   onclick="abrirFluxo()">💵 Caixa</button>
-  </div>
-  <div class="user-badge" id="userBadge" style="display:none;">
-    <div class="user-avatar-placeholder" id="userAvatarPlaceholder">👤</div>
-    <img class="user-avatar" id="userAvatarImg" style="display:none;" src="" alt="">
-    <span class="user-name-short" id="userNameShort"></span>
-    <button class="btn-logout" onclick="logout()">Sair</button>
   </div>
 </header>
 
