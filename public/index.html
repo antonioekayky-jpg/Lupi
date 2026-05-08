@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LupiAI — Gestão Inteligente de Estoque</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBg9qEWHAqDOD8GwfywA5syIG8dRPYye3g",
+      authDomain: "lupi-ai-2846f.firebaseapp.com",
+      projectId: "lupi-ai-2846f",
+      storageBucket: "lupi-ai-2846f.firebasestorage.app",
+      messagingSenderId: "376572426861",
+      appId: "1:376572426861:web:03e75339bac14d9c7f9d64"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    window._firestoreDb = db;
+    window._firestoreLib = { doc, getDoc, setDoc, collection, getDocs, deleteDoc };
+    window._firebaseAuth = auth;
+    window._GoogleAuthProvider = GoogleAuthProvider;
+    window._signInWithCredential = signInWithCredential;
+    window.dispatchEvent(new Event("firebaseReady"));
+  </script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #080c14;
+    --surface:   #0e1420;
+    --surface2:  #141b2d;
+    --surface3:  #1a2235;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.12);
+    --accent:    #3b82f6;
+    --accent2:   #60a5fa;
+    --accent-dim: rgba(59,130,246,0.12);
+    --accent-glow: rgba(59,130,246,0.25);
+    --green:     #10b981;
+    --green-dim: rgba(16,185,129,0.12);
+    --red:       #ef4444;
+    --red-dim:   rgba(239,68,68,0.12);
+    --yellow:    #f59e0b;
+    --yellow-dim:rgba(245,158,11,0.12);
+    --purple:    #8b5cf6;
+    --purple-dim:rgba(139,92,246,0.12);
+    --teal:      #06b6d4;
+    --teal-dim:  rgba(6,182,212,0.12);
+    --wa:        #25d366;
+    --wa-dim:    rgba(37,211,102,0.12);
+    --text:      #e2e8f0;
+    --text-2:    #64748b;
+    --text-3:    #334155;
+    --font:      'Plus Jakarta Sans', sans-serif;
+    --mono:      'JetBrains Mono', monospace;
+    --radius:    14px;
+    --radius-sm: 8px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html { overflow:hidden; height:100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── GRID BACKGROUND ─────────────────────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -100px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LOGIN ───────────────────────────────────────────────────────────── */
+  #loginScreen {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    z-index: 9000;
+    padding: 20px;
+    transition: opacity 0.4s ease;
+  }
+  #loginScreen.hide { opacity: 0; pointer-events: none; }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 100%; max-width: 400px;
+    text-align: center;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .login-logo {
+    width: 64px; height: 64px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 20px;
+  }
+  .login-titulo {
+    font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .login-sub {
+    font-size: 0.82rem; color: var(--text-2); line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .login-google-btn {
+    width: 100%; padding: 13px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text); font-family: var(--font);
+    font-size: 0.88rem; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s;
+  }
+  .login-google-btn:hover { background: var(--surface3); border-color: var(--accent); }
+  .login-google-btn svg { width: 18px; height: 18px; }
+  .login-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0; color: var(--text-3); font-size: 0.75rem;
+  }
+  .login-divider::before, .login-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .login-demo-btn {
+    width: 100%; padding: 12px;
+    background: transparent;
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    color: var(--text-2); font-family: var(--font);
+    font-size: 0.85rem; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .login-demo-btn:hover { color: var(--text); border-color: var(--accent); }
+  .login-footer {
+    margin-top: 20px; font-size: 0.72rem; color: var(--text-3); line-height: 1.5;
+  }
+
+  /* ── TOPBAR ──────────────────────────────────────────────────────────── */
+  header {
+    position: relative; z-index: 100;
+    padding: 0 12px;
+    height: 54px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(8,12,20,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    width: 34px; height: 34px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+
+  .brand {
+    font-size: 0.95rem; font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #fff; flex-shrink: 0;
+    display: none;
+  }
+
+  /* Nav pills */
+  .nav-pills {
+    display: flex; gap: 4px;
+    flex: 1; overflow-x: auto; min-width: 0;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .nav-pills::-webkit-scrollbar { display: none; }
+
+  .npill {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-2);
+    font-family: var(--font);
+    font-size: 0.72rem; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .npill:hover { background: var(--surface2); color: var(--text); }
+  .npill .pill-icon { font-size: 14px; }
+
+  .npill-primary {
+    background: var(--accent-dim);
+    border-color: rgba(59,130,246,0.35);
+    color: var(--accent2);
+  }
+  .npill-primary:hover { background: rgba(59,130,246,0.2); }
+
+  .npill-green  { background: var(--green-dim);  border-color: rgba(16,185,129,0.3);  color: var(--green); }
+  .npill-green:hover  { background: rgba(16,185,129,0.2); }
+  .npill-purple { background: var(--purple-dim); border-color: rgba(139,92,246,0.3);  color: var(--purple); }
+  .npill-purple:hover { background: rgba(139,92,246,0.2); }
+  .npill-wa     { background: var(--wa-dim);     border-color: rgba(37,211,102,0.3);  color: var(--wa); }
+  .npill-wa:hover     { background: rgba(37,211,102,0.2); }
+  .npill-yellow { background: var(--yellow-dim); border-color: rgba(245,158,11,0.3);  color: var(--yellow); }
+  .npill-yellow:hover { background: rgba(245,158,11,0.2); }
+  .npill-teal   { background: var(--teal-dim);   border-color: rgba(6,182,212,0.3);   color: var(--teal); }
+  .npill-teal:hover   { background: rgba(6,182,212,0.2); }
+  .npill-cash   { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.25); color: #34d399; }
+  .npill-cash:hover   { background: rgba(16,185,129,0.18); }
+
+  /* user badge */
+  .user-badge {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  .user-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    object-fit: cover; border: 1px solid rgba(59,130,246,0.4);
+  }
+  .user-avatar-placeholder {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-dim);
+    border: 1px solid rgba(59,130,246,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--accent2);
+  }
+  .user-name-short {
+    font-size: 0.75rem; font-weight: 600; color: var(--text-2);
+    max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .btn-logout {
+    padding: 4px 10px;
+    background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 6px;
+    color: var(--red); font-family: var(--font);
+    font-size: 0.68rem; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── DASHBOARD STATS BAR ─────────────────────────────────────────────── */
+  #statsBar {
+    display: none;
+    flex-shrink: 0;
+    padding: 8px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: relative; z-index: 50;
+  }
+  #statsBar::-webkit-scrollbar { display: none; }
+  #statsBar.visible { display: flex; }
+
+  .stat-chip {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 7px 12px;
+    min-width: 130px;
+  }
+  .stat-chip-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .stat-chip-icon.blue   { background: var(--accent-dim); }
+  .stat-chip-icon.green  { background: var(--green-dim); }
+  .stat-chip-icon.red    { background: var(--red-dim); }
+  .stat-chip-icon.yellow { background: var(--yellow-dim); }
+  .stat-chip-body { min-width: 0; }
+  .stat-chip-label { font-size: 0.62rem; color: var(--text-2); font-weight: 500; white-space: nowrap; }
+  .stat-chip-value { font-size: 0.82rem; font-weight: 700; color: var(--text); white-space: nowrap; font-family: var(--mono); }
+  .stat-chip-value.red    { color: var(--red); }
+  .stat-chip-value.green  { color: var(--green); }
+  .stat-chip-value.yellow { color: var(--yellow); }
+
+  /* ── PENDING BAR ─────────────────────────────────────────────────────── */
+  #pendentes-bar {
+    display: none; flex-shrink: 0;
+    background: rgba(245,158,11,0.08);
+    border-bottom: 1px solid rgba(245,158,11,0.2);
+    padding: 7px 14px;
+    position: relative; z-index: 50;
+  }
+  #pendentes-bar.visible { display: block; }
+  .pendentes-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.76rem; color: var(--yellow); font-weight: 500;
+  }
+  .ver-btn {
+    background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.35);
+    border-radius: 6px; padding: 3px 10px;
+    color: var(--yellow); font-family: var(--font);
+    font-size: 0.7rem; font-weight: 700; cursor: pointer;
+  }
+
+  /* ── ALERTAS ─────────────────────────────────────────────────────────── */
+  #alertas-container { flex-shrink: 0; position: relative; z-index: 50; }
+
+  .alerta-banner {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem; line-height: 1.5;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  .alerta-banner.critico  { background: rgba(239,68,68,0.07);   border-left: 3px solid var(--red); }
+  .alerta-banner.atencao  { background: rgba(245,158,11,0.07);  border-left: 3px solid var(--yellow); }
+  .alerta-banner.inativo  { background: rgba(100,116,139,0.07); border-left: 3px solid #475569; }
+  .alerta-banner.parado   { background: rgba(139,92,246,0.07);  border-left: 3px solid var(--purple); }
+  .alerta-fechar {
+    margin-left: auto; background: none; border: none;
+    color: var(--text-3); font-size: 1rem; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── CHAT AREA ───────────────────────────────────────────────────────── */
+  #mensagens {
+    flex: 1; overflow-y: auto;
+    padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; z-index: 10;
+  }
+  #mensagens::-webkit-scrollbar { width: 3px; }
+  #mensagens::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── WELCOME ─────────────────────────────────────────────────────────── */
+  .welcome {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; gap: 10px;
+    padding: 28px 16px 16px;
+    animation: fadeUp 0.5s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .welcome-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .welcome h2 {
+    font-size: 1.15rem; font-weight: 800;
+    letter-spacing: -0.03em; color: #fff;
+  }
+  .welcome p {
+    font-size: 0.82rem; color: var(--text-2); line-height: 1.6; max-width: 320px;
+  }
+  .chips { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 380px; margin-top: 4px; }
+  .chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.8rem; color: var(--text-2);
+    cursor: pointer; text-align: left;
+    transition: all 0.15s;
+  }
+  .chip:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
+
+  /* ── MESSAGES ────────────────────────────────────────────────────────── */
+  .msg-row { display: flex; gap: 8px; }
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; align-self: flex-end;
+  }
+  .msg-avatar.ai { background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.25); }
+  .msg-avatar.user-av { background: var(--surface2); border: 1px solid var(--border); }
+
+  .msg-bubble {
+    max-width: 82%; padding: 10px 13px;
+    border-radius: 14px; font-size: 0.83rem; line-height: 1.6;
+  }
+  .msg-bubble.ai {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-bottom-left-radius: 4px; color: var(--text);
+  }
+  .msg-bubble.user {
+    background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.3);
+    border-bottom-right-radius: 4px; color: var(--text);
+  }
+
+  .sugestoes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .sugestao-btn {
+    background: var(--surface3); border: 1px solid var(--border2);
+    border-radius: 20px; padding: 5px 12px;
+    color: var(--accent2); font-family: var(--font);
+    font-size: 0.74rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sugestao-btn:hover { background: var(--accent-dim); }
+
+  /* typing */
+  .typing-bubble {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; border-bottom-left-radius: 4px;
+    padding: 10px 14px; display: flex; gap: 5px; align-items: center;
+  }
+  .typing-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--text-2);
+    animation: blink 1.4s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100% { opacity:0.3; transform:scale(0.85); } 40% { opacity:1; transform:scale(1); } }
+
+  /* ── ACTION CARDS ────────────────────────────────────────────────────── */
+  .action-card {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 14px; font-size: 0.82rem;
+    animation: fadeUp 0.3s ease;
+    border-left: 3px solid var(--accent);
+  }
+  .action-card-header { font-weight: 700; color: #fff; margin-bottom: 6px; font-size: 0.85rem; }
+  .action-card-body { color: var(--text-2); line-height: 1.6; margin-bottom: 10px; }
+  .action-card-footer { display: flex; gap: 8px; }
+  .btn-aprovar, .btn-rejeitar {
+    flex: 1; padding: 9px; border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    border: none; transition: all 0.15s;
+  }
+  .btn-aprovar { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .btn-aprovar:hover { background: rgba(16,185,129,0.25); }
+  .btn-rejeitar { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .btn-rejeitar:hover { background: rgba(239,68,68,0.2); }
+
+  /* ── INPUT AREA ──────────────────────────────────────────────────────── */
+  .input-area {
+    flex-shrink: 0;
+    padding: 10px 12px 12px;
+    background: rgba(8,12,20,0.95);
+    border-top: 1px solid var(--border);
+    position: relative; z-index: 20;
+  }
+  .input-row {
+    display: flex; align-items: flex-end; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 8px 8px 14px;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within { border-color: rgba(59,130,246,0.5); }
+
+  textarea#inputMsg {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: var(--font);
+    font-size: 0.88rem; resize: none;
+    max-height: 100px; line-height: 1.5;
+  }
+  textarea#inputMsg::placeholder { color: var(--text-3); }
+
+  #btnEnviar {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: var(--accent); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s;
+  }
+  #btnEnviar:hover { background: #2563eb; transform: scale(1.05); }
+  #btnEnviar:disabled { background: var(--surface3); cursor: not-allowed; transform: none; }
+  #btnEnviar svg { width: 16px; height: 16px; color: #fff; }
+
+  .hint { font-size: 0.64rem; color: var(--text-3); text-align: center; margin-top: 6px; }
+
+  /* ── MODALS ──────────────────────────────────────────────────────────── */
+  /* Guarantee modals always render on top on mobile */
+  #modalRegistro, #modalFinanceiro, #modalVenda,
+  #modalContatos, #modalMensagem, #modalFluxo {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100% !important; height: 100% !important;
+    z-index: 9999 !important;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .modal-inner {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 24px 20px;
+    width: calc(100% - 32px); max-width: 420px;
+    max-height: 88vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-inner::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    border-radius: 20px 20px 0 0;
+  }
+  .modal-inner h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
+
+  .modal-inner input, .modal-inner select {
+    width: 100%; padding: 11px 13px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-family: var(--font); font-size: 0.84rem;
+    outline: none; margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .modal-inner input:focus, .modal-inner select:focus { border-color: rgba(59,130,246,0.5); }
+  .modal-inner input::placeholder { color: var(--text-3); }
+  .modal-inner select option { background: var(--surface2); }
+
+  .modal-btns { display: flex; gap: 8px; margin-top: 4px; }
+
+  .btn-salvar {
+    flex: 1; padding: 11px;
+    background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.35);
+    border-radius: var(--radius-sm);
+    color: var(--accent2); font-family: var(--font);
+    font-size: 0.84rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-salvar:hover { background: rgba(59,130,246,0.2); }
+
+  .btn-cancelar {
+    flex: 1; padding: 11px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-2); font-family: var(--font);
+    font-size: 0.84rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-cancelar:hover { background: var(--surface3); }
+
+  /* Contatos */
+  .contatos-inner { max-width: 460px; }
+  .contato-lista { margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+  .contato-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 11px;
+  }
+  .contato-avatar {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: var(--purple-dim); border: 1px solid rgba(139,92,246,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+  }
+  .contato-info { flex: 1; min-width: 0; }
+  .contato-nome { font-size: 0.8rem; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .contato-cargo { font-size: 0.7rem; color: var(--text-2); }
+  .contato-fone { font-size: 0.7rem; color: var(--text-3); font-family: var(--mono); }
+  .contato-remove {
+    background: var(--red-dim); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 6px; padding: 5px 8px;
+    color: var(--red); font-size: 0.7rem; cursor: pointer;
+  }
+  .contatos-form { border-top: 1px solid var(--border); padding-top: 14px; }
+
+  /* WhatsApp modal */
+  .msg-inner { max-width: 440px; }
+  .wa-destinatario {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 10px;
+  }
+  .wa-dest-nome { font-size: 0.84rem; font-weight: 600; color: #fff; }
+  .wa-dest-fone { font-size: 0.74rem; color: var(--text-2); font-family: var(--mono); }
+  .wa-preview {
+    background: rgba(37,211,102,0.05); border: 1px solid rgba(37,211,102,0.2);
+    border-radius: var(--radius-sm); padding: 12px;
+    font-size: 0.8rem; color: var(--text-2); line-height: 1.6;
+    max-height: 160px; overflow-y: auto; margin-bottom: 8px; white-space: pre-wrap;
+  }
+
+  /* Seletor de contato */
+  #seletorContato {
+    position: fixed; inset: 0; z-index: 9998;
+    background: rgba(0,0,0,0.85);
+    display: none; align-items: flex-end; justify-content: center;
+    -webkit-transform: translateZ(0); transform: translateZ(0);
+  }
+  .seletor-sheet {
+    background: var(--surface);
+    border-radius: 22px 22px 0 0;
+    border: 1px solid var(--border2); border-bottom: none;
+    width: 100%; max-width: 500px;
+    padding: 0 0 28px;
+    display: flex; flex-direction: column;
+  }
+  .seletor-handle {
+    width: 36px; height: 4px; background: var(--border2);
+    border-radius: 2px; margin: 12px auto 0;
+  }
+  .seletor-titulo {
+    font-size: 0.92rem; font-weight: 700; color: #fff;
+    padding: 14px 16px 8px;
+  }
+  .seletor-lista { overflow-y: auto; max-height: 55vh; padding: 0 12px; }
+  .seletor-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .seletor-item:hover { background: var(--surface2); }
+
+  /* ── FLUXO DE CAIXA (bottom sheet) ──────────────────────────────────── */
+  #modalFluxo {
+    display: none; align-items: flex-end; justify-content: center;
+    background: rgba(0,0,0,0.88);
+  }
+  .fluxo-sheet {
+    background: var(--surface);
+    border-radius: 22px 22px 0 0;
+    border: 1px solid var(--border2); border-bottom: none;
+    width: 100%; max-width: 500px;
+    max-height: 92vh; overflow-y: auto;
+    padding: 0 0 30px; display: flex; flex-direction: column;
+  }
+  .fluxo-handle {
+    width: 36px; height: 4px; background: var(--border2);
+    border-radius: 2px; margin: 12px auto 0;
+  }
+  .fluxo-header { padding: 12px 18px 6px; }
+  .fluxo-titulo { font-size: 1rem; font-weight: 800; color: #fff; }
+  .fluxo-sub { font-size: 0.72rem; color: var(--text-2); margin-top: 2px; }
+
+  .saldo-card {
+    margin: 8px 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .saldo-card.positivo { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); }
+  .saldo-card.negativo { background: rgba(239,68,68,0.06);  border-color: rgba(239,68,68,0.2); }
+  .saldo-card.neutro   { background: var(--surface2); }
+  .saldo-label { font-size: 0.7rem; color: var(--text-2); margin-bottom: 3px; }
+  .saldo-valor { font-size: 1.2rem; font-weight: 800; font-family: var(--mono); color: #fff; }
+  .saldo-pills { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .saldo-pill { font-size: 0.72rem; font-weight: 700; font-family: var(--mono); }
+  .pill-entrada { color: var(--green); }
+  .pill-saida   { color: var(--red); }
+
+  .fluxo-tabs {
+    display: flex; gap: 4px; padding: 4px 14px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fluxo-tab {
+    flex: 1; padding: 8px 4px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-2); font-family: var(--font);
+    font-size: 0.74rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fluxo-tab.ativo {
+    background: var(--accent-dim); border-color: rgba(59,130,246,0.3); color: var(--accent2);
+  }
+
+  .fluxo-form { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .fluxo-form input, .fluxo-form select {
+    width: 100%; padding: 11px 13px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-family: var(--font); font-size: 0.84rem; outline: none;
+  }
+  .fluxo-form input:focus, .fluxo-form select:focus { border-color: rgba(59,130,246,0.4); }
+  .fluxo-form input::placeholder { color: var(--text-3); }
+  .fluxo-form select option { background: var(--surface); }
+
+  .fluxo-tipo-btns { display: flex; gap: 8px; }
+  .tipo-btn {
+    flex: 1; padding: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-2); font-family: var(--font);
+    font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tipo-btn.entrada.ativo { background: var(--green-dim); border-color: rgba(16,185,129,0.35); color: var(--green); }
+  .tipo-btn.saida.ativo   { background: var(--red-dim);   border-color: rgba(239,68,68,0.3);   color: var(--red); }
+
+  .fluxo-lista { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .lanc-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+  }
+  .lanc-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .lanc-icon.entrada { background: var(--green-dim); }
+  .lanc-icon.saida   { background: var(--red-dim); }
+  .lanc-info { flex: 1; min-width: 0; }
+  .lanc-desc { font-size: 0.8rem; color: #e2e8f0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lanc-cat  { font-size: 0.68rem; color: var(--text-2); }
+  .lanc-valor { font-size: 0.84rem; font-weight: 700; font-family: var(--mono); white-space: nowrap; flex-shrink: 0; }
+  .lanc-valor.entrada { color: var(--green); }
+  .lanc-valor.saida   { color: var(--red); }
+  .lanc-del {
+    background: var(--red-dim); border: none; border-radius: 6px;
+    padding: 4px 7px; color: var(--red); font-size: 0.75rem; cursor: pointer; flex-shrink: 0;
+  }
+
+  .resumo-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .resumo-row:last-child { border-bottom: none; }
+  .resumo-label { color: var(--text-2); }
+  .resumo-val { font-weight: 700; font-family: var(--mono); }
+
+  /* ── FASE BADGE ──────────────────────────────────────────────────────── */
+  .fase-badge {
+    margin-left: auto; font-size: 0.6rem; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 0.04em; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TELA DE LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">📦</div>
+    <div class="login-titulo">LupiAI</div>
+    <div class="login-sub">Entre com sua conta Google para salvar seu estoque, contatos e histórico financeiro de forma segura.</div>
+
+    <button class="login-google-btn" onclick="iniciarLoginGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Entrar com Google
+    </button>
+
+    <div class="login-divider"><span>ou</span></div>
+
+    <button class="login-demo-btn" onclick="loginDemo()">
+      👀 Usar em modo demonstração
+    </button>
+
+    <div class="login-footer">
+      🔒 Seus dados ficam salvos com segurança na sua conta Google.
+    </div>
+  </div>
+</div>
+
+<!-- ── TOPBAR ── -->
+<header>
+  <div class="logo">📦</div>
+
+  <div class="nav-pills">
+    <button class="npill npill-primary" onclick="document.getElementById('modalRegistro').style.display='flex'">
+      <span class="pill-icon">📦</span> Produto
+    </button>
+    <button class="npill npill-green" onclick="abrirModalVenda()">
+      <span class="pill-icon">🛒</span> Venda
+    </button>
+    <button class="npill npill-teal" onclick="gerarPlanilha()">
+      <span class="pill-icon">📊</span> Planilha
+    </button>
+    <button class="npill npill-cash" onclick="abrirFluxo()">
+      <span class="pill-icon">💵</span> Caixa
+    </button>
+    <button class="npill npill-yellow" onclick="document.getElementById('modalFinanceiro').style.display='flex'">
+      <span class="pill-icon">💰</span> Finanças
+    </button>
+    <button class="npill npill-purple" onclick="abrirModalContatos()">
+      <span class="pill-icon">👥</span> Contatos
+    </button>
+    <button class="npill npill-wa" onclick="abrirSeletorContato()">
+      <span class="pill-icon">📲</span> Msg
+    </button>
+  </div>
+
+  <div class="user-badge" id="userBadge" style="display:none;">
+    <div class="user-avatar-placeholder" id="userAvatarPlaceholder"></div>
+    <img class="user-avatar" id="userAvatarImg" style="display:none;" src="" alt="">
+    <span class="user-name-short" id="userNameShort"></span>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<!-- ── STATS BAR (mostra após login) ── -->
+<div id="statsBar">
+  <div class="stat-chip">
+    <div class="stat-chip-icon blue">📦</div>
+    <div class="stat-chip-body">
+      <div class="stat-chip-label">Produtos</div>
+      <div class="stat-chip-value" id="statProdutos">—</div>
+    </div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-chip-icon red">🔴</div>
+    <div class="stat-chip-body">
+      <div class="stat-chip-label">Estoque Baixo</div>
+      <div class="stat-chip-value red" id="statBaixo">—</div>
+    </div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-chip-icon green">💰</div>
+    <div class="stat-chip-body">
+      <div class="stat-chip-label">Vendas (mês)</div>
+      <div class="stat-chip-value green" id="statVendas">—</div>
+    </div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-chip-icon yellow">⚠️</div>
+    <div class="stat-chip-body">
+      <div class="stat-chip-label">Parados +30d</div>
+      <div class="stat-chip-value yellow" id="statParados">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PENDENTES BAR ── -->
+<div id="pendentes-bar">
+  <div class="pendentes-inner">
+    <span>⚠️ <span id="pendentes-count">0</span> ação(ões) aguardando aprovação</span>
+    <button class="ver-btn" onclick="scrollParaPendente()">Ver</button>
+  </div>
+</div>
+
+<div id="alertas-container"></div>
+
+<!-- ── CHAT ── -->
+<div id="mensagens">
+  <div class="welcome" id="welcome">
+    <div class="welcome-icon">🤖</div>
+    <h2>E aí! Sou seu assistente de estoque.</h2>
+    <p>Me conta o que tá acontecendo no negócio — posso analisar, alertar e propor ações pra você aprovar.</p>
+    <div class="chips">
+      <div class="chip" onclick="usarChip(this)">📉 Filtro de óleo tá acabando, só tenho 8 unidades</div>
+      <div class="chip" onclick="usarChip(this)">📦 Sandália feminina parada há 2 meses sem vender nada</div>
+      <div class="chip" onclick="usarChip(this)">🚚 Meu fornecedor principal não entrega há 3 semanas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INPUT ── -->
+<div class="input-area">
+  <div class="input-row">
+    <textarea id="inputMsg" placeholder="Descreva a situação do estoque..." rows="1"></textarea>
+    <button id="btnEnviar" onclick="enviar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+  <div class="hint">Powered by Groq · LLaMA 3.3 · LupiAI · <a href="politica.html" style="color:var(--accent);text-decoration:none;">Política de Privacidade</a></div>
+</div>
+
+<!-- ── MODAIS ── -->
+<div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-inner">
+    <h3>📦 Novo Produto</h3>
+    <p style="font-size:0.72rem;color:#64748b;margin:4px 0 14px;">Preencha só o que souber — o resto você pode completar depois.</p>
+    <input type="text"   id="regProduto"       placeholder="Nome do produto *">
+    <input type="number" id="regQuantidade"    placeholder="Quantidade atual em estoque *">
+    <input type="number" id="regConsumoDiario" placeholder="Quantas unidades vende por dia?" step="0.1">
+    <input type="number" id="regPrecoCusto"    placeholder="Quanto custa para você? (R$)" step="0.01">
+    <input type="number" id="regPrecoVenda"    placeholder="Por quanto você vende? (R$)" step="0.01">
+    <div class="modal-btns">
+      <button class="btn-salvar"   onclick="salvarRegistro()">Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalFinanceiro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-inner">
+    <h3>💰 Dados Financeiros</h3>
+    <p style="font-size:0.72rem;color:#64748b;margin:4px 0 14px;">Informações gerais do negócio para análise de lucro.</p>
+    <input type="number" id="regGastos"       placeholder="Gastos mensais totais (R$)">
+    <input type="number" id="regLucros"       placeholder="Lucro deste mês (R$)">
+    <input type="number" id="regLucrosMesAnt" placeholder="Lucro do mês passado (R$)">
+    <div class="modal-btns">
+      <button class="btn-salvar"   onclick="salvarFinanceiro()">Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModalFinanceiro()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalVenda" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-inner">
+    <h3>🛒 Registrar Venda</h3>
+    <select id="vendaProduto" style="width:100%;padding:11px 13px;margin-bottom:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:white;font-family:var(--font);font-size:0.84rem;outline:none;">
+      <option value="">Selecione o produto...</option>
+    </select>
+    <input type="number" id="vendaQtd" placeholder="Quantidade vendida" min="1">
+    <div class="modal-btns">
+      <button class="btn-salvar"   onclick="salvarVenda()">Registrar</button>
+      <button class="btn-cancelar" onclick="fecharModalVenda()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalContatos" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-inner contatos-inner">
+    <h3>👥 Contatos</h3>
+    <p style="font-size:0.72rem;color:#64748b;margin:6px 0 12px;">Adicione supervisores, fornecedores e equipe para receber mensagens automáticas.</p>
+    <div class="contato-lista" id="contatoLista"></div>
+    <div class="contatos-form">
+      <input type="text" id="cNome"  placeholder="Nome (ex: João Silva)">
+      <input type="text" id="cCargo" placeholder="Cargo / Função (ex: Fornecedor)">
+      <input type="tel"  id="cFone"  placeholder="WhatsApp com DDD (ex: 16991234567)">
+      <div class="modal-btns">
+        <button class="btn-salvar"   onclick="salvarContato()">+ Adicionar</button>
+        <button class="btn-cancelar" onclick="fecharModalContatos()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalMensagem" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-inner msg-inner">
+    <h3>📲 Enviar via WhatsApp</h3>
+    <p style="font-size:0.72rem;color:#64748b;margin:6px 0 4px;">Destinatário</p>
+    <div class="wa-destinatario">
+      <div class="contato-avatar">👤</div>
+      <div class="wa-dest-info">
+        <div class="wa-dest-nome" id="waNome">—</div>
+        <div class="wa-dest-fone" id="waFone">—</div>
+      </div>
+    </div>
+    <p style="font-size:0.72rem;color:#64748b;margin:4px 0 0;">Mensagem gerada pela IA</p>
+    <div class="wa-preview" id="waTexto"></div>
+    <div style="font-size:0.68rem;color:#475569;margin-bottom:10px;text-align:center;">Você será redirecionado para o WhatsApp para confirmar o envio.</div>
+    <div class="modal-btns">
+      <button class="btn-salvar" onclick="confirmarEnvioWhatsApp()" style="background:rgba(37,211,102,0.12);color:#25d366;border-color:rgba(37,211,102,0.3);">📲 Abrir WhatsApp</button>
+      <button class="btn-cancelar" onclick="fecharModalMensagem()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Seletor de contato -->
+<div id="seletorContato">
+  <div class="seletor-sheet">
+    <div class="seletor-handle"></div>
+    <div class="seletor-titulo">📲 Enviar mensagem para...</div>
+    <div class="seletor-lista" id="seletorLista"></div>
+  </div>
+</div>
+
+<!-- Modal Fluxo de Caixa -->
+<div id="modalFluxo">
+  <div class="fluxo-sheet">
+    <div class="fluxo-handle"></div>
+    <div class="fluxo-header">
+      <div class="fluxo-titulo">💵 Fluxo de Caixa</div>
+      <div class="fluxo-sub" id="fluxoMesLabel">Carregando...</div>
+    </div>
+    <div class="saldo-card neutro" id="saldoCard">
+      <div>
+        <div class="saldo-label">Saldo do mês</div>
+        <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
+      </div>
+      <div class="saldo-pills">
+        <div class="saldo-pill pill-entrada" id="pillEntrada">↑ R$ 0,00</div>
+        <div class="saldo-pill pill-saida"   id="pillSaida">↓ R$ 0,00</div>
+      </div>
+    </div>
+    <div class="fluxo-tabs">
+      <button class="fluxo-tab ativo" id="tabLancar"    onclick="fluxoTab('lancar')">➕ Lançar</button>
+      <button class="fluxo-tab"       id="tabHistorico" onclick="fluxoTab('historico')">📋 Histórico</button>
+      <button class="fluxo-tab"       id="tabResumo"    onclick="fluxoTab('resumo')">📊 Resumo</button>
+    </div>
+    <div id="painelLancar" class="fluxo-form">
+      <div class="fluxo-tipo-btns">
+        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipoLanc('entrada')">📈 Entrada</button>
+        <button class="tipo-btn saida"         id="btnSaida"   onclick="setTipoLanc('saida')">📉 Saída</button>
+      </div>
+      <input type="text"   id="lancDesc"      placeholder="Descrição (ex: Venda de filtro, Aluguel...)">
+      <input type="number" id="lancValor"     placeholder="Valor (R$)" step="0.01" min="0.01">
+      <select id="lancCategoria">
+        <option value="Venda">🛒 Venda</option>
+        <option value="Fornecedor">🏭 Fornecedor</option>
+        <option value="Aluguel">🏠 Aluguel</option>
+        <option value="Energia">⚡ Energia</option>
+        <option value="Salário">👷 Salário</option>
+        <option value="Transporte">🚚 Transporte</option>
+        <option value="Marketing">📣 Marketing</option>
+        <option value="Outros">📦 Outros</option>
+      </select>
+      <button class="btn-salvar" style="padding:11px;" onclick="salvarLancamento()">Registrar</button>
+      <button class="btn-cancelar" style="padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
+    </div>
+    <div id="painelHistorico" style="display:none;">
+      <div class="fluxo-lista" id="fluxoLista"></div>
+    </div>
+    <div id="painelResumo" style="display:none;padding:0 16px;">
+      <div id="resumoConteudo"></div>
+      <button class="btn-cancelar" style="width:100%;margin-top:14px;padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getStorageKey(key) {
+    // Separa dados por usuário: prefixo com o ID da conta
+    const uid = usuarioAtual ? usuarioAtual.id : "demo";
+    return `estoqueIA_${uid}_${key}`;
+  }
+
+  function iniciarLoginGoogle() {
+    // Usa o Google Identity Services (One Tap / popup)
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: onGoogleSignIn,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+    google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // Se One Tap não funcionar (ex: bloqueio de 3rd party cookies), tenta popup manual
+        google.accounts.id.renderButton(
+          document.getElementById("loginScreen"),
+          { theme: "outline", size: "large" }
+        );
+      }
+    });
+  }
+
+  async function onGoogleSignIn(credentialResponse) {
+    try {
+      // Decodifica o JWT (payload apenas — sem validação de assinatura no client)
+      const payload = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
+      usuarioAtual = {
+        id: payload.sub,
+        nome: payload.name,
+        email: payload.email,
+        foto: payload.picture || null,
+      };
+
+      // Autentica também no Firebase Auth para que o Firestore aceite as requisições
+      try {
+        const firebaseCredential = window._GoogleAuthProvider.credential(credentialResponse.credential);
+        await window._signInWithCredential(window._firebaseAuth, firebaseCredential);
+      } catch (authErr) {
+        console.warn("Firebase Auth signIn falhou (dados ainda serão salvos se as regras permitirem):", authErr);
+      }
+
+      salvarSessao(usuarioAtual);
+      entrarNoApp();
+    } catch (e) {
+      alert("Erro ao processar login Google. Tente novamente.");
+      console.error(e);
+    }
+  }
+
+  function loginDemo() {
+    usuarioAtual = {
+      id: "demo",
+      nome: "Modo Demo",
+      email: "demo@estoqueIA.local",
+      foto: null,
+    };
+    salvarSessao(usuarioAtual);
+    entrarNoApp();
+  }
+
+  function salvarSessao(usuario) {
+    localStorage.setItem("estoqueIA_sessao", JSON.stringify(usuario));
+  }
+
+  function carregarSessao() {
+    const raw = localStorage.getItem("estoqueIA_sessao");
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+
+  function logout() {
+    if (!confirm("Sair da conta? Seus dados continuarão salvos.")) return;
+    localStorage.removeItem("estoqueIA_sessao");
+    usuarioAtual = null;
+    // Reinicia dados em memória
+    dbEstoque  = [];
+    dbContatos = [];
+    dbFluxo    = [];
+    // Volta pra tela de login
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("loginScreen").classList.remove("hide");
+    document.getElementById("userBadge").style.display = "none";
+    document.getElementById("statsBar").classList.remove("visible");
+    // Restaura o texto do header
+    const headerInfo = document.querySelector(".header-info");
+    if (headerInfo) headerInfo.style.display = "";
+    // Limpa mensagens do chat
+    const feed = document.getElementById("mensagens");
+    feed.innerHTML = `<div class="welcome" id="welcome">
+      <span class="welcome-icon">🤖</span>
+      <h2>E aí! Sou seu assistente de estoque.</h2>
+      <p>Me conta o que tá acontecendo no negócio — posso analisar, alertar e propor ações pra você aprovar.</p>
+      <div class="chips">
+        <div class="chip" onclick="usarChip(this)">📉 Filtro de óleo tá acabando, só tenho 8 unidades</div>
+        <div class="chip" onclick="usarChip(this)">📦 Sandália feminina parada há 2 meses sem vender nada</div>
+        <div class="chip" onclick="usarChip(this)">🚚 Meu fornecedor principal não entrega há 3 semanas</div>
+      </div>
+    </div>`;
+  }
+
+  // ─── FIREBASE HELPERS ──────────────────────────────────────────────────────
+
+  function esperarFirebase() {
+    return new Promise((resolve) => {
+      if (window._firestoreLib && window._firestoreDb) { resolve(); return; }
+      window.addEventListener("firebaseReady", () => resolve(), { once: true });
+      // Timeout de segurança: 5 segundos
+      setTimeout(() => resolve(), 5000);
+    });
+  }
+
+  async function fbSalvar(colecao, dados) {
+    try {
+      await esperarFirebase();
+      const db = window._firestoreDb;
+      const { doc, setDoc } = window._firestoreLib;
+      const uid = usuarioAtual.id;
+      await setDoc(doc(db, "usuarios", uid, colecao, "dados"), { valor: JSON.stringify(dados) });
+    } catch(e) { console.warn("Erro ao salvar no Firebase:", e); }
+  }
+
+  async function fbCarregar(colecao) {
+    try {
+      await esperarFirebase();
+      const db = window._firestoreDb;
+      const { doc, getDoc } = window._firestoreLib;
+      const uid = usuarioAtual.id;
+      const snap = await getDoc(doc(db, "usuarios", uid, colecao, "dados"));
+      if (snap.exists()) return JSON.parse(snap.data().valor);
+    } catch(e) { console.warn("Erro ao carregar do Firebase:", e); }
+    return null;
+  }
+
+  async function entrarNoApp() {
+    // Recarrega dados do usuário logado do Firebase
+    const [estoque, contatos, fluxo] = await Promise.all([
+      fbCarregar("estoque_db"),
+      fbCarregar("contatos_db"),
+      fbCarregar("fluxo_db"),
+    ]);
+    const [gastosFb, lucrosFb, lucrosAntFb] = await Promise.all([
+      fbCarregar("gastos_mensais"),
+      fbCarregar("lucros_mensais"),
+      fbCarregar("lucros_mes_anterior"),
+    ]);
+    dbEstoque  = estoque  || JSON.parse(localStorage.getItem(getStorageKey("estoque_db"))  || "[]");
+    dbContatos = contatos || JSON.parse(localStorage.getItem(getStorageKey("contatos_db")) || "[]");
+    dbFluxo    = fluxo    || JSON.parse(localStorage.getItem(getStorageKey("fluxo_db"))    || "[]");
+    if (gastosFb   !== null) localStorage.setItem(getStorageKey("gastos_mensais"), gastosFb);
+    if (lucrosFb   !== null) localStorage.setItem(getStorageKey("lucros_mensais"), lucrosFb);
+    if (lucrosAntFb !== null) localStorage.setItem(getStorageKey("lucros_mes_anterior"), lucrosAntFb);
+
+    // Atualiza badge no header
+    const badge   = document.getElementById("userBadge");
+    const avatarI = document.getElementById("userAvatarImg");
+    const avatarP = document.getElementById("userAvatarPlaceholder");
+    const nome    = document.getElementById("userNameShort");
+
+    if (usuarioAtual.foto) {
+      avatarI.src = usuarioAtual.foto;
+      avatarI.style.display = "block";
+      avatarP.style.display = "none";
+    } else {
+      avatarI.style.display = "none";
+      avatarP.style.display = "flex";
+      avatarP.textContent = usuarioAtual.nome.charAt(0).toUpperCase();
+    }
+    nome.textContent = usuarioAtual.nome.split(" ")[0];
+    badge.style.display = "flex";
+
+    // Mostra stats bar
+    document.getElementById("statsBar").classList.add("visible");
+
+    // Esconde tela de login com animação
+    const loginScreen = document.getElementById("loginScreen");
+    loginScreen.classList.add("hide");
+    setTimeout(() => { loginScreen.style.display = "none"; }, 450);
+
+    // Atualiza alertas e stats
+    setTimeout(() => {
+      if (typeof verificarAlertasAutomaticos === 'function') verificarAlertasAutomaticos();
+      atualizarStatsBar();
+    }, 600);
+  }
+
+  // Inicializa: verifica se já tem sessão salva
+  window.addEventListener("DOMContentLoaded", () => {
+    const sessao = carregarSessao();
+    if (sessao) {
+      usuarioAtual = sessao;
+      entrarNoApp();
+    }
+    // Se não tiver sessão, loginScreen fica visível (já está no HTML)
+  });
+</script>
+<script>
+  // ─── CONFIG ───────────────────────────────────────────────────────────────
+
+  const API_KEY = ""; // chave gerenciada pelo Netlify Function
+  const API_URL = "/chat";
+
+  const SYSTEM_PROMPT = `Você é o LupiAI — assistente de estoque esperto, direto e gente boa. Fala como um sócio de confiança: natural, sem enrolação, sem papo corporativo.
+
+⚠️ REGRA ABSOLUTA DE FORMATO — NUNCA QUEBRE ISSO:
+Sua resposta deve ser APENAS um objeto JSON válido. Nada antes, nada depois. Zero texto fora do JSON.
+
+SCHEMA OBRIGATÓRIO:
+{
+  "resposta": "Sua mensagem aqui — conversacional, com emojis moderados",
+  "sugestoes": ["ação rápida 1", "ação rápida 2"],
+  "acao": {
+    "tipo": "pedido" | "alerta" | "comunicado" | "mensagem",
+    "titulo": "Título curto",
+    "urgencia": "alta" | "media" | "baixa",
+    "detalhes": { "campo": "valor" }
+  }
+}
+
+REGRAS:
+- "sugestoes": array com 2-3 perguntas ou ações que o usuário pode fazer a seguir. Sempre inclua, são botões clicáveis no chat.
+- "acao": inclua só quando houver algo concreto a fazer. Para WhatsApp, use tipo "mensagem". Se não precisar, coloque null.
+- NUNCA coloque texto fora do JSON. NUNCA repita o JSON depois de escrever a resposta. NUNCA use markdown fora do JSON.
+- A "resposta" deve ser amigável, como um sócio que entende do negócio. Use os dados do estoque ativamente.`;
+
+
+  // ─── ELEMENTOS ────────────────────────────────────────────────────────────
+  const input    = document.getElementById("inputMsg");
+  const btn      = document.getElementById("btnEnviar");
+  const feed     = document.getElementById("mensagens");
+  const barPend  = document.getElementById("pendentes-bar");
+  const cntPend  = document.getElementById("pendentes-count");
+
+  let pendentes = 0;
+  let ultimoPendente = null;
+  let ultimoContextoUsuario = ""; // Guarda o que o usuário pediu para usar na mensagem WhatsApp
+
+  // ─── BANCO DE DADOS LOCAL ─────────────────────────────────────────────────
+  // Os dados são inicializados vazios — serão carregados em entrarNoApp() com a chave do usuário
+  let dbEstoque  = [];
+  let dbContatos = [];
+
+  // ─── CONTATOS ─────────────────────────────────────────────────────────────
+  const CARGO_EMOJIS = {
+    "fornecedor": "🏭", "supervisor": "👔", "gerente": "💼",
+    "equipe": "👥", "financeiro": "💰", "logística": "🚚", "default": "👤"
+  };
+
+  function emojiCargo(cargo) {
+    const c = (cargo || "").toLowerCase();
+    for (const k of Object.keys(CARGO_EMOJIS)) {
+      if (c.includes(k)) return CARGO_EMOJIS[k];
+    }
+    return CARGO_EMOJIS.default;
+  }
+
+  function abrirModalContatos() {
+    renderizarContatos();
+    document.getElementById("modalContatos").style.display = "flex";
+  }
+
+  function fecharModalContatos() {
+    document.getElementById("modalContatos").style.display = "none";
+    ["cNome","cCargo","cFone"].forEach(id => document.getElementById(id).value = "");
+  }
+
+  function renderizarContatos() {
+    const lista = document.getElementById("contatoLista");
+    lista.innerHTML = "";
+    if (dbContatos.length === 0) {
+      lista.innerHTML = '<p style="font-size:0.75rem;color:#4b5563;text-align:center;padding:12px 0;">Nenhum contato cadastrado ainda.</p>';
+      return;
+    }
+    dbContatos.forEach((c, i) => {
+      const div = document.createElement("div");
+      div.className = "contato-item";
+      div.innerHTML = `
+        <div class="contato-avatar">${emojiCargo(c.cargo)}</div>
+        <div class="contato-info">
+          <div class="contato-nome">${c.nome}</div>
+          <div class="contato-cargo">${c.cargo}</div>
+          <div class="contato-fone">📱 ${c.fone}</div>
+        </div>
+        <button class="contato-del" onclick="removerContato(${i})" title="Remover">🗑</button>
+      `;
+      lista.appendChild(div);
+    });
+  }
+
+  function salvarContato() {
+    const nome  = document.getElementById("cNome").value.trim();
+    const cargo = document.getElementById("cCargo").value.trim();
+    const fone  = document.getElementById("cFone").value.replace(/\D/g, "");
+    if (!nome || !fone) { alert("Informe ao menos nome e telefone."); return; }
+    dbContatos.push({ nome, cargo, fone });
+    localStorage.setItem(getStorageKey("contatos_db"), JSON.stringify(dbContatos)); fbSalvar("contatos_db", dbContatos);
+    ["cNome","cCargo","cFone"].forEach(id => document.getElementById(id).value = "");
+    renderizarContatos();
+  }
+
+  function removerContato(i) {
+    dbContatos.splice(i, 1);
+    localStorage.setItem(getStorageKey("contatos_db"), JSON.stringify(dbContatos)); fbSalvar("contatos_db", dbContatos);
+    renderizarContatos();
+  }
+
+  // ─── WHATSAPP ─────────────────────────────────────────────────────────────
+  let waContatoAtual = null;
+  let waTextoAtual   = "";
+
+  function abrirModalMensagem(contato, texto) {
+    waContatoAtual = contato;
+    waTextoAtual   = texto;
+    document.getElementById("waNome").textContent  = contato.nome + (contato.cargo ? ` — ${contato.cargo}` : "");
+    document.getElementById("waFone").textContent  = "📱 " + contato.fone;
+    document.getElementById("waTexto").textContent = texto;
+    document.getElementById("modalMensagem").style.display = "flex";
+  }
+
+  function fecharModalMensagem() {
+    document.getElementById("modalMensagem").style.display = "none";
+    waContatoAtual = null; waTextoAtual = "";
+  }
+
+  function confirmarEnvioWhatsApp() {
+    if (!waContatoAtual) return;
+    const fone = waContatoAtual.fone.replace(/\D/g, "");
+    const url  = `https://wa.me/55${fone}?text=${encodeURIComponent(waTextoAtual)}`;
+    window.open(url, "_blank");
+    fecharModalMensagem();
+    adicionarMsg(`📲 Mensagem para ${waContatoAtual.nome} aberta no WhatsApp.`, "ai");
+  }
+
+  // Gera mensagem automática com base nos alertas e situação atual
+  async function gerarMensagemParaContato(contato) {
+    if (dbEstoque.length === 0) {
+      adicionarMsg("⚠️ Registre pelo menos um produto antes de enviar mensagens.", "ai");
+      return;
+    }
+    mostrarTyping();
+    btn.disabled = true;
+
+    // Monta resumo do estoque para o prompt
+    const estoqueResumo = dbEstoque.map(p => {
+      const dias = calcularDiasRestantes(p);
+      return `${p.produto}: ${p.quantidade} un.${dias !== null ? ` (~${dias} dias restantes)` : ""}`;
+    }).join("; ");
+
+    // Usa o contexto do que o usuário pediu para focar no produto certo
+    const contextoSolicitacao = ultimoContextoUsuario
+      ? `\n\nO usuário solicitou especificamente: "${ultimoContextoUsuario}". PRIORIZE o produto mencionado nessa solicitação. Se não houver produto explícito, use o mais crítico do estoque.`
+      : "";
+
+    const promptMensagem = `Você é um assistente de estoque. Gere uma mensagem profissional e direta para ser enviada via WhatsApp para "${contato.nome}" (${contato.cargo || "contato"}).
+
+Estoque disponível para referência: ${estoqueResumo}${contextoSolicitacao}
+
+A mensagem deve:
+- Cumprimentar pelo nome
+- Focar NO PRODUTO ESPECÍFICO mencionado na solicitação do usuário (não liste todos os produtos)
+- Indicar a quantidade atual e quantos dias de estoque restam desse produto
+- Solicitar providências ou reposição conforme necessário
+- Ser profissional, objetiva e em português
+- Ter no máximo 5 linhas
+- NÃO incluir marcações JSON, apenas texto puro da mensagem`;
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: promptMensagem }],
+          temperature: 0.5,
+          max_tokens: 300
+        })
+      });
+      const data = await res.json();
+      removerTyping();
+      btn.disabled = false;
+      const texto = data.choices?.[0]?.message?.content?.trim();
+      if (!texto) { adicionarMsg("⚠️ Não foi possível gerar a mensagem.", "ai"); return; }
+      abrirModalMensagem(contato, texto);
+    } catch (err) {
+      removerTyping();
+      btn.disabled = false;
+      adicionarMsg("⚠️ Erro ao gerar mensagem. Verifique sua conexão.", "ai");
+    }
+  }
+
+  // Painel de seleção de contato para envio
+  function abrirSeletorContato() {
+    if (dbContatos.length === 0) {
+      adicionarMsg("⚠️ Nenhum contato cadastrado. Clique em 👥 Contatos para adicionar.", "ai");
+      return;
+    }
+    // Exibe mini-painel na conversa
+    const welcome = document.getElementById("welcome");
+    if (welcome) welcome.remove();
+
+    const wrap = document.createElement("div");
+    wrap.className = "msg ai";
+    wrap.style.maxWidth = "100%";
+    wrap.style.width = "100%";
+
+    const label = document.createElement("div");
+    label.className = "msg-label";
+    label.textContent = "LupiAI";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.display = "flex";
+    bubble.style.flexDirection = "column";
+    bubble.style.gap = "8px";
+    bubble.innerHTML = `<span style="font-size:0.82rem;">Para quem deseja enviar o relatório de estoque?</span>`;
+
+    dbContatos.forEach((c, i) => {
+      const btn2 = document.createElement("button");
+      btn2.style.cssText = "background:#131929;border:1px solid #1f2937;border-radius:9px;padding:8px 12px;color:#e8eaf0;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;";
+      btn2.innerHTML = `<span style="font-size:1rem;">${emojiCargo(c.cargo)}</span><span><strong>${c.nome}</strong><br><span style="color:#6b7280;font-size:0.68rem;">${c.cargo} · ${c.fone}</span></span>`;
+      btn2.onclick = () => {
+        wrap.remove();
+        gerarMensagemParaContato(c);
+      };
+      bubble.appendChild(btn2);
+    });
+
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    feed.appendChild(wrap);
+    scrollBaixo();
+  }
+
+  function getSystemPromptComDados() {
+    const estoqueInfo = dbEstoque.length
+      ? dbEstoque.map(p => {
+          let info = `${p.produto}: ${p.quantidade} unidades`;
+          const consumo = calcularConsumoDiario(p);
+          if (consumo) {
+            const dias = Math.floor(p.quantidade / consumo);
+            info += ` (consumo ~${consumo.toFixed(1)}/dia, ~${dias} dias restantes)`;
+          }
+          if (p.precoCusto && p.precoVenda) {
+            const margem = ((p.precoVenda - p.precoCusto) / p.precoVenda * 100).toFixed(1);
+            info += ` [custo R$${p.precoCusto}, venda R$${p.precoVenda}, margem ${margem}%]`;
+          }
+          return info;
+        }).join("; ")
+      : "Nenhum produto registrado ainda";
+    const lucroAtual = localStorage.getItem(getStorageKey("lucros_mensais")) || "0";
+    const lucroAnt   = localStorage.getItem(getStorageKey("lucros_mes_anterior")) || "0";
+    const contatosInfo = dbContatos.length
+      ? dbContatos.map(c => `${c.nome} (${c.cargo})`).join(", ")
+      : "Nenhum contato cadastrado";
+    return `Você é o LupiAI — assistente esperto de gestão de estoque com personalidade.
+
+CONTEXTO DO NEGÓCIO:
+- Estoque: ${estoqueInfo}
+- Gastos mensais: R$ ${localStorage.getItem(getStorageKey("gastos_mensais")) || "não informado"}
+- Lucro este mês: R$ ${lucroAtual || "não informado"}
+- Lucro mês passado: R$ ${lucroAnt || "não informado"}
+- Contatos: ${contatosInfo}
+
+Use esses dados ativamente nas respostas. Se tiver dias restantes calculados, mencione. Se tiver margem, comente. Seja o sócio que entende o negócio.
+
+${SYSTEM_PROMPT}`;
+  }
+
+  // Verifica alertas ao carregar a página (dados já salvos)
+  verificarAlertasAutomaticos();
+
+  // ─── MODAL PRODUTO ────────────────────────────────────────────────────────
+  function salvarRegistro() {
+    const produto       = document.getElementById("regProduto").value.trim();
+    const quantidade    = parseInt(document.getElementById("regQuantidade").value);
+    const consumoDiario = parseFloat(document.getElementById("regConsumoDiario").value);
+    const precoCusto    = parseFloat(document.getElementById("regPrecoCusto").value);
+    const precoVenda    = parseFloat(document.getElementById("regPrecoVenda").value);
+
+    if (!produto || isNaN(quantidade)) {
+      alert("Informe ao menos o nome e a quantidade do produto.");
+      return;
+    }
+
+    const idx = dbEstoque.findIndex(p => p.produto.toLowerCase() === produto.toLowerCase());
+    const item = idx >= 0 ? dbEstoque[idx] : { produto, vendasDiarias: [] };
+    item.quantidade = quantidade;
+    item.data = new Date().toISOString();
+    if (!isNaN(consumoDiario) && consumoDiario > 0) item.consumoDiarioManual = consumoDiario;
+    if (!isNaN(precoCusto)   && precoCusto   > 0) item.precoCusto = precoCusto;
+    if (!isNaN(precoVenda)   && precoVenda   > 0) item.precoVenda = precoVenda;
+    if (!item.vendasDiarias) item.vendasDiarias = [];
+    if (idx >= 0) dbEstoque[idx] = item; else dbEstoque.push(item);
+    localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
+
+    fecharModal();
+    ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda"]
+      .forEach(id => document.getElementById(id).value = "");
+    verificarAlertasAutomaticos();
+    adicionarMsg(`📦 "${produto}" adicionado! ${!isNaN(consumoDiario) && consumoDiario > 0 ? `Com consumo de ${consumoDiario}/dia, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.` : "Registre vendas para eu calcular a previsão de duração."}`, "ai");
+  }
+
+  function fecharModal() {
+    document.getElementById("modalRegistro").style.display = "none";
+  }
+
+  // ─── MODAL FINANCEIRO ─────────────────────────────────────────────────────
+  function salvarFinanceiro() {
+    const gastos       = document.getElementById("regGastos").value;
+    const lucros       = document.getElementById("regLucros").value;
+    const lucrosMesAnt = document.getElementById("regLucrosMesAnt").value;
+    if (gastos)       { localStorage.setItem(getStorageKey("gastos_mensais"), gastos); fbSalvar("gastos_mensais", gastos); }
+    if (lucros)       { localStorage.setItem(getStorageKey("lucros_mensais"), lucros); fbSalvar("lucros_mensais", lucros); }
+    if (lucrosMesAnt) { localStorage.setItem(getStorageKey("lucros_mes_anterior"), lucrosMesAnt); fbSalvar("lucros_mes_anterior", lucrosMesAnt); }
+    fecharModalFinanceiro();
+    verificarAlertasAutomaticos();
+    adicionarMsg("💰 Dados financeiros salvos! Já estou monitorando sua margem e variação de lucro.", "ai");
+  }
+
+  function fecharModalFinanceiro() {
+    document.getElementById("modalFinanceiro").style.display = "none";
+    ["regGastos","regLucros","regLucrosMesAnt"].forEach(id => document.getElementById(id).value = "");
+  }
+
+  // ─── SISTEMA DE VENDAS ────────────────────────────────────────────────────
+  function abrirModalVenda() {
+    const sel = document.getElementById("vendaProduto");
+    sel.innerHTML = '<option value="">Selecione o produto...</option>';
+    dbEstoque.forEach((p, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${p.produto} (${p.quantidade} un.)`;
+      sel.appendChild(opt);
+    });
+    document.getElementById("vendaQtd").value = "";
+    document.getElementById("modalVenda").style.display = "flex";
+  }
+
+  function fecharModalVenda() {
+    document.getElementById("modalVenda").style.display = "none";
+  }
+
+  function salvarVenda() {
+    const idx = parseInt(document.getElementById("vendaProduto").value);
+    const qtd = parseInt(document.getElementById("vendaQtd").value);
+    if (isNaN(idx) || isNaN(qtd) || qtd <= 0) return;
+
+    const item = dbEstoque[idx];
+    if (!item) return;
+    if (!item.vendasDiarias) item.vendasDiarias = [];
+
+    // Registra venda com data de hoje
+    const hoje = new Date().toISOString().split("T")[0];
+    const registroHoje = item.vendasDiarias.find(v => v.data === hoje);
+    if (registroHoje) {
+      registroHoje.qtd += qtd;
+    } else {
+      item.vendasDiarias.push({ data: hoje, qtd });
+    }
+
+    // Mantém apenas últimos 30 dias
+    item.vendasDiarias = item.vendasDiarias.slice(-30);
+
+    // Atualiza estoque
+    item.quantidade = Math.max(0, item.quantidade - qtd);
+    dbEstoque[idx] = item;
+    localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
+
+    fecharModalVenda();
+    verificarAlertasAutomaticos();
+    const diasRestantes = calcularDiasRestantes(item);
+    const diasTxt = diasRestantes !== null ? ` Estoque estimado para ${diasRestantes} dia(s).` : "";
+    adicionarMsg(`🛒 Venda de ${qtd} un. de "${item.produto}" registrada. Estoque atual: ${item.quantidade} un.${diasTxt}`, "ai");
+  }
+
+  // ─── CÁLCULO DE CONSUMO E DIAS RESTANTES ──────────────────────────────────
+  function calcularConsumoDiario(item) {
+    // Prioridade: consumo manual > média das vendas registradas
+    if (item.consumoDiarioManual && item.consumoDiarioManual > 0) {
+      return item.consumoDiarioManual;
+    }
+    if (!item.vendasDiarias || item.vendasDiarias.length === 0) return null;
+    // Média sobre o período coberto pelos registros
+    const totalVendido = item.vendasDiarias.reduce((s, v) => s + v.qtd, 0);
+    const diasCobertos = item.vendasDiarias.length; // cada entrada = 1 dia distinto
+    return totalVendido / diasCobertos;
+  }
+
+  function calcularDiasRestantes(item) {
+    const consumo = calcularConsumoDiario(item);
+    if (!consumo || consumo <= 0) return null;
+    return Math.floor(item.quantidade / consumo);
+  }
+
+  // ─── ALERTAS AUTOMÁTICOS ──────────────────────────────────────────────────
+  function atualizarStatsBar() {
+    const total = dbEstoque.length;
+    const baixo = dbEstoque.filter(p => {
+      const dias = calcularDiasRestantes(p);
+      return dias !== null && dias <= 7;
+    }).length;
+    const parados = dbEstoque.filter(p => {
+      if (!p.vendasDiarias || p.vendasDiarias.length === 0) return false;
+      const ultima = new Date(p.vendasDiarias[p.vendasDiarias.length - 1].data);
+      const diff = (Date.now() - ultima.getTime()) / (1000 * 60 * 60 * 24);
+      return diff >= 30;
+    }).length;
+    const mes = mesAtual ? mesAtual() : new Date().toISOString().slice(0,7);
+    const vendas = dbEstoque.reduce((acc, p) => {
+      return acc + (p.vendasDiarias || [])
+        .filter(v => v.data && v.data.startsWith(mes))
+        .reduce((s, v) => s + (v.qtd * (p.precoVenda || 0)), 0);
+    }, 0);
+
+    document.getElementById("statProdutos").textContent = total || "0";
+    const elBaixo = document.getElementById("statBaixo");
+    elBaixo.textContent = baixo || "0";
+    elBaixo.className = "stat-chip-value " + (baixo > 0 ? "red" : "green");
+    document.getElementById("statVendas").textContent = vendas > 0 ? `R$${vendas.toFixed(0)}` : "R$0";
+    const elParados = document.getElementById("statParados");
+    elParados.textContent = parados || "0";
+    elParados.className = "stat-chip-value " + (parados > 0 ? "yellow" : "green");
+  }
+
+  function verificarAlertasAutomaticos() {
+    const container = document.getElementById("alertas-container");
+    container.innerHTML = "";
+
+    dbEstoque.forEach(item => {
+      // ── Regra de Dias Restantes (prioridade mais alta) ──
+      const dias = calcularDiasRestantes(item);
+      if (dias !== null) {
+        if (dias <= 1) {
+          criarAlertaBanner("emergencia",
+            `🔴 <strong>EMERGÊNCIA — ${item.produto}:</strong> estoque acaba em ${dias <= 0 ? "menos de 1" : dias} dia(s)! Ação imediata necessária.`,
+            container);
+        } else if (dias <= 3) {
+          criarAlertaBanner("critico",
+            `🚨 <strong>Estoque crítico — ${item.produto}:</strong> faltam apenas ${dias} dia(s) com base no consumo médio.`,
+            container);
+        } else if (dias <= 7) {
+          criarAlertaBanner("baixo",
+            `⚠️ O produto <strong>${item.produto}</strong> irá acabar em aproximadamente <strong>${dias} dias</strong> com base no seu histórico de vendas.`,
+            container);
+        }
+      }
+
+      // ── Regra de Margem < 10% ──
+      if (item.precoCusto > 0 && item.precoVenda > 0) {
+        const margem = ((item.precoVenda - item.precoCusto) / item.precoVenda) * 100;
+        if (margem < 10) {
+          criarAlertaBanner("margem",
+            `⚠️ O produto <strong>${item.produto}</strong> está com margem de lucro baixa (${margem.toFixed(1)}%). Considere revisar o preço.`,
+            container);
+        }
+      }
+    });
+
+    // ── Regra de Queda de Lucro > 15% ──
+    const lucroAtual = parseFloat(localStorage.getItem(getStorageKey("lucros_mensais")) || "0");
+    const lucroAnt   = parseFloat(localStorage.getItem(getStorageKey("lucros_mes_anterior")) || "0");
+    if (lucroAnt > 0 && lucroAtual > 0) {
+      const quedaPerc = ((lucroAnt - lucroAtual) / lucroAnt) * 100;
+      if (quedaPerc > 15) {
+        criarAlertaBanner("queda",
+          `📉 Seu lucro caiu <strong>${quedaPerc.toFixed(1)}%</strong> em relação ao mês passado.`,
+          container);
+      }
+    }
+  }
+
+  function criarAlertaBanner(tipo, htmlMsg, container) {
+    const div = document.createElement("div");
+    div.className = `alerta-banner ${tipo}`;
+    div.innerHTML = `<span class="alerta-txt">${htmlMsg}</span><span class="alerta-fechar">✕</span>`;
+    div.querySelector(".alerta-fechar").onclick = (e) => {
+      e.stopPropagation();
+      div.remove();
+    };
+    container.appendChild(div);
+  }
+
+  // ─── MENSAGENS ────────────────────────────────────────────────────────────
+  function adicionarMsg(texto, remetente, sugestoes) {
+    const welcome = document.getElementById("welcome");
+    if (welcome) welcome.remove();
+
+    const wrap = document.createElement("div");
+    wrap.className = `msg ${remetente}`;
+
+    const label = document.createElement("div");
+    label.className = "msg-label";
+    label.textContent = remetente === "user" ? "Você" : "LupiAI";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = texto;
+
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+
+    // Sugestões clicáveis
+    if (remetente === "ai" && sugestoes && sugestoes.length) {
+      const sugsWrap = document.createElement("div");
+      sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:0 4px;";
+      sugestoes.forEach(s => {
+        const sbtn = document.createElement("button");
+        sbtn.style.cssText = "background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:9px 13px;color:#93c5fd;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;transition:background 0.15s;";
+        sbtn.textContent = s;
+        sbtn.onmouseenter = () => sbtn.style.background = "rgba(59,130,246,0.16)";
+        sbtn.onmouseleave = () => sbtn.style.background = "rgba(59,130,246,0.08)";
+        sbtn.onclick = () => {
+          input.value = s;
+          sugsWrap.remove();
+          enviar();
+        };
+        sugsWrap.appendChild(sbtn);
+      });
+      wrap.appendChild(sugsWrap);
+    }
+
+    feed.appendChild(wrap);
+    scrollBaixo();
+    return wrap;
+  }
+
+  function mostrarTyping() {
+    const wrap = document.createElement("div");
+    wrap.className = "msg ai typing";
+    wrap.id = "typing";
+
+    const label = document.createElement("div");
+    label.className = "msg-label";
+    label.textContent = "LupiAI";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    feed.appendChild(wrap);
+    scrollBaixo();
+  }
+
+  function removerTyping() {
+    const t = document.getElementById("typing");
+    if (t) t.remove();
+  }
+
+  function scrollBaixo() {
+    feed.scrollTop = feed.scrollHeight;
+  }
+
+  // ─── ACTION CARD ──────────────────────────────────────────────────────────
+  const tipoIcons = {
+    pedido:     { icon: "🛒", label: "Pedido de Reposição" },
+    alerta:     { icon: "⚠️", label: "Alerta de Estoque" },
+    comunicado: { icon: "📢", label: "Comunicado à Equipe" },
+    mensagem:   { icon: "📲", label: "Mensagem WhatsApp" }
+  };
+
+  function adicionarActionCard(acao) {
+    const meta = tipoIcons[acao.tipo] || { icon: "📋", label: acao.tipo };
+
+    const card = document.createElement("div");
+    card.className = "action-card";
+
+    // Header
+    const head = document.createElement("div");
+    head.className = "action-header";
+
+    const iconEl = document.createElement("div");
+    iconEl.className = `action-icon ${acao.tipo}`;
+    iconEl.textContent = meta.icon;
+
+    const titleEl = document.createElement("div");
+    titleEl.className = "action-title";
+    titleEl.textContent = acao.titulo || meta.label;
+
+    const badge = document.createElement("span");
+    badge.className = `urgencia-badge ${acao.urgencia || "media"}`;
+    badge.textContent = acao.urgencia || "média";
+
+    head.appendChild(iconEl);
+    head.appendChild(titleEl);
+    head.appendChild(badge);
+
+    // Body
+    const body = document.createElement("div");
+    body.className = "action-body";
+
+    if (acao.detalhes && typeof acao.detalhes === "object") {
+      Object.entries(acao.detalhes).forEach(([k, v]) => {
+        const row = document.createElement("div");
+        row.className = "action-row";
+        row.innerHTML = `<span class="label">${k}</span><span class="val">${v}</span>`;
+        body.appendChild(row);
+      });
+    }
+
+    // Footer
+    const footer = document.createElement("div");
+    footer.className = "action-footer";
+
+    const btnAprovar = document.createElement("button");
+    btnAprovar.className = "btn-aprovar";
+    btnAprovar.innerHTML = "✓ Aprovar";
+
+    const btnRecusar = document.createElement("button");
+    btnRecusar.className = "btn-recusar";
+    btnRecusar.innerHTML = "✕ Recusar";
+
+    btnAprovar.onclick = () => resolverAcao(card, footer, true, acao);
+    btnRecusar.onclick = () => resolverAcao(card, footer, false, acao);
+
+    footer.appendChild(btnAprovar);
+    footer.appendChild(btnRecusar);
+
+    card.appendChild(head);
+    card.appendChild(body);
+    card.appendChild(footer);
+
+    feed.appendChild(card);
+    scrollBaixo();
+
+    // Atualiza barra de pendentes
+    ultimoPendente = card;
+    pendentes++;
+    atualizarBarPendentes();
+  }
+
+  function resolverAcao(card, footer, aprovado, acao) {
+    footer.remove();
+    card.className = `action-card ${aprovado ? "aprovado" : "recusado"}`;
+
+    const status = document.createElement("div");
+    status.className = `status-final ${aprovado ? "ok" : "no"}`;
+    status.textContent = aprovado ? "✓ Ação aprovada e registrada" : "✕ Ação recusada";
+    card.appendChild(status);
+
+    pendentes = Math.max(0, pendentes - 1);
+    atualizarBarPendentes();
+    scrollBaixo();
+
+    // Se aprovado e for ação de mensagem → abre seletor de contato
+    if (aprovado && acao && acao.tipo === "mensagem") {
+      setTimeout(() => abrirSeletorContato(), 400);
+    }
+  }
+
+  function atualizarBarPendentes() {
+    if (pendentes > 0) {
+      barPend.style.display = "block";
+      cntPend.textContent = pendentes;
+    } else {
+      barPend.style.display = "none";
+    }
+  }
+
+  function scrollParaPendente() {
+    if (ultimoPendente) {
+      ultimoPendente.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  // ─── CHIPS ────────────────────────────────────────────────────────────────
+  function usarChip(el) {
+    // Remove o emoji do início para limpar o texto
+    input.value = el.textContent.replace(/^[\p{Emoji}\s]+/u, "").trim();
+    input.focus();
+    autoResize();
+  }
+
+  // ─── FLUXO DE CAIXA ───────────────────────────────────────────────────────
+  let dbFluxo    = [];
+  let tipoLancamento = "entrada";
+
+  const MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                    "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+  function mesAtual() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+  }
+
+  function lancamentosMes(mes) {
+    return dbFluxo.filter(l => l.data.startsWith(mes));
+  }
+
+  function calcularSaldo(lancamentos) {
+    let entradas = 0, saidas = 0;
+    lancamentos.forEach(l => {
+      if (l.tipo === "entrada") entradas += l.valor;
+      else saidas += l.valor;
+    });
+    return { entradas, saidas, saldo: entradas - saidas };
+  }
+
+  function fmt(v) {
+    return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function atualizarSaldoCard() {
+    const mes = mesAtual();
+    const d = new Date();
+    document.getElementById("fluxoMesLabel").textContent =
+      `${MESES_PT[d.getMonth()]} ${d.getFullYear()}`;
+
+    // Soma vendas do mês registradas no sistema
+    const vendasMes = dbEstoque.reduce((total, p) => {
+      return total + (p.vendasDiarias || [])
+        .filter(v => v.data.startsWith(mes))
+        .reduce((s, v) => s + (v.qtd * (p.precoVenda || 0)), 0);
+    }, 0);
+
+    const lancs = lancamentosMes(mes);
+
+    // Adiciona vendas como entradas automáticas (sem duplicar)
+    const { entradas: lancEntradas, saidas, saldo: lancSaldo } = calcularSaldo(lancs);
+    const totalEntradas = lancEntradas + vendasMes;
+    const saldo = totalEntradas - saidas;
+
+    const card = document.getElementById("saldoCard");
+    card.className = "saldo-card " + (saldo > 0 ? "positivo" : saldo < 0 ? "negativo" : "neutro");
+    document.getElementById("saldoValor").textContent = fmt(saldo);
+    document.getElementById("pillEntrada").textContent = "↑ " + fmt(totalEntradas);
+    document.getElementById("pillSaida").textContent   = "↓ " + fmt(saidas);
+  }
+
+  function abrirFluxo() {
+    atualizarSaldoCard();
+    fluxoTab("lancar");
+    document.getElementById("modalFluxo").style.display = "flex";
+  }
+
+  function fecharFluxo() {
+    document.getElementById("modalFluxo").style.display = "none";
+  }
+
+  function fluxoTab(tab) {
+    ["lancar","historico","resumo"].forEach(t => {
+      document.getElementById("painel" + t.charAt(0).toUpperCase() + t.slice(1)).style.display = "none";
+      document.getElementById("tab"   + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove("ativo");
+    });
+    document.getElementById("painel" + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = "";
+    document.getElementById("tab"    + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("ativo");
+
+    if (tab === "historico") renderHistorico();
+    if (tab === "resumo")    renderResumo();
+  }
+
+  function setTipoLanc(tipo) {
+    tipoLancamento = tipo;
+    document.getElementById("btnEntrada").classList.toggle("ativo", tipo === "entrada");
+    document.getElementById("btnSaida").classList.toggle("ativo",   tipo === "saida");
+
+    // Filtra categorias por tipo
+    const sel = document.getElementById("lancCategoria");
+    const entradasCats = ["Venda","Outros"];
+    const saidasCats   = ["Fornecedor","Aluguel","Energia","Salário","Transporte","Marketing","Outros"];
+    const cats = tipo === "entrada" ? entradasCats : saidasCats;
+    const icones = { Venda:"🛒", Fornecedor:"🏭", Aluguel:"🏠", Energia:"⚡", Salário:"👷", Transporte:"🚚", Marketing:"📣", Outros:"📦" };
+    sel.innerHTML = cats.map(c => `<option value="${c}">${icones[c]} ${c}</option>`).join("");
+  }
+
+  function salvarLancamento() {
+    const desc  = document.getElementById("lancDesc").value.trim();
+    const valor = parseFloat(document.getElementById("lancValor").value);
+    const cat   = document.getElementById("lancCategoria").value;
+
+    if (!desc || isNaN(valor) || valor <= 0) {
+      alert("Preencha a descrição e o valor."); return;
+    }
+
+    const lanc = {
+      id: Date.now(),
+      tipo: tipoLancamento,
+      descricao: desc,
+      valor,
+      categoria: cat,
+      data: new Date().toISOString().split("T")[0]
+    };
+
+    dbFluxo.push(lanc);
+    localStorage.setItem(getStorageKey("fluxo_db"), JSON.stringify(dbFluxo)); fbSalvar("fluxo_db", dbFluxo);
+
+    document.getElementById("lancDesc").value  = "";
+    document.getElementById("lancValor").value = "";
+
+    atualizarSaldoCard();
+
+    const sinal = tipoLancamento === "entrada" ? "+" : "-";
+    const emoji = tipoLancamento === "entrada" ? "💚" : "🔴";
+    adicionarMsg(
+      `${emoji} Lançamento registrado: ${desc} (${sinal}${fmt(valor)}) — ${cat}`,
+      "ai",
+      ["Ver resumo do mês", "Qual minha situação financeira?", "Quanto saiu este mês?"]
+    );
+
+    fecharFluxo();
+    verificarAlertasAutomaticos();
+  }
+
+  function renderHistorico() {
+    const lista = document.getElementById("fluxoLista");
+    const mes   = mesAtual();
+    const lancs = [...lancamentosMes(mes)].reverse();
+
+    // Adiciona vendas automáticas do sistema
+    const vendasAuto = [];
+    dbEstoque.forEach(p => {
+      (p.vendasDiarias || []).filter(v => v.data.startsWith(mes)).forEach(v => {
+        vendasAuto.push({
+          id: `venda-${p.produto}-${v.data}`,
+          tipo: "entrada",
+          descricao: `Venda: ${p.produto}`,
+          valor: v.qtd * (p.precoVenda || 0),
+          categoria: "Venda",
+          data: v.data,
+          auto: true
+        });
+      });
+    });
+
+    const todos = [...vendasAuto, ...lancs]
+      .sort((a, b) => b.data.localeCompare(a.data));
+
+    lista.innerHTML = "";
+
+    if (todos.length === 0) {
+      lista.innerHTML = '<div class="fluxo-vazio">Nenhum lançamento este mês ainda.</div>';
+      return;
+    }
+
+    todos.forEach(l => {
+      const div = document.createElement("div");
+      div.className = "lancamento-item";
+      const sinal = l.tipo === "entrada" ? "+" : "-";
+      div.innerHTML = `
+        <div class="lanc-icone ${l.tipo}">${l.tipo === "entrada" ? "↑" : "↓"}</div>
+        <div class="lanc-info">
+          <div class="lanc-desc">${l.descricao}${l.auto ? " <span style='font-size:0.6rem;color:#374151;'>auto</span>" : ""}</div>
+          <div class="lanc-meta">${l.categoria} · ${l.data.split("-").reverse().join("/")}</div>
+        </div>
+        <div class="lanc-valor ${l.tipo}">${sinal}${fmt(l.valor)}</div>
+        ${!l.auto ? `<button class="lanc-del" onclick="removerLancamento(${l.id})">🗑</button>` : ""}
+      `;
+      lista.appendChild(div);
+    });
+  }
+
+  function removerLancamento(id) {
+    dbFluxo = dbFluxo.filter(l => l.id !== id);
+    localStorage.setItem(getStorageKey("fluxo_db"), JSON.stringify(dbFluxo)); fbSalvar("fluxo_db", dbFluxo);
+    atualizarSaldoCard();
+    renderHistorico();
+  }
+
+  function renderResumo() {
+    const d   = new Date();
+    const mes = mesAtual();
+    const lancs = lancamentosMes(mes);
+
+    const vendasMes = dbEstoque.reduce((total, p) => {
+      return total + (p.vendasDiarias || [])
+        .filter(v => v.data.startsWith(mes))
+        .reduce((s, v) => s + (v.qtd * (p.precoVenda || 0)), 0);
+    }, 0);
+
+    const { entradas: lancEntradas, saidas } = calcularSaldo(lancs);
+    const totalEntradas = lancEntradas + vendasMes;
+    const saldo = totalEntradas - saidas;
+
+    // Agrupa saídas por categoria
+    const porCategoria = {};
+    lancs.filter(l => l.tipo === "saida").forEach(l => {
+      porCategoria[l.categoria] = (porCategoria[l.categoria] || 0) + l.valor;
+    });
+    const catOrdenadas = Object.entries(porCategoria).sort((a,b) => b[1] - a[1]);
+
+    const situacao = saldo > 0
+      ? `<span style="color:#22c55e">✅ Mês no azul</span>`
+      : saldo < 0
+      ? `<span style="color:#ef4444">🚨 Mês no vermelho</span>`
+      : `<span style="color:#9ca3af">— Empatado</span>`;
+
+    const icones = { Venda:"🛒", Fornecedor:"🏭", Aluguel:"🏠", Energia:"⚡", Salário:"👷", Transporte:"🚚", Marketing:"📣", Outros:"📦" };
+
+    document.getElementById("resumoConteudo").innerHTML = `
+      <div style="background:#111827;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1f2937;">
+        <div style="font-size:0.7rem;color:#6b7280;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">${MESES_PT[d.getMonth()]} ${d.getFullYear()}</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="color:#6b7280;font-size:0.82rem;">📈 Entradas</span>
+          <span style="color:#22c55e;font-weight:700;">${fmt(totalEntradas)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #1f2937;">
+          <span style="color:#6b7280;font-size:0.82rem;">📉 Saídas</span>
+          <span style="color:#ef4444;font-weight:700;">-${fmt(saidas)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#e8eaf0;font-weight:700;font-size:0.9rem;">💵 Saldo</span>
+          <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:${saldo>=0?"#22c55e":"#ef4444"};">${fmt(saldo)}</span>
+        </div>
+        <div style="text-align:center;margin-top:12px;font-size:0.82rem;">${situacao}</div>
+      </div>
+      ${catOrdenadas.length ? `
+      <div style="background:#111827;border-radius:14px;padding:14px;border:1px solid #1f2937;">
+        <div style="font-size:0.7rem;color:#6b7280;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">Saídas por categoria</div>
+        ${catOrdenadas.map(([cat, val]) => {
+          const pct = saidas > 0 ? Math.round((val/saidas)*100) : 0;
+          return `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:0.78rem;color:#d1d5db;">${icones[cat]||"📦"} ${cat}</span>
+              <span style="font-size:0.78rem;color:#ef4444;font-weight:600;">${fmt(val)} <span style="color:#4b5563">(${pct}%)</span></span>
+            </div>
+            <div style="height:4px;background:#1f2937;border-radius:2px;">
+              <div style="height:4px;background:#ef4444;border-radius:2px;width:${pct}%;opacity:0.7;"></div>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>` : ""}
+    `;
+  }
+
+  // Integração do fluxo de caixa no contexto da IA
+  function getFluxoContexto() {
+    const mes = mesAtual();
+    const lancs = lancamentosMes(mes);
+    const vendasMes = dbEstoque.reduce((total, p) => {
+      return total + (p.vendasDiarias || [])
+        .filter(v => v.data.startsWith(mes))
+        .reduce((s, v) => s + (v.qtd * (p.precoVenda || 0)), 0);
+    }, 0);
+    const { entradas, saidas } = calcularSaldo(lancs);
+    const totalEntradas = entradas + vendasMes;
+    const saldo = totalEntradas - saidas;
+    return `Fluxo de Caixa (mês atual): Entradas R$${totalEntradas.toFixed(2)}, Saídas R$${saidas.toFixed(2)}, Saldo R$${saldo.toFixed(2)}`;
+  }
+  function gerarPlanilha() {
+    if (!window.XLSX) { adicionarMsg("⚠️ Biblioteca de planilha não carregou. Verifique sua conexão.", "ai"); return; }
+
+    const wb = XLSX.utils.book_new();
+    const hoje = new Date().toLocaleDateString("pt-BR");
+
+    // ── ABA 1: Estoque Atual ──────────────────────────────────────────────
+    const estoqueRows = [
+      [`LupiAI — Relatório de Estoque  |  Gerado em: ${hoje}`],
+      [],
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)", "Ação Recomendada"]
+    ];
+
+    dbEstoque.forEach(p => {
+      const consumo = calcularConsumoDiario(p);
+      const dias    = consumo ? Math.floor(p.quantidade / consumo) : null;
+      const status  = dias === null ? "—" :
+                      dias <= 1 ? "🔴 EMERGÊNCIA" :
+                      dias <= 3 ? "🚨 Crítico" :
+                      dias <= 7 ? "⚠️ Baixo" : "✅ OK";
+      const acao    = dias === null ? "Registre consumo/dia" :
+                      dias <= 1 ? "⚡ Compra URGENTE agora!" :
+                      dias <= 3 ? "🚨 Pedir hoje — crítico" :
+                      dias <= 7 ? "📦 Planejar reposição" : "👍 Sem ação necessária";
+      const margem  = p.precoCusto && p.precoVenda
+                      ? `${(((p.precoVenda - p.precoCusto) / p.precoVenda) * 100).toFixed(1)}%`
+                      : "—";
+      const lucroU  = p.precoCusto && p.precoVenda
+                      ? `R$ ${(p.precoVenda - p.precoCusto).toFixed(2)}`
+                      : "—";
+
+      estoqueRows.push([
+        p.produto,
+        p.quantidade,
+        consumo ? consumo.toFixed(1) : "—",
+        dias !== null ? dias : "—",
+        status,
+        p.precoCusto ? `R$ ${p.precoCusto.toFixed(2)}` : "—",
+        p.precoVenda ? `R$ ${p.precoVenda.toFixed(2)}` : "—",
+        margem,
+        lucroU,
+        acao
+      ]);
+    });
+
+    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", "", ""]);
+
+    const ws1 = XLSX.utils.aoa_to_sheet(estoqueRows);
+    ws1["!cols"] = [24,10,12,14,14,16,16,10,14,26].map(w => ({ wch: w }));
+    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }]; // merge título
+    XLSX.utils.book_append_sheet(wb, ws1, "📦 Estoque Atual");
+
+    // ── ABA 2: Alertas ────────────────────────────────────────────────────
+    const alertRows = [
+      [`🚨 Alertas de Estoque Crítico  |  ${hoje}`],
+      [],
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Nível", "Urgência"]
+    ];
+
+    const criticos = dbEstoque.filter(p => {
+      const consumo = calcularConsumoDiario(p);
+      if (!consumo) return false;
+      return Math.floor(p.quantidade / consumo) <= 7;
+    });
+
+    criticos.forEach(p => {
+      const consumo = calcularConsumoDiario(p);
+      const dias    = Math.floor(p.quantidade / consumo);
+      alertRows.push([
+        p.produto, p.quantidade, consumo.toFixed(1), dias,
+        dias <= 1 ? "🔴 EMERGÊNCIA" : dias <= 3 ? "🚨 Crítico" : "⚠️ Baixo",
+        dias <= 1 ? "Compra urgente agora!" : dias <= 3 ? "Pedir hoje" : "Planejar reposição"
+      ]);
+    });
+
+    if (criticos.length === 0) alertRows.push(["✅ Nenhum produto em situação crítica no momento."]);
+
+    const ws2 = XLSX.utils.aoa_to_sheet(alertRows);
+    ws2["!cols"] = [26, 10, 12, 15, 16, 26].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws2, "🚨 Alertas");
+
+    // ── ABA 3: Financeiro ─────────────────────────────────────────────────
+    const gastos  = parseFloat(localStorage.getItem(getStorageKey("gastos_mensais")) || "0");
+    const lucroAt = parseFloat(localStorage.getItem(getStorageKey("lucros_mensais")) || "0");
+    const lucroAn = parseFloat(localStorage.getItem(getStorageKey("lucros_mes_anterior")) || "0");
+    const variacao = lucroAn > 0 ? (((lucroAt - lucroAn) / lucroAn) * 100).toFixed(1) + "%" : "—";
+
+    const finRows = [
+      [`💰 Análise Financeira  |  ${hoje}`],
+      [],
+      ["Indicador", "Valor"],
+      ["Gastos Mensais", gastos > 0 ? `R$ ${gastos.toFixed(2)}` : "Não informado"],
+      ["Lucro este Mês", lucroAt > 0 ? `R$ ${lucroAt.toFixed(2)}` : "Não informado"],
+      ["Lucro Mês Anterior", lucroAn > 0 ? `R$ ${lucroAn.toFixed(2)}` : "Não informado"],
+      ["Variação de Lucro", variacao],
+      ["Situação", lucroAn > 0 && lucroAt > 0
+        ? (lucroAt >= lucroAn * 1.15 ? "✅ Crescimento forte"
+          : lucroAt >= lucroAn ? "📈 Crescendo"
+          : lucroAt >= lucroAn * 0.85 ? "⚠️ Atenção — leve queda"
+          : "🚨 Queda crítica")
+        : "—"],
+      [],
+      ["Contatos Cadastrados", dbContatos.length],
+      ...dbContatos.map(c => [`  ${c.nome} (${c.cargo})`, c.fone])
+    ];
+
+    const ws3 = XLSX.utils.aoa_to_sheet(finRows);
+    ws3["!cols"] = [{ wch: 28 }, { wch: 22 }];
+    XLSX.utils.book_append_sheet(wb, ws3, "💰 Financeiro");
+
+    // ── ABA 4: Histórico de Vendas ────────────────────────────────────────
+    const vendaRows = [
+      [`📈 Histórico de Vendas  |  ${hoje}`],
+      [],
+      ["Produto", "Data", "Qtd Vendida"]
+    ];
+
+    dbEstoque.forEach(p => {
+      (p.vendasDiarias || []).forEach(v => {
+        vendaRows.push([p.produto, v.data, v.qtd]);
+      });
+    });
+
+    if (vendaRows.length === 3) vendaRows.push(["Nenhuma venda registrada ainda."]);
+
+    const ws4 = XLSX.utils.aoa_to_sheet(vendaRows);
+    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }];
+    XLSX.utils.book_append_sheet(wb, ws4, "📈 Histórico Vendas");
+
+    // ── Download ──────────────────────────────────────────────────────────
+    const nomeArq = `LupiAI_${hoje.replace(/\//g, "-")}.xlsx`;
+    XLSX.writeFile(wb, nomeArq);
+
+    adicionarMsg(
+      `📊 Planilha "${nomeArq}" gerada com ${dbEstoque.length} produto(s) e ${criticos.length} alerta(s)! Verifique seus downloads.`,
+      "ai",
+      ["Ver alertas críticos", "Analisar margem de lucro", "Como melhorar meu estoque?"]
+    );
+  }
+  function autoResize() {
+    input.style.height = "auto";
+    input.style.height = input.scrollHeight + "px";
+  }
+
+  input.addEventListener("input", autoResize);
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      enviar();
+    }
+  });
+
+  // ─── ENVIAR ───────────────────────────────────────────────────────────────
+  async function enviar() {
+    const texto = input.value.trim();
+    if (!texto || btn.disabled) return;
+
+    adicionarMsg(texto, "user");
+    ultimoContextoUsuario = texto; // Salva contexto para geração de mensagem WhatsApp
+    input.value = "";
+    input.style.height = "auto";
+    btn.disabled = true;
+    mostrarTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: getSystemPromptComDados() },
+            { role: "user",   content: texto }
+          ],
+          temperature: 0.75,
+          max_tokens: 800
+        })
+      });
+
+      const data = await res.json();
+      removerTyping();
+
+      if (!data.choices || !data.choices[0]) {
+        adicionarMsg("⚠️ Resposta inesperada da API. Verifique sua chave do Groq.", "ai");
+        return;
+      }
+
+      const raw = data.choices[0].message.content;
+
+      // Parser robusto: extrai JSON de qualquer lugar da resposta
+      let parsed = null;
+      try {
+        // Tenta achar bloco JSON (com ou sem ```json)
+        const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/) ||
+                          raw.match(/(\{[\s\S]*"resposta"[\s\S]*\})/);
+        const jsonStr = jsonMatch ? jsonMatch[1].trim() : raw.trim();
+        parsed = JSON.parse(jsonStr);
+      } catch {
+        // Se falhar tudo, usa texto livre mas remove qualquer fragmento JSON solto
+        const semJson = raw
+          .replace(/```(?:json)?[\s\S]*?```/g, "")
+          .replace(/\{[\s\S]*"resposta"[\s\S]*\}/g, "")
+          .replace(/\{[\s\S]*"acao"[\s\S]*\}/g, "")
+          .trim();
+        adicionarMsg(semJson || raw, "ai");
+        btn.disabled = false;
+        input.focus();
+        return;
+      }
+
+      // Usa só o campo "resposta" — nunca exibe JSON bruto
+      const textoResposta = parsed?.resposta || parsed?.message || parsed?.text;
+      if (textoResposta) {
+        adicionarMsg(textoResposta, "ai", parsed?.sugestoes);
+      }
+
+      if (parsed?.acao?.tipo) {
+        if (parsed.acao.tipo === "mensagem") {
+          // Mensagem WhatsApp: executa direto sem action card
+          setTimeout(() => abrirSeletorContato(), 400);
+        } else {
+          setTimeout(() => adicionarActionCard(parsed.acao), 300);
+        }
+      }
+
+    } catch (err) {
+      removerTyping();
+      adicionarMsg("⚠️ Erro de conexão. Verifique sua chave do Groq e tente novamente.", "ai");
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  }
+</script>
+</body>
+</html>
