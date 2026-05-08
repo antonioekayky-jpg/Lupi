@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LupiAI — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+    }
+
+    .ls-card {
+      width: 700px; max-width: calc(100vw - 32px); height: 480px;
+      background: #141416;
+      border-radius: 28px;
+      border: 0.5px solid rgba(255,255,255,.08);
+      position: relative; overflow: hidden;
+    }
+
+    /* PAINÉIS DE FORMULÁRIO */
+    .lp-form-container {
+      position: absolute; top: 0; height: 100%; width: 50%;
+      transition: all .6s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 40px 36px; text-align: center;
+    }
+
+    .lp-sign-in { left: 0; z-index: 2; opacity: 1; }
+    .lp-sign-up { left: 0; opacity: 0; z-index: 1; }
+
+    .ls-card.active .lp-sign-in { transform: translateX(100%); opacity: 0; }
+    .ls-card.active .lp-sign-up { transform: translateX(100%); opacity: 1; z-index: 5; }
+
+    /* PAINEL DESLIZANTE AZUL */
+    .lp-toggle-container {
+      position: absolute; top: 0; left: 50%; width: 50%; height: 100%;
+      overflow: hidden;
+      transition: all .6s cubic-bezier(.4,0,.2,1);
+      border-radius: 0 28px 28px 0;
+      z-index: 100;
+    }
+    .ls-card.active .lp-toggle-container {
+      transform: translateX(-100%);
+      border-radius: 28px 0 0 28px;
+    }
+
+    .lp-toggle {
+      position: relative; left: -100%; width: 200%; height: 100%;
+      background: linear-gradient(145deg, #0A84FF, #0055CC);
+      display: flex;
+      transition: all .6s cubic-bezier(.4,0,.2,1);
+    }
+    .ls-card.active .lp-toggle { transform: translateX(50%); }
+
+    .lp-toggle-panel {
+      width: 50%; height: 100%;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 40px; text-align: center; color: #fff;
+    }
+    .lp-toggle-panel h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+    .lp-toggle-panel p  { font-size: .8rem; line-height: 1.6; opacity: .85; max-width: 200px; margin: 0 auto 24px; }
+
+    /* ELEMENTOS DOS FORMULÁRIOS */
+    .lp-logo {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: #0A84FF; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lp-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .lp-sub   { font-size: .78rem; color: #888; line-height: 1.6; max-width: 220px; margin-bottom: 22px; }
+
+    .btn-google {
+      width: 100%; max-width: 260px; height: 48px;
+      background: #fff; color: #111;
+      border: none; border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: transform .2s;
+    }
+    .btn-google:hover { transform: translateY(-2px); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .divider {
+      width: 100%; max-width: 260px;
+      display: flex; align-items: center; gap: 10px; margin: 14px 0;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: rgba(255,255,255,.1); }
+    .divider span { font-size: .68rem; color: #555; }
+
+    .btn-demo {
+      width: 100%; max-width: 260px; height: 48px;
+      background: #1e1e20; color: #ccc;
+      border: 0.5px solid rgba(255,255,255,.12); border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-demo:hover { background: #2a2a2e; color: #fff; }
+
+    .btn-demo-destaque {
+      width: 100%; max-width: 260px; height: 48px;
+      background: #0A84FF; color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-demo-destaque:hover { background: #0073e6; }
+
+    .btn-outline {
+      padding: 11px 26px;
+      border: 1.5px solid rgba(255,255,255,.55);
+      border-radius: 999px; background: transparent; color: #fff;
+      font-family: 'Sora', sans-serif; font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,.15); }
+
+    .lp-footer { margin-top: 16px; font-size: .64rem; color: #444; max-width: 220px; line-height: 1.6; }
+
+    /* MOBILE */
+    .mobile-switch { display: none; margin-top: 16px; font-size: .74rem; color: #666; }
+    .mobile-switch button {
+      background: none; border: none; color: #0A84FF;
+      font-family: 'Sora', sans-serif; font-size: .74rem; font-weight: 600; cursor: pointer; padding: 0;
+    }
+
+    @media (max-width: 580px) {
+      .ls-card { width: 100%; height: 560px; border-radius: 20px; max-width: 100%; }
+
+      .lp-form-container { width: 100%; }
+      .lp-sign-in  { transform: translateX(0);    opacity: 1; }
+      .lp-sign-up  { transform: translateX(100%); opacity: 0; }
+      .ls-card.active .lp-sign-in { transform: translateX(-100%); opacity: 0; }
+      .ls-card.active .lp-sign-up { transform: translateX(0);     opacity: 1; z-index: 3; }
+
+      .lp-toggle-container { display: none; }
+      .mobile-switch { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ls-card" id="lsCard">
+
+    <!-- PAINEL LOGIN (esquerda) -->
+    <div class="lp-form-container lp-sign-in">
+      <div class="lp-logo">
+        <svg viewBox="0 0 26 26" fill="none" width="26" height="26">
+          <path d="M13 3 L21 8 L21 18 L13 23 L5 18 L5 8 Z" fill="white" opacity=".9"/>
+          <circle cx="13" cy="13" r="3.5" fill="#0A84FF"/>
+        </svg>
+      </div>
+      <div class="lp-title">LupiAI</div>
+      <div class="lp-sub">Entre com sua conta Google e acesse seu estoque em qualquer dispositivo.</div>
+
+      <button class="btn-google" onclick="iniciarLoginGoogle()">
+        <svg viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Entrar com Google
+      </button>
+
+      <div class="lp-footer" style="margin-top:16px">Seus dados ficam protegidos e sincronizados com sua conta Google.</div>
+
+      <div class="mobile-switch">
+        Quer testar o demo? <button onclick="toggleLogin()">Abrir demo →</button>
+      </div>
+    </div>
+
+    <!-- PAINEL DEMO (esquerda, aparece ao alternar) -->
+    <div class="lp-form-container lp-sign-up">
+      <div class="lp-logo" style="background:#1e1e20; border:0.5px solid rgba(255,255,255,.12)">
+        <svg viewBox="0 0 26 26" fill="none" width="26" height="26">
+          <path d="M13 3 L21 8 L21 18 L13 23 L5 18 L5 8 Z" fill="white" opacity=".9"/>
+          <circle cx="13" cy="13" r="3.5" fill="#0A84FF"/>
+        </svg>
+      </div>
+      <div class="lp-title">Modo Demo</div>
+      <div class="lp-sub">Explore todas as funcionalidades com dados de exemplo, sem precisar de uma conta.</div>
+
+      <button class="btn-demo-destaque" onclick="loginDemo()">Entrar no modo demonstração</button>
+
+      <div class="lp-footer">Os dados do modo demo não são salvos permanentemente.</div>
+
+      <div class="mobile-switch">
+        Já possui conta? <button onclick="toggleLogin()">← Fazer login</button>
+      </div>
+    </div>
+
+    <!-- PAINEL DESLIZANTE AZUL -->
+    <div class="lp-toggle-container">
+      <div class="lp-toggle">
+
+        <!-- Visível quando demo está ativo -->
+        <div class="lp-toggle-panel">
+          <h2>Modo Demo</h2>
+          <p>Explore todas as funcionalidades sem criar conta.</p>
+          <button class="btn-outline" onclick="toggleLogin()">Fazer login</button>
+        </div>
+
+        <!-- Visível quando login está ativo -->
+        <div class="lp-toggle-panel">
+          <h2>Bem-vindo</h2>
+          <p>Faça login com Google para sincronizar seu estoque na nuvem.</p>
+          <button class="btn-outline" onclick="toggleLogin()">Abrir demo</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleLogin() {
+      document.getElementById('lsCard').classList.toggle('active');
+    }
+
+    function iniciarLoginGoogle() {
+      // Coloque sua função de login com Google aqui
+    }
+
+    function loginDemo() {
+      // Coloque sua função de modo demo aqui
+    }
+  </script>
+
+</body>
+</html>
