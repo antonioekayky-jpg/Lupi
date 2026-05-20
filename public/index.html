@@ -1294,6 +1294,12 @@
   const API_KEY = ""; // chave gerenciada pelo Netlify Function
   const API_URL = "/chat";
 
+  // ─── VARIÁVEIS GLOBAIS ────────────────────────────────────────────────────
+  const GOOGLE_CLIENT_ID = "835367809372-i29t39qhe4ainev85poab2fep6k8pur5.apps.googleusercontent.com";
+  let usuarioAtual = null;
+  let dbFluxo      = [];
+  let tipoLancamento = "entrada";
+
   const SYSTEM_PROMPT = `Você é o LupiAI — assistente de estoque esperto, direto e gente boa. Fala como um sócio de confiança: natural, sem enrolação, sem papo corporativo.
 
 ⚠️ REGRA ABSOLUTA DE FORMATO — NUNCA QUEBRE ISSO:
@@ -1967,9 +1973,6 @@ ${SYSTEM_PROMPT}`;
   }
 
   // ─── FLUXO DE CAIXA ───────────────────────────────────────────────────────
-  let dbFluxo    = [];
-  let tipoLancamento = "entrada";
-
   const MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
                     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
