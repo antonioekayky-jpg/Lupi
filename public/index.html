@@ -1261,6 +1261,16 @@
     loginScreen.classList.add("hide");
     setTimeout(() => { loginScreen.style.display = "none"; }, 450);
 
+    // Mostra contador de usos se não for liberado
+    if (!isUsuarioLiberado()) {
+      const usos = getUsoAtual();
+      const restam = LIMITE_USOS - usos;
+      if (restam <= 10) {
+        const hint = document.querySelector('.hint');
+        if (hint) hint.innerHTML = `⚠️ <strong style="color:#f59e0b">${restam} uso(s) gratuito(s) restantes</strong> · <a href="#planos" style="color:#3b82f6;text-decoration:none;">Ver planos</a>`;
+      }
+    }
+
     // Atualiza alertas e stats
     setTimeout(() => {
       if (typeof verificarAlertasAutomaticos === 'function') verificarAlertasAutomaticos();
@@ -2376,9 +2386,71 @@ ${SYSTEM_PROMPT}`;
   });
 
   // ─── ENVIAR ───────────────────────────────────────────────────────────────
+  // ─── TRIAL SYSTEM ──────────────────────────────────────────────────────────
+  const UIDS_LIBERADOS = [
+    "110435818882316764213", // Antonio (dono)
+    // Adicione UIDs de beta testers aqui:
+    // "UID_DO_BETA_TESTER_1",
+    // "UID_DO_BETA_TESTER_2",
+  ];
+  const LIMITE_USOS = 30;
+
+  function isUsuarioLiberado() {
+    if (!usuarioAtual) return false;
+    if (usuarioAtual.id === "demo") return false; // demo tem limite
+    return UIDS_LIBERADOS.includes(usuarioAtual.id);
+  }
+
+  function getUsoAtual() {
+    const key = getStorageKey("usos_count");
+    return parseInt(localStorage.getItem(key) || "0");
+  }
+
+  function incrementarUso() {
+    const key = getStorageKey("usos_count");
+    const atual = getUsoAtual();
+    localStorage.setItem(key, atual + 1);
+    return atual + 1;
+  }
+
+  function mostrarModalTrial() {
+    const existing = document.getElementById("modalTrial");
+    if (existing) return;
+    const modal = document.createElement("div");
+    modal.id = "modalTrial";
+    modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;";
+    modal.innerHTML = `
+      <div style="background:#0e1420;border:1px solid rgba(59,130,246,0.3);border-radius:20px;padding:32px 24px;max-width:380px;width:100%;text-align:center;position:relative;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#3b82f6,transparent);border-radius:20px 20px 0 0;"></div>
+        <div style="font-size:2.2rem;margin-bottom:12px;">🔒</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:8px;color:#fff;">Seus ${LIMITE_USOS} usos gratuitos acabaram</h2>
+        <p style="font-size:0.82rem;color:#64748b;line-height:1.7;margin-bottom:24px;">Para continuar usando o LupiAI sem limites, escolha um plano. É simples e rápido.</p>
+        <a href="https://mpago.la/12QTVvT" target="_blank" style="display:block;width:100%;padding:13px;background:#3b82f6;color:#fff;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:700;text-decoration:none;margin-bottom:10px;">💳 Plano Mensal — R$59,99/mês</a>
+        <a href="https://mpago.la/2C42QL9" target="_blank" style="display:block;width:100%;padding:13px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:700;text-decoration:none;margin-bottom:16px;">🏆 Plano Anual — R$699,99/ano</a>
+        <p style="font-size:0.7rem;color:#334155;">Já pagou? Entre em contato para liberar seu acesso.</p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
   async function enviar() {
     const texto = input.value.trim();
     if (!texto || btn.disabled) return;
+
+    // Verifica trial
+    if (!isUsuarioLiberado()) {
+      const usos = getUsoAtual();
+      if (usos >= LIMITE_USOS) {
+        mostrarModalTrial();
+        return;
+      }
+      incrementarUso();
+      // Avisa quando tá chegando no limite
+      const restam = LIMITE_USOS - usos - 1;
+      if (restam <= 5 && restam > 0) {
+        adicionarMsg(`⚠️ Você tem **${restam} uso(s) gratuito(s)** restantes. Após isso será necessário assinar um plano.`, "ai");
+      }
+    }
 
     adicionarMsg(texto, "user");
     ultimoContextoUsuario = texto; // Salva contexto para geração de mensagem WhatsApp
