@@ -1304,8 +1304,9 @@
     <button class="hbtn hbtn-green"  onclick="abrirModalVenda()">Venda</button>
     <button class="hbtn hbtn-purple" onclick="abrirModalContatos()">Contatos</button>
     <button class="hbtn hbtn-wa"     onclick="abrirSeletorContato()">Mensagem</button>
+    <button class="hbtn hbtn-yellow" onclick="document.getElementById('modalFinanceiro').style.display='flex'">💰 Finanças</button>
     <button class="hbtn hbtn-teal"   onclick="gerarPlanilha()">Planilha</button>
-    <button class="hbtn hbtn-cash"   onclick="abrirFluxo()">Caixa</button>
+    <button class="hbtn hbtn-cash"   onclick="abrirFluxo()">💵 Caixa</button>
   </div>
   <div class="user-badge" id="userBadge" style="display:none;">
     <div class="user-avatar-placeholder" id="userAvatarPlaceholder">👤</div>
@@ -1350,17 +1351,39 @@
   <div class="hint">Powered by Groq · LLaMA 3.3 · LupiAI · <a href="politica.html" style="color:var(--accent);text-decoration:none;">Política de Privacidade</a></div>
 </div>
 
-<div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;">
-  <div class="modal-inner">
-    <h3>📦 Novo Produto</h3>
-    <p style="font-size:0.72rem;color:#6b7280;margin:4px 0 12px;">Preencha só o que souber — o resto você pode completar depois.</p>
-    <input type="text"   id="regProduto"        placeholder="Nome do produto *">
-    <input type="number" id="regQuantidade"     placeholder="Quantidade atual em estoque *">
-    <input type="number" id="regConsumoDiario"  placeholder="Quantas unidades vende por dia?" step="0.1">
-    <input type="number" id="regPrecoCusto"     placeholder="Quanto custa para você? (R$)" step="0.01">
-    <input type="number" id="regPrecoVenda"     placeholder="Por quanto você vende? (R$)" step="0.01">
+<div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;">
+  <div class="modal-inner" style="max-height:90vh;overflow-y:auto;">
+    <h3>Novo Produto</h3>
+    <p style="font-size:0.72rem;color:#8E8E93;margin:4px 0 14px;">Só nome e quantidade são obrigatórios. O resto você preenche quando quiser.</p>
+
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">OBRIGATÓRIO</div>
+    <input type="text"   id="regProduto"    placeholder="Nome do produto *">
+    <input type="number" id="regQuantidade" placeholder="Quantidade em estoque *" min="0">
+
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">IDENTIFICAÇÃO (opcional)</div>
+    <input type="text"   id="regSKU"        placeholder="Código / SKU do produto">
+    <input type="text"   id="regCategoria"  placeholder="Categoria (ex: Vestido, Calça, Blusa...)">
+    <select id="regLancamento" style="width:100%;padding:10px;margin-bottom:8px;background:#2C2C2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#8E8E93;font-size:0.85rem;outline:none;">
+      <option value="">É lançamento ou peça básica? (opcional)</option>
+      <option value="lancamento">Lançamento</option>
+      <option value="basica">Peça básica (sempre no mix)</option>
+      <option value="sazonal">Sazonal</option>
+    </select>
+    <input type="text"   id="regFornecedor" placeholder="Fornecedor (ex: Atacado Silva)">
+
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">PREÇOS (opcional)</div>
+    <input type="number" id="regPrecoCusto"    placeholder="Preço de custo (R$)" step="0.01" min="0">
+    <input type="number" id="regPrecoVenda"    placeholder="Preço de venda (R$)" step="0.01" min="0">
+    <input type="number" id="regEstoqueMinimo" placeholder="Estoque mínimo — alerta quando chegar aqui" min="0">
+
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">GIRO (opcional)</div>
+    <input type="number" id="regConsumoDiario" placeholder="Quantas unidades vende por dia?" step="0.1" min="0">
+
     <div class="modal-btns">
-      <button class="btn-salvar"   onclick="salvarRegistro()">Salvar</button>
+      <button class="btn-salvar"   onclick="salvarRegistro()">Salvar produto</button>
       <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
     </div>
   </div>
@@ -1440,7 +1463,7 @@
   <div class="fluxo-sheet">
     <div class="fluxo-handle"></div>
     <div class="fluxo-header">
-      <div class="fluxo-titulo">Fluxo de Caixa</div>
+      <div class="fluxo-titulo">💵 Fluxo de Caixa</div>
       <div class="fluxo-sub" id="fluxoMesLabel">Carregando...</div>
     </div>
 
@@ -1458,52 +1481,31 @@
 
     <!-- Tabs -->
     <div class="fluxo-tabs">
-      <button class="fluxo-tab ativo" id="tabLancar"  onclick="fluxoTab('lancar')">Lançar</button>
-      <button class="fluxo-tab"       id="tabHistorico" onclick="fluxoTab('historico')">Histórico</button>
-      <button class="fluxo-tab"       id="tabResumo"  onclick="fluxoTab('resumo')">Resumo</button>
+      <button class="fluxo-tab ativo" id="tabLancar"  onclick="fluxoTab('lancar')">➕ Lançar</button>
+      <button class="fluxo-tab"       id="tabHistorico" onclick="fluxoTab('historico')">📋 Histórico</button>
+      <button class="fluxo-tab"       id="tabResumo"  onclick="fluxoTab('resumo')">📊 Resumo</button>
     </div>
 
     <!-- Painel Lançar -->
     <div id="painelLancar" class="fluxo-form">
       <div class="fluxo-tipo-btns">
-        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipoLanc('entrada')">↑ Entrada</button>
-        <button class="tipo-btn saida"         id="btnSaida"   onclick="setTipoLanc('saida')">↓ Saída</button>
+        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipoLanc('entrada')">📈 Entrada</button>
+        <button class="tipo-btn saida"         id="btnSaida"   onclick="setTipoLanc('saida')">📉 Saída</button>
       </div>
       <input type="text"   id="lancDesc"   placeholder="Descrição (ex: Venda de filtro, Aluguel...)">
       <input type="number" id="lancValor"  placeholder="Valor (R$)" step="0.01" min="0.01">
       <select id="lancCategoria">
-        <optgroup label="Entradas">
-          <option value="Venda">Venda de produto</option>
-          <option value="Devolução recebida">Devolução recebida</option>
-          <option value="Outro recebimento">Outro recebimento</option>
-        </optgroup>
-        <optgroup label="Saídas — Operacional">
-          <option value="Fornecedor">Fornecedor / Reposição</option>
-          <option value="Produto vencido">Produto vencido / perdido</option>
-          <option value="Estoque parado">Desconto p/ girar estoque parado</option>
-          <option value="Frete">Frete / Transporte</option>
-        </optgroup>
-        <optgroup label="Saídas — Fixas">
-          <option value="Aluguel">Aluguel</option>
-          <option value="Energia">Energia elétrica</option>
-          <option value="Salário">Salário / Pró-labore</option>
-          <option value="Sistema">Sistema / Software</option>
-        </optgroup>
-        <optgroup label="Saídas — Variáveis">
-          <option value="Marketing">Marketing / Anúncio</option>
-          <option value="Manutenção">Manutenção</option>
-          <option value="Imposto">Imposto / Taxa</option>
-          <option value="Outros">Outros</option>
-        </optgroup>
+        <option value="Venda">Venda</option>
+        <option value="Fornecedor">🏭 Fornecedor</option>
+        <option value="Aluguel">🏠 Aluguel</option>
+        <option value="Energia">⚡ Energia</option>
+        <option value="Salário">👷 Salário</option>
+        <option value="Transporte">🚚 Transporte</option>
+        <option value="Marketing">📣 Marketing</option>
+        <option value="Outros">📦 Outros</option>
       </select>
-      <button class="btn-salvar" style="margin-top:2px;padding:11px;" onclick="salvarLancamento()">Registrar lançamento</button>
-      <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0;"></div>
-      <div style="font-size:0.72rem;color:#8E8E93;margin-bottom:8px;font-weight:600;letter-spacing:0.03em;">METAS DO MÊS</div>
-      <input type="number" id="regGastos"       placeholder="Gastos mensais previstos (R$)" style="margin-bottom:8px;">
-      <input type="number" id="regLucros"       placeholder="Meta de lucro deste mês (R$)" style="margin-bottom:8px;">
-      <input type="number" id="regLucrosMesAnt" placeholder="Lucro real do mês passado (R$)" style="margin-bottom:8px;">
-      <button class="btn-salvar" style="padding:9px;font-size:0.8rem;background:#2C2C2E;color:#8E8E93;" onclick="salvarFinanceiro()">Salvar metas</button>
-      <button class="btn-cancelar" style="padding:9px;font-size:0.8rem;margin-top:6px;" onclick="fecharFluxo()">Fechar</button>
+      <button class="btn-salvar" style="margin-top:2px;padding:11px;" onclick="salvarLancamento()">Registrar</button>
+      <button class="btn-cancelar" style="padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
     </div>
 
     <!-- Painel Histórico -->
@@ -1514,8 +1516,6 @@
     <!-- Painel Resumo -->
     <div id="painelResumo" style="display:none;padding:0 16px;">
       <div id="resumoConteudo"></div>
-      <!-- Card de Alertas de Perda -->
-      <div id="alertasPerda" style="margin-top:14px;"></div>
       <button class="btn-cancelar" style="width:100%;margin-top:14px;padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
     </div>
   </div>
@@ -1989,6 +1989,11 @@ ${SYSTEM_PROMPT}`;
     const consumoDiario = parseFloat(document.getElementById("regConsumoDiario").value);
     const precoCusto    = parseFloat(document.getElementById("regPrecoCusto").value);
     const precoVenda    = parseFloat(document.getElementById("regPrecoVenda").value);
+    const estoqueMinimo = parseInt(document.getElementById("regEstoqueMinimo").value);
+    const sku           = document.getElementById("regSKU").value.trim();
+    const categoria     = document.getElementById("regCategoria").value.trim();
+    const lancamento    = document.getElementById("regLancamento").value;
+    const fornecedor    = document.getElementById("regFornecedor").value.trim();
 
     if (!produto || isNaN(quantidade)) {
       alert("Informe ao menos o nome e a quantidade do produto.");
@@ -1999,18 +2004,39 @@ ${SYSTEM_PROMPT}`;
     const item = idx >= 0 ? dbEstoque[idx] : { produto, vendasDiarias: [] };
     item.quantidade = quantidade;
     item.data = new Date().toISOString();
+
+    // Campos opcionais — só salva se preenchido
     if (!isNaN(consumoDiario) && consumoDiario > 0) item.consumoDiarioManual = consumoDiario;
-    if (!isNaN(precoCusto)   && precoCusto   > 0) item.precoCusto = precoCusto;
-    if (!isNaN(precoVenda)   && precoVenda   > 0) item.precoVenda = precoVenda;
+    if (!isNaN(precoCusto)    && precoCusto    > 0) item.precoCusto = precoCusto;
+    if (!isNaN(precoVenda)    && precoVenda    > 0) item.precoVenda = precoVenda;
+    if (!isNaN(estoqueMinimo) && estoqueMinimo >= 0) item.estoqueMinimo = estoqueMinimo;
+    if (sku)        item.sku        = sku;
+    if (categoria)  item.categoria  = categoria;
+    if (lancamento) item.lancamento = lancamento;
+    if (fornecedor) item.fornecedor = fornecedor;
     if (!item.vendasDiarias) item.vendasDiarias = [];
+
     if (idx >= 0) dbEstoque[idx] = item; else dbEstoque.push(item);
     localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
 
     fecharModal();
-    ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda"]
+    ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda",
+     "regEstoqueMinimo","regSKU","regCategoria","regFornecedor"]
       .forEach(id => document.getElementById(id).value = "");
+    document.getElementById("regLancamento").value = "";
     verificarAlertasAutomaticos();
-    adicionarMsg(`📦 "${produto}" adicionado! ${!isNaN(consumoDiario) && consumoDiario > 0 ? `Com consumo de ${consumoDiario}/dia, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.` : "Registre vendas para eu calcular a previsão de duração."}`, "ai");
+
+    // Mensagem de confirmação adaptada ao que foi preenchido
+    let msg = `"${produto}" adicionado com ${quantidade} unidades.`;
+    if (!isNaN(consumoDiario) && consumoDiario > 0) {
+      msg += ` Com ${consumoDiario}/dia de consumo, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.`;
+    } else {
+      msg += " Registre vendas para eu calcular a previsão de duração.";
+    }
+    if (!isNaN(estoqueMinimo) && estoqueMinimo >= 0) {
+      msg += ` Vou te avisar quando chegar em ${estoqueMinimo} unidades.`;
+    }
+    adicionarMsg(msg, "ai");
   }
 
   function fecharModal() {
