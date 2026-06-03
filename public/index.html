@@ -1351,39 +1351,17 @@
   <div class="hint">Powered by Groq · LLaMA 3.3 · LupiAI · <a href="politica.html" style="color:var(--accent);text-decoration:none;">Política de Privacidade</a></div>
 </div>
 
-<div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;">
-  <div class="modal-inner" style="max-height:90vh;overflow-y:auto;">
-    <h3>Novo Produto</h3>
-    <p style="font-size:0.72rem;color:#8E8E93;margin:4px 0 14px;">Só nome e quantidade são obrigatórios. O resto você preenche quando quiser.</p>
-
-    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">OBRIGATÓRIO</div>
-    <input type="text"   id="regProduto"    placeholder="Nome do produto *">
-    <input type="number" id="regQuantidade" placeholder="Quantidade em estoque *" min="0">
-
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
-    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">IDENTIFICAÇÃO (opcional)</div>
-    <input type="text"   id="regSKU"        placeholder="Código / SKU do produto">
-    <input type="text"   id="regCategoria"  placeholder="Categoria (ex: Vestido, Calça, Blusa...)">
-    <select id="regLancamento" style="width:100%;padding:10px;margin-bottom:8px;background:#2C2C2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#8E8E93;font-size:0.85rem;outline:none;">
-      <option value="">É lançamento ou peça básica? (opcional)</option>
-      <option value="lancamento">Lançamento</option>
-      <option value="basica">Peça básica (sempre no mix)</option>
-      <option value="sazonal">Sazonal</option>
-    </select>
-    <input type="text"   id="regFornecedor" placeholder="Fornecedor (ex: Atacado Silva)">
-
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
-    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">PREÇOS (opcional)</div>
-    <input type="number" id="regPrecoCusto"    placeholder="Preço de custo (R$)" step="0.01" min="0">
-    <input type="number" id="regPrecoVenda"    placeholder="Preço de venda (R$)" step="0.01" min="0">
-    <input type="number" id="regEstoqueMinimo" placeholder="Estoque mínimo — alerta quando chegar aqui" min="0">
-
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0 10px;"></div>
-    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">GIRO (opcional)</div>
-    <input type="number" id="regConsumoDiario" placeholder="Quantas unidades vende por dia?" step="0.1" min="0">
-
+<div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;">
+  <div class="modal-inner">
+    <h3>📦 Novo Produto</h3>
+    <p style="font-size:0.72rem;color:#6b7280;margin:4px 0 12px;">Preencha só o que souber — o resto você pode completar depois.</p>
+    <input type="text"   id="regProduto"        placeholder="Nome do produto *">
+    <input type="number" id="regQuantidade"     placeholder="Quantidade atual em estoque *">
+    <input type="number" id="regConsumoDiario"  placeholder="Quantas unidades vende por dia?" step="0.1">
+    <input type="number" id="regPrecoCusto"     placeholder="Quanto custa para você? (R$)" step="0.01">
+    <input type="number" id="regPrecoVenda"     placeholder="Por quanto você vende? (R$)" step="0.01">
     <div class="modal-btns">
-      <button class="btn-salvar"   onclick="salvarRegistro()">Salvar produto</button>
+      <button class="btn-salvar"   onclick="salvarRegistro()">Salvar</button>
       <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
     </div>
   </div>
@@ -1406,13 +1384,31 @@
 
 <div id="modalVenda" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;">
   <div class="modal-inner">
-    <h3>🛒 Registrar Venda</h3>
-    <select id="vendaProduto" style="width:100%;padding:10px;margin-bottom:10px;background:#131929;border:1px solid #1f2937;border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;">
+    <h3>Registrar Venda</h3>
+    <p style="font-size:0.72rem;color:#8E8E93;margin:4px 0 12px;">Produto e quantidade são obrigatórios. O resto é opcional mas vai na planilha.</p>
+
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">OBRIGATÓRIO</div>
+    <select id="vendaProduto" style="width:100%;padding:10px;margin-bottom:8px;background:#2C2C2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:white;font-size:0.85rem;outline:none;">
       <option value="">Selecione o produto...</option>
     </select>
-    <input type="number" id="vendaQtd" placeholder="Quantidade vendida" min="1">
+    <input type="number" id="vendaQtd" placeholder="Quantidade vendida *" min="1">
+
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:12px 0 10px;"></div>
+    <div style="font-size:0.68rem;color:#8E8E93;margin-bottom:6px;font-weight:600;letter-spacing:0.04em;">DETALHES (opcional — aparecem na planilha)</div>
+
+    <input type="text" id="vendaCliente" placeholder="Nome da cliente (ex: Maria, Ana...)">
+    <input type="date" id="vendaData" style="margin-bottom:8px;">
+    <select id="vendaTipo" style="width:100%;padding:10px;margin-bottom:8px;background:#2C2C2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#8E8E93;font-size:0.85rem;outline:none;">
+      <option value="">Tipo de venda (opcional)</option>
+      <option value="loja">Loja (peça do mix normal)</option>
+      <option value="lancamento">Lançamento (peça nova)</option>
+      <option value="pronta_entrega">Pronta entrega</option>
+      <option value="encomenda">Encomenda</option>
+    </select>
+    <input type="text" id="vendaObs" placeholder="Observação (ex: cliente voltou, troca...)">
+
     <div class="modal-btns">
-      <button class="btn-salvar"   onclick="salvarVenda()">Registrar</button>
+      <button class="btn-salvar" onclick="salvarVenda()">Registrar venda</button>
       <button class="btn-cancelar" onclick="fecharModalVenda()">Cancelar</button>
     </div>
   </div>
@@ -1989,11 +1985,6 @@ ${SYSTEM_PROMPT}`;
     const consumoDiario = parseFloat(document.getElementById("regConsumoDiario").value);
     const precoCusto    = parseFloat(document.getElementById("regPrecoCusto").value);
     const precoVenda    = parseFloat(document.getElementById("regPrecoVenda").value);
-    const estoqueMinimo = parseInt(document.getElementById("regEstoqueMinimo").value);
-    const sku           = document.getElementById("regSKU").value.trim();
-    const categoria     = document.getElementById("regCategoria").value.trim();
-    const lancamento    = document.getElementById("regLancamento").value;
-    const fornecedor    = document.getElementById("regFornecedor").value.trim();
 
     if (!produto || isNaN(quantidade)) {
       alert("Informe ao menos o nome e a quantidade do produto.");
@@ -2004,39 +1995,18 @@ ${SYSTEM_PROMPT}`;
     const item = idx >= 0 ? dbEstoque[idx] : { produto, vendasDiarias: [] };
     item.quantidade = quantidade;
     item.data = new Date().toISOString();
-
-    // Campos opcionais — só salva se preenchido
     if (!isNaN(consumoDiario) && consumoDiario > 0) item.consumoDiarioManual = consumoDiario;
-    if (!isNaN(precoCusto)    && precoCusto    > 0) item.precoCusto = precoCusto;
-    if (!isNaN(precoVenda)    && precoVenda    > 0) item.precoVenda = precoVenda;
-    if (!isNaN(estoqueMinimo) && estoqueMinimo >= 0) item.estoqueMinimo = estoqueMinimo;
-    if (sku)        item.sku        = sku;
-    if (categoria)  item.categoria  = categoria;
-    if (lancamento) item.lancamento = lancamento;
-    if (fornecedor) item.fornecedor = fornecedor;
+    if (!isNaN(precoCusto)   && precoCusto   > 0) item.precoCusto = precoCusto;
+    if (!isNaN(precoVenda)   && precoVenda   > 0) item.precoVenda = precoVenda;
     if (!item.vendasDiarias) item.vendasDiarias = [];
-
     if (idx >= 0) dbEstoque[idx] = item; else dbEstoque.push(item);
     localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
 
     fecharModal();
-    ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda",
-     "regEstoqueMinimo","regSKU","regCategoria","regFornecedor"]
+    ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda"]
       .forEach(id => document.getElementById(id).value = "");
-    document.getElementById("regLancamento").value = "";
     verificarAlertasAutomaticos();
-
-    // Mensagem de confirmação adaptada ao que foi preenchido
-    let msg = `"${produto}" adicionado com ${quantidade} unidades.`;
-    if (!isNaN(consumoDiario) && consumoDiario > 0) {
-      msg += ` Com ${consumoDiario}/dia de consumo, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.`;
-    } else {
-      msg += " Registre vendas para eu calcular a previsão de duração.";
-    }
-    if (!isNaN(estoqueMinimo) && estoqueMinimo >= 0) {
-      msg += ` Vou te avisar quando chegar em ${estoqueMinimo} unidades.`;
-    }
-    adicionarMsg(msg, "ai");
+    adicionarMsg(`📦 "${produto}" adicionado! ${!isNaN(consumoDiario) && consumoDiario > 0 ? `Com consumo de ${consumoDiario}/dia, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.` : "Registre vendas para eu calcular a previsão de duração."}`, "ai");
   }
 
   function fecharModal() {
@@ -2088,28 +2058,47 @@ ${SYSTEM_PROMPT}`;
     if (!item) return;
     if (!item.vendasDiarias) item.vendasDiarias = [];
 
-    // Registra venda com data de hoje
-    const hoje = new Date().toISOString().split("T")[0];
-    const registroHoje = item.vendasDiarias.find(v => v.data === hoje);
-    if (registroHoje) {
+    // Campos opcionais
+    const cliente = document.getElementById("vendaCliente").value.trim();
+    const dataInput = document.getElementById("vendaData").value;
+    const tipo = document.getElementById("vendaTipo").value;
+    const obs = document.getElementById("vendaObs").value.trim();
+
+    // Data da venda — usa a digitada ou hoje
+    const dataVenda = dataInput || new Date().toISOString().split("T")[0];
+
+    // Registro detalhado
+    const novoRegistro = { data: dataVenda, qtd };
+    if (cliente) novoRegistro.cliente = cliente;
+    if (tipo)    novoRegistro.tipo = tipo;
+    if (obs)     novoRegistro.obs = obs;
+
+    // Agrupa por data (mantém compatibilidade)
+    const registroHoje = item.vendasDiarias.find(v => v.data === dataVenda && !v.cliente);
+    if (registroHoje && !cliente && !tipo && !obs) {
       registroHoje.qtd += qtd;
     } else {
-      item.vendasDiarias.push({ data: hoje, qtd });
+      item.vendasDiarias.push(novoRegistro);
     }
 
-    // Mantém apenas últimos 30 dias
-    item.vendasDiarias = item.vendasDiarias.slice(-30);
+    // Mantém últimos 60 registros
+    item.vendasDiarias = item.vendasDiarias.slice(-60);
 
     // Atualiza estoque
     item.quantidade = Math.max(0, item.quantidade - qtd);
     dbEstoque[idx] = item;
     localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
 
+    // Limpa campos opcionais
+    ["vendaCliente","vendaData","vendaObs"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("vendaTipo").value = "";
+
     fecharModalVenda();
     verificarAlertasAutomaticos();
     const diasRestantes = calcularDiasRestantes(item);
     const diasTxt = diasRestantes !== null ? ` Estoque estimado para ${diasRestantes} dia(s).` : "";
-    adicionarMsg(`Venda de ${qtd} un. de "${item.produto}" registrada. Estoque atual: ${item.quantidade} un.${diasTxt}`, "ai");
+    const clienteTxt = cliente ? ` — cliente: ${cliente}` : "";
+    adicionarMsg(`Venda de ${qtd} un. de "${item.produto}" registrada${clienteTxt}. Estoque atual: ${item.quantidade} un.${diasTxt}`, "ai");
   }
 
   // ─── CÁLCULO DE CONSUMO E DIAS RESTANTES ──────────────────────────────────
@@ -2651,305 +2640,138 @@ ${SYSTEM_PROMPT}`;
   function gerarPlanilha() {
     if (!window.XLSX) { adicionarMsg("⚠️ Biblioteca de planilha não carregou. Verifique sua conexão.", "ai"); return; }
 
-    const wb   = XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new();
     const hoje = new Date().toLocaleDateString("pt-BR");
-    const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
-    // ── HELPERS DE ESTILO ────────────────────────────────────────────────────
-    function cell(v, s) { return { v, s, t: typeof v === "number" ? "n" : "s" }; }
-
-    const CORES = {
-      azul:       "FF0A84FF",
-      azulEscuro: "FF0056b3",
-      verde:      "FF30D158",
-      verdeEscuro:"FF1a7a36",
-      vermelho:   "FFef4444",
-      laranja:    "FFf59e0b",
-      cinzaEsc:   "FF1C1C1E",
-      cinzaMed:   "FF2C2C2E",
-      cinzaClaro: "FF3A3A3C",
-      branco:     "FFF5F5F7",
-      preto:      "FF000000",
-      azulPale:   "FFe8f4ff",
-      verdePale:  "FFe8fff2",
-      vermPale:   "FFffe8e8",
-      amarPale:   "FFfffbe8",
-    };
-
-    function sTitulo(bgColor) {
-      return { font: { bold: true, sz: 14, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: bgColor } }, alignment: { horizontal: "center", vertical: "center" } };
-    }
-    function sSubtitulo(bgColor) {
-      return { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: bgColor } }, alignment: { horizontal: "center" } };
-    }
-    function sHeader() {
-      return { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: CORES.cinzaEsc } }, alignment: { horizontal: "center", vertical: "center" }, border: { bottom: { style: "thin", color: { rgb: CORES.azul } } } };
-    }
-    function sNormal(bg) {
-      return { font: { sz: 9, color: { rgb: CORES.cinzaEsc } }, fill: { fgColor: { rgb: bg || "FFFFFFFF" } }, alignment: { vertical: "center" } };
-    }
-    function sNumero(bg) {
-      return { font: { sz: 9, color: { rgb: CORES.cinzaEsc } }, fill: { fgColor: { rgb: bg || "FFFFFFFF" } }, alignment: { horizontal: "right", vertical: "center" } };
-    }
-    function sStatus(nivel) {
-      const map = {
-        emergencia: { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: CORES.vermelho } }, alignment: { horizontal: "center" } },
-        critico:    { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: "FFb45309" } }, alignment: { horizontal: "center" } },
-        baixo:      { font: { bold: true, sz: 9, color: { rgb: CORES.preto } },  fill: { fgColor: { rgb: CORES.laranja } }, alignment: { horizontal: "center" } },
-        ok:         { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: CORES.verde } },    alignment: { horizontal: "center" } },
-      };
-      return map[nivel] || sNormal();
-    }
-    function sTotal(bgColor) {
-      return { font: { bold: true, sz: 9, color: { rgb: CORES.branco } }, fill: { fgColor: { rgb: bgColor || CORES.cinzaEsc } }, alignment: { horizontal: "right" } };
-    }
-
-    // Aplica estilos a células individuais numa sheet AOA
-    function aplicarEstilosAoa(ws, estilos) {
-      // estilos = array de { r, c, style }
-      estilos.forEach(({ r, c, s }) => {
-        const addr = XLSX.utils.encode_cell({ r, c });
-        if (!ws[addr]) ws[addr] = { v: "", t: "s" };
-        ws[addr].s = s;
-      });
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    // ABA 1 — ESTOQUE
-    // ════════════════════════════════════════════════════════════════════════
-    const criticos = dbEstoque.filter(p => { const c = calcularConsumoDiario(p); return c && Math.floor(p.quantidade / c) <= 7; });
-    const totalProd = dbEstoque.length;
-    const totalQtd  = dbEstoque.reduce((s, p) => s + (p.quantidade || 0), 0);
-    const totalValorEstoque = dbEstoque.reduce((s, p) => s + ((p.precoVenda || 0) * (p.quantidade || 0)), 0);
-    const totalLucroEstoque = dbEstoque.reduce((s, p) => s + (((p.precoVenda || 0) - (p.precoCusto || 0)) * (p.quantidade || 0)), 0);
-
-    const e1Rows = [
-      // Linha 0: Título
-      ["LupiAI — Relatório de Estoque", "", "", "", "", "", "", "", "", ""],
-      // Linha 1: Subtítulo
-      [`Gerado em: ${hoje} às ${hora}  |  ${totalProd} produto(s)  |  ${criticos.length} alerta(s) crítico(s)`, "", "", "", "", "", "", "", "", ""],
-      // Linha 2: Vazia
-      ["", "", "", "", "", "", "", "", "", ""],
-      // Linha 3: Cabeçalhos
-      ["PRODUTO", "QTD ATUAL", "CONSUMO/DIA", "DIAS REST.", "STATUS", "CUSTO (R$)", "VENDA (R$)", "MARGEM (%)", "LUCRO UNIT.", "AÇÃO RECOMENDADA"],
+    // ── ABA 1: Estoque Atual ──────────────────────────────────────────────
+    const estoqueRows = [
+      [`LupiAI — Relatório de Estoque  |  Gerado em: ${hoje}`],
+      [],
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)", "Ação Recomendada"]
     ];
 
-    const e1Estilos = [];
-    // Título — linha 0
-    e1Estilos.push({ r: 0, c: 0, s: sTitulo(CORES.azulEscuro) });
-    for (let c = 1; c <= 9; c++) e1Estilos.push({ r: 0, c, s: sTitulo(CORES.azulEscuro) });
-    // Subtítulo — linha 1
-    for (let c = 0; c <= 9; c++) e1Estilos.push({ r: 1, c, s: sSubtitulo(CORES.cinzaMed) });
-    // Cabeçalhos — linha 3
-    for (let c = 0; c <= 9; c++) e1Estilos.push({ r: 3, c, s: sHeader() });
-
-    dbEstoque.forEach((p, i) => {
+    dbEstoque.forEach(p => {
       const consumo = calcularConsumoDiario(p);
       const dias    = consumo ? Math.floor(p.quantidade / consumo) : null;
-      const nivel   = dias === null ? "ok" : dias <= 1 ? "emergencia" : dias <= 3 ? "critico" : dias <= 7 ? "baixo" : "ok";
-      const statusTxt = dias === null ? "— Sem dados" : dias <= 1 ? "🔴 EMERGÊNCIA" : dias <= 3 ? "🚨 Crítico" : dias <= 7 ? "⚠️ Baixo" : "✅ OK";
-      const acaoTxt   = dias === null ? "Registre consumo/dia" : dias <= 1 ? "Compra URGENTE agora!" : dias <= 3 ? "Pedir hoje — crítico" : dias <= 7 ? "Planejar reposição esta semana" : "Nenhuma ação necessária";
-      const margem  = p.precoCusto && p.precoVenda ? (((p.precoVenda - p.precoCusto) / p.precoVenda) * 100).toFixed(1) : null;
-      const lucroU  = p.precoCusto && p.precoVenda ? (p.precoVenda - p.precoCusto) : null;
-      const bgLinha = i % 2 === 0 ? "FFFFFFFF" : "FFF7F9FC";
-      const r = 4 + i;
+      const status  = dias === null ? "—" :
+                      dias <= 1 ? "🔴 EMERGÊNCIA" :
+                      dias <= 3 ? "🚨 Crítico" :
+                      dias <= 7 ? "⚠️ Baixo" : "✅ OK";
+      const acao    = dias === null ? "Registre consumo/dia" :
+                      dias <= 1 ? "⚡ Compra URGENTE agora!" :
+                      dias <= 3 ? "🚨 Pedir hoje — crítico" :
+                      dias <= 7 ? "📦 Planejar reposição" : "👍 Sem ação necessária";
+      const margem  = p.precoCusto && p.precoVenda
+                      ? `${(((p.precoVenda - p.precoCusto) / p.precoVenda) * 100).toFixed(1)}%`
+                      : "—";
+      const lucroU  = p.precoCusto && p.precoVenda
+                      ? `R$ ${(p.precoVenda - p.precoCusto).toFixed(2)}`
+                      : "—";
 
-      e1Rows.push([
+      estoqueRows.push([
         p.produto,
         p.quantidade,
         consumo ? consumo.toFixed(1) : "—",
         dias !== null ? dias : "—",
-        statusTxt,
-        p.precoCusto ? p.precoCusto : "—",
-        p.precoVenda ? p.precoVenda : "—",
-        margem ? parseFloat(margem) : "—",
-        lucroU !== null ? lucroU : "—",
-        acaoTxt
+        status,
+        p.precoCusto ? `R$ ${p.precoCusto.toFixed(2)}` : "—",
+        p.precoVenda ? `R$ ${p.precoVenda.toFixed(2)}` : "—",
+        margem,
+        lucroU,
+        acao
       ]);
-
-      for (let c = 0; c <= 9; c++) {
-        if (c === 4) e1Estilos.push({ r, c, s: sStatus(nivel) });
-        else if ([1,2,3,5,6,7,8].includes(c)) e1Estilos.push({ r, c, s: sNumero(bgLinha) });
-        else e1Estilos.push({ r, c, s: sNormal(bgLinha) });
-      }
     });
 
-    // Linha de totais
-    const rTot = 4 + dbEstoque.length;
-    e1Rows.push(["TOTAIS", totalQtd, "", "", `${criticos.length} em alerta`, "", "", "", totalLucroEstoque.toFixed(2), `Valor em estoque: R$ ${totalValorEstoque.toFixed(2)}`]);
-    for (let c = 0; c <= 9; c++) e1Estilos.push({ r: rTot, c, s: sTotal(CORES.azulEscuro) });
+    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", "", ""]);
 
-    const ws1 = XLSX.utils.aoa_to_sheet(e1Rows);
-    ws1["!cols"] = [28,10,13,12,16,13,13,12,14,30].map(w => ({ wch: w }));
-    ws1["!rows"] = [{ hpt: 28 }, { hpt: 18 }, { hpt: 6 }, { hpt: 20 }];
-    ws1["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } }
+    const ws1 = XLSX.utils.aoa_to_sheet(estoqueRows);
+    ws1["!cols"] = [24,10,12,14,14,16,16,10,14,26].map(w => ({ wch: w }));
+    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }]; // merge título
+    XLSX.utils.book_append_sheet(wb, ws1, "📦 Estoque Atual");
+
+    // ── ABA 2: Alertas ────────────────────────────────────────────────────
+    const alertRows = [
+      [`🚨 Alertas de Estoque Crítico  |  ${hoje}`],
+      [],
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Nível", "Urgência"]
     ];
-    aplicarEstilosAoa(ws1, e1Estilos);
-    XLSX.utils.book_append_sheet(wb, ws1, "Estoque");
 
-    // ════════════════════════════════════════════════════════════════════════
-    // ABA 2 — ALERTAS
-    // ════════════════════════════════════════════════════════════════════════
-    const a2Rows = [
-      ["LupiAI — Alertas Críticos de Estoque", "", "", "", "", ""],
-      [`${hoje}  |  ${criticos.length} produto(s) em situação crítica`, "", "", "", "", ""],
-      ["", "", "", "", "", ""],
-      ["PRODUTO", "QTD ATUAL", "CONSUMO/DIA", "DIAS REST.", "NÍVEL", "AÇÃO IMEDIATA"],
-    ];
-    const a2Estilos = [];
-    for (let c = 0; c <= 5; c++) {
-      a2Estilos.push({ r: 0, c, s: sTitulo("FFb91c1c") });
-      a2Estilos.push({ r: 1, c, s: sSubtitulo(CORES.cinzaMed) });
-      a2Estilos.push({ r: 3, c, s: sHeader() });
-    }
-
-    if (criticos.length === 0) {
-      a2Rows.push(["✅ Nenhum produto em situação crítica no momento. Estoque saudável!", "", "", "", "", ""]);
-      for (let c = 0; c <= 5; c++) a2Estilos.push({ r: 4, c, s: { font: { bold: true, color: { rgb: CORES.verdeEscuro } }, fill: { fgColor: { rgb: CORES.verdePale } }, alignment: { horizontal: "center" } } });
-    } else {
-      criticos.forEach((p, i) => {
-        const consumo = calcularConsumoDiario(p);
-        const dias    = Math.floor(p.quantidade / consumo);
-        const nivel   = dias <= 1 ? "emergencia" : dias <= 3 ? "critico" : "baixo";
-        const nivelTxt = dias <= 1 ? "🔴 EMERGÊNCIA" : dias <= 3 ? "🚨 Crítico" : "⚠️ Baixo";
-        const acao    = dias <= 1 ? "Ligar para fornecedor AGORA" : dias <= 3 ? "Fazer pedido hoje" : "Planejar reposição";
-        const bg      = dias <= 1 ? CORES.vermPale : dias <= 3 ? CORES.amarPale : "FFFFFFFF";
-        const r       = 4 + i;
-        a2Rows.push([p.produto, p.quantidade, consumo.toFixed(1), dias, nivelTxt, acao]);
-        for (let c = 0; c <= 5; c++) {
-          if (c === 4) a2Estilos.push({ r, c, s: sStatus(nivel) });
-          else if (c === 1 || c === 2 || c === 3) a2Estilos.push({ r, c, s: sNumero(bg) });
-          else a2Estilos.push({ r, c, s: sNormal(bg) });
-        }
-      });
-    }
-
-    const ws2 = XLSX.utils.aoa_to_sheet(a2Rows);
-    ws2["!cols"] = [28, 12, 13, 13, 16, 32].map(w => ({ wch: w }));
-    ws2["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }];
-    aplicarEstilosAoa(ws2, a2Estilos);
-    XLSX.utils.book_append_sheet(wb, ws2, "Alertas");
-
-    // ════════════════════════════════════════════════════════════════════════
-    // ABA 3 — FINANCEIRO
-    // ════════════════════════════════════════════════════════════════════════
-    const gastos   = parseFloat(localStorage.getItem(getStorageKey("gastos_mensais")) || "0");
-    const lucroAt  = parseFloat(localStorage.getItem(getStorageKey("lucros_mensais")) || "0");
-    const lucroAn  = parseFloat(localStorage.getItem(getStorageKey("lucros_mes_anterior")) || "0");
-    const margLiq  = lucroAt - gastos;
-    const variacao = lucroAn > 0 ? (((lucroAt - lucroAn) / lucroAn) * 100).toFixed(1) : null;
-    const situacao = !lucroAn || !lucroAt ? "Dados insuficientes" :
-                     lucroAt >= lucroAn * 1.15 ? "Crescimento forte ✅" :
-                     lucroAt >= lucroAn       ? "Crescendo 📈" :
-                     lucroAt >= lucroAn * 0.85 ? "Atenção — leve queda ⚠️" : "Queda crítica 🚨";
-
-    const f3Rows = [
-      ["LupiAI — Análise Financeira", ""],
-      [`Gerado em: ${hoje}`, ""],
-      ["", ""],
-      ["📊 RESUMO DO MÊS", "VALOR"],
-      ["Receita Mensal",      lucroAt > 0 ? lucroAt : "Não informado"],
-      ["Gastos Mensais",      gastos > 0  ? gastos  : "Não informado"],
-      ["Margem Líquida",      lucroAt > 0 && gastos > 0 ? margLiq : "—"],
-      ["Margem %",            lucroAt > 0 && gastos > 0 ? parseFloat(((margLiq / lucroAt) * 100).toFixed(1)) : "—"],
-      ["", ""],
-      ["📈 COMPARATIVO", ""],
-      ["Receita Mês Anterior", lucroAn > 0 ? lucroAn : "Não informado"],
-      ["Variação de Receita",  variacao ? parseFloat(variacao) : "—"],
-      ["Situação",             situacao],
-      ["", ""],
-      ["📦 ESTOQUE — VALOR", ""],
-      ["Valor Total em Estoque (venda)", totalValorEstoque > 0 ? totalValorEstoque : "—"],
-      ["Lucro Potencial do Estoque",     totalLucroEstoque > 0 ? totalLucroEstoque : "—"],
-      ["Produtos Cadastrados",           totalProd],
-      ["Produtos em Alerta",             criticos.length],
-      ["", ""],
-      ["👥 CONTATOS", ""],
-      ...dbContatos.map(c => [`${c.nome} (${c.cargo})`, c.fone || c.email || "—"]),
-    ];
-    if (dbContatos.length === 0) f3Rows.push(["Nenhum contato cadastrado.", ""]);
-
-    const f3Estilos = [];
-    for (let c = 0; c <= 1; c++) {
-      f3Estilos.push({ r: 0, c, s: sTitulo(CORES.verdeEscuro) });
-      f3Estilos.push({ r: 1, c, s: sSubtitulo(CORES.cinzaMed) });
-    }
-    // Cabeçalhos de seção
-    [3, 9, 14, 20].forEach(r => { for (let c = 0; c <= 1; c++) f3Estilos.push({ r, c, s: sHeader() }); });
-    // Linhas de dados
-    const linhasDados = [4,5,6,7,10,11,12,15,16,17,18];
-    linhasDados.forEach((r, i) => {
-      const bg = i % 2 === 0 ? "FFFFFFFF" : "FFF7F9FC";
-      f3Estilos.push({ r, c: 0, s: sNormal(bg) });
-      f3Estilos.push({ r, c: 1, s: sNumero(bg) });
+    const criticos = dbEstoque.filter(p => {
+      const consumo = calcularConsumoDiario(p);
+      if (!consumo) return false;
+      return Math.floor(p.quantidade / consumo) <= 7;
     });
-    // Margem líquida — cor condicional
-    if (lucroAt > 0 && gastos > 0) {
-      const corMargem = margLiq >= 0 ? CORES.verdePale : CORES.vermPale;
-      f3Estilos.push({ r: 6, c: 1, s: { font: { bold: true, sz: 9, color: { rgb: margLiq >= 0 ? CORES.verdeEscuro : "FF991b1b" } }, fill: { fgColor: { rgb: corMargem } }, alignment: { horizontal: "right" } } });
-    }
 
-    const ws3 = XLSX.utils.aoa_to_sheet(f3Rows);
-    ws3["!cols"] = [{ wch: 32 }, { wch: 22 }];
-    ws3["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }];
-    aplicarEstilosAoa(ws3, f3Estilos);
-    XLSX.utils.book_append_sheet(wb, ws3, "Financeiro");
+    criticos.forEach(p => {
+      const consumo = calcularConsumoDiario(p);
+      const dias    = Math.floor(p.quantidade / consumo);
+      alertRows.push([
+        p.produto, p.quantidade, consumo.toFixed(1), dias,
+        dias <= 1 ? "🔴 EMERGÊNCIA" : dias <= 3 ? "🚨 Crítico" : "⚠️ Baixo",
+        dias <= 1 ? "Compra urgente agora!" : dias <= 3 ? "Pedir hoje" : "Planejar reposição"
+      ]);
+    });
 
-    // ════════════════════════════════════════════════════════════════════════
-    // ABA 4 — HISTÓRICO DE VENDAS
-    // ════════════════════════════════════════════════════════════════════════
-    const v4Rows = [
-      ["LupiAI — Histórico de Vendas", "", "", ""],
-      [`Gerado em: ${hoje}`, "", "", ""],
-      ["", "", "", ""],
-      ["PRODUTO", "DATA", "QTD VENDIDA", "RECEITA (R$)"],
+    if (criticos.length === 0) alertRows.push(["✅ Nenhum produto em situação crítica no momento."]);
+
+    const ws2 = XLSX.utils.aoa_to_sheet(alertRows);
+    ws2["!cols"] = [26, 10, 12, 15, 16, 26].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws2, "🚨 Alertas");
+
+    // ── ABA 3: Financeiro ─────────────────────────────────────────────────
+    const gastos  = parseFloat(localStorage.getItem(getStorageKey("gastos_mensais")) || "0");
+    const lucroAt = parseFloat(localStorage.getItem(getStorageKey("lucros_mensais")) || "0");
+    const lucroAn = parseFloat(localStorage.getItem(getStorageKey("lucros_mes_anterior")) || "0");
+    const variacao = lucroAn > 0 ? (((lucroAt - lucroAn) / lucroAn) * 100).toFixed(1) + "%" : "—";
+
+    const finRows = [
+      [`💰 Análise Financeira  |  ${hoje}`],
+      [],
+      ["Indicador", "Valor"],
+      ["Gastos Mensais", gastos > 0 ? `R$ ${gastos.toFixed(2)}` : "Não informado"],
+      ["Lucro este Mês", lucroAt > 0 ? `R$ ${lucroAt.toFixed(2)}` : "Não informado"],
+      ["Lucro Mês Anterior", lucroAn > 0 ? `R$ ${lucroAn.toFixed(2)}` : "Não informado"],
+      ["Variação de Lucro", variacao],
+      ["Situação", lucroAn > 0 && lucroAt > 0
+        ? (lucroAt >= lucroAn * 1.15 ? "✅ Crescimento forte"
+          : lucroAt >= lucroAn ? "📈 Crescendo"
+          : lucroAt >= lucroAn * 0.85 ? "⚠️ Atenção — leve queda"
+          : "🚨 Queda crítica")
+        : "—"],
+      [],
+      ["Contatos Cadastrados", dbContatos.length],
+      ...dbContatos.map(c => [`  ${c.nome} (${c.cargo})`, c.fone])
     ];
-    const v4Estilos = [];
-    for (let c = 0; c <= 3; c++) {
-      v4Estilos.push({ r: 0, c, s: sTitulo(CORES.azulEscuro) });
-      v4Estilos.push({ r: 1, c, s: sSubtitulo(CORES.cinzaMed) });
-      v4Estilos.push({ r: 3, c, s: sHeader() });
-    }
 
-    let linhaV = 4;
-    let totalVendas = 0, totalReceita = 0;
+    const ws3 = XLSX.utils.aoa_to_sheet(finRows);
+    ws3["!cols"] = [{ wch: 28 }, { wch: 22 }];
+    XLSX.utils.book_append_sheet(wb, ws3, "💰 Financeiro");
+
+    // ── ABA 4: Histórico de Vendas ────────────────────────────────────────
+    const vendaRows = [
+      [`📈 Histórico de Vendas  |  ${hoje}`],
+      [],
+      ["Produto", "Data", "Qtd Vendida"]
+    ];
+
     dbEstoque.forEach(p => {
-      (p.vendasDiarias || []).forEach((v, i) => {
-        const receita = (p.precoVenda || 0) * v.qtd;
-        totalVendas  += v.qtd;
-        totalReceita += receita;
-        const bg = linhaV % 2 === 0 ? "FFFFFFFF" : "FFF7F9FC";
-        v4Rows.push([p.produto, v.data, v.qtd, receita > 0 ? receita : "—"]);
-        v4Estilos.push({ r: linhaV, c: 0, s: sNormal(bg) });
-        v4Estilos.push({ r: linhaV, c: 1, s: sNormal(bg) });
-        v4Estilos.push({ r: linhaV, c: 2, s: sNumero(bg) });
-        v4Estilos.push({ r: linhaV, c: 3, s: sNumero(bg) });
-        linhaV++;
+      (p.vendasDiarias || []).forEach(v => {
+        vendaRows.push([p.produto, v.data, v.qtd]);
       });
     });
 
-    if (linhaV === 4) {
-      v4Rows.push(["Nenhuma venda registrada ainda.", "", "", ""]);
-      for (let c = 0; c <= 3; c++) v4Estilos.push({ r: 4, c, s: sNormal(CORES.amarPale) });
-    } else {
-      v4Rows.push(["TOTAL", "", totalVendas, totalReceita]);
-      for (let c = 0; c <= 3; c++) v4Estilos.push({ r: linhaV, c, s: sTotal(CORES.azulEscuro) });
-    }
+    if (vendaRows.length === 3) vendaRows.push(["Nenhuma venda registrada ainda."]);
 
-    const ws4 = XLSX.utils.aoa_to_sheet(v4Rows);
-    ws4["!cols"] = [28, 14, 14, 16].map(w => ({ wch: w }));
-    ws4["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } }];
-    aplicarEstilosAoa(ws4, v4Estilos);
-    XLSX.utils.book_append_sheet(wb, ws4, "Historico Vendas");
+    const ws4 = XLSX.utils.aoa_to_sheet(vendaRows);
+    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }];
+    XLSX.utils.book_append_sheet(wb, ws4, "📈 Histórico Vendas");
 
-    // ── Download ─────────────────────────────────────────────────────────
-    const nomeArq = `LupiAI_Relatorio_${hoje.replace(/\//g, "-")}.xlsx`;
+    // ── Download ──────────────────────────────────────────────────────────
+    const nomeArq = `LupiAI_${hoje.replace(/\//g, "-")}.xlsx`;
     XLSX.writeFile(wb, nomeArq);
 
     adicionarMsg(
-      `📊 Relatório profissional gerado!\n\n📦 ${totalProd} produto(s) | 🚨 ${criticos.length} alerta(s) | 💰 R$ ${totalReceita.toFixed(2)} em vendas\n\nArquivo: "${nomeArq}" — verifique seus downloads.`,
+      `Planilha "${nomeArq}" gerada com ${dbEstoque.length} produto(s) e ${criticos.length} alerta(s)! Verifique seus downloads.`,
       "ai",
       ["Ver alertas críticos", "Analisar margem de lucro", "Como melhorar meu estoque?"]
     );
