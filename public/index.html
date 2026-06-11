@@ -1859,52 +1859,52 @@ REGRAS CRÍTICAS:
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-ico" style="background:rgba(37,99,235,0.12)">
+            <div class="kpi-ico" style="background:#EFF6FF">
               <svg viewBox="0 0 24 24" style="stroke:#2563EB"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
             </div>
-            <span class="kpi-badge" style="background:rgba(34,197,94,0.12);color:#22C55E">${dbFluxo.filter(l=>l.tipo==='entrada').length} lançamentos</span>
+            <span class="kpi-badge" style="background:#DCFCE7;color:#16A34A">${dbFluxo.filter(l=>l.tipo==='entrada').length} lançamentos</span>
           </div>
-          <div class="kpi-val">R$ ${receitaMes.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="kpi-val" style="color:#111827">R$ ${receitaMes.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
           <div class="kpi-label">Receita registrada</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-ico" style="background:rgba(34,197,94,0.12)">
-              <svg viewBox="0 0 24 24" style="stroke:#22C55E"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <div class="kpi-ico" style="background:#DCFCE7">
+              <svg viewBox="0 0 24 24" style="stroke:#16A34A"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
-            <span class="kpi-badge" style="background:rgba(34,197,94,0.12);color:#22C55E">${lucroMes>0?'Meta definida':'Sem meta'}</span>
+            <span class="kpi-badge" style="background:#DCFCE7;color:#16A34A">${lucroMes>0?'Meta definida':'Sem meta'}</span>
           </div>
-          <div class="kpi-val">R$ ${lucroMes.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>
+          <div class="kpi-val" style="color:#111827">R$ ${lucroMes.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>
           <div class="kpi-label">Meta de lucro</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-ico" style="background:rgba(245,158,11,0.12)">
-              <svg viewBox="0 0 24 24" style="stroke:#F59E0B"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="kpi-ico" style="background:#FEF3C7">
+              <svg viewBox="0 0 24 24" style="stroke:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <span class="kpi-badge" style="background:${criticos.length>0?'rgba(239,68,68,0.12)':'rgba(34,197,94,0.12)'};color:${criticos.length>0?'#EF4444':'#22C55E'}">${criticos.length>0?'Atenção':'OK'}</span>
           </div>
-          <div class="kpi-val">${criticos.length}</div>
+          <div class="kpi-val" style="color:#111827">${criticos.length}</div>
           <div class="kpi-label">Produtos em alerta</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-ico" style="background:rgba(255,255,255,0.06)">
-              <svg viewBox="0 0 24 24" style="stroke:#94A3B8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
+            <div class="kpi-ico" style="background:#F3F4F6">
+              <svg viewBox="0 0 24 24" style="stroke:#6B7280"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
             </div>
-            <span class="kpi-badge" style="background:rgba(255,255,255,0.06);color:#94A3B8">${total} itens</span>
+            <span class="kpi-badge" style="background:#F3F4F6;color:#6B7280">${total} itens</span>
           </div>
-          <div class="kpi-val">${total}</div>
+          <div class="kpi-val" style="color:#111827">${total}</div>
           <div class="kpi-label">Produtos cadastrados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-ico" style="background:rgba(37,99,235,0.12)">
+            <div class="kpi-ico" style="background:#EFF6FF">
               <svg viewBox="0 0 24 24" style="stroke:#2563EB"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.56L23 6H6"/></svg>
             </div>
-            <span class="kpi-badge" style="background:rgba(37,99,235,0.12);color:#2563EB">${totalVendas} unidades</span>
+            <span class="kpi-badge" style="background:#EFF6FF;color:#2563EB">${totalVendas} unidades</span>
           </div>
-          <div class="kpi-val">${totalVendas}</div>
+          <div class="kpi-val" style="color:#111827">${totalVendas}</div>
           <div class="kpi-label">Vendas registradas</div>
         </div>
         <div class="kpi-card">
@@ -1914,7 +1914,7 @@ REGRAS CRÍTICAS:
             </div>
             <span class="kpi-badge" style="background:${margem!==null?(margem>=40?'rgba(34,197,94,0.12)':margem>=25?'rgba(245,158,11,0.12)':'rgba(239,68,68,0.12)'):'rgba(255,255,255,0.06)'};color:${margem!==null?(margem>=40?'#22C55E':margem>=25?'#F59E0B':'#EF4444'):'#94A3B8'}">${margem!==null?(margem>=40?'Saudável':margem>=25?'Atenção':'Baixa'):'—'}</span>
           </div>
-          <div class="kpi-val">${margem!==null?margem.toFixed(0)+'%':'—'}</div>
+          <div class="kpi-val" style="color:#111827">${margem!==null?margem.toFixed(0)+'%':'—'}</div>
           <div class="kpi-label">Margem média</div>
         </div>
       </div>
@@ -1927,7 +1927,7 @@ REGRAS CRÍTICAS:
             ${barVals.map((v,i)=>{
               const h = Math.max(6, Math.round(v/barMax*100));
               const isToday = i===6;
-              return `<div class="bar-col" style="height:${h}%;background:${isToday?'#2563EB':'rgba(255,255,255,0.08)'};border:1px solid ${isToday?'transparent':'rgba(255,255,255,0.04)'}"></div>`;
+              return `<div class="bar-col" style="height:${h}%;background:${isToday?'#2563EB':'#E5E7EB'};border:none"></div>`;
             }).join('')}
           </div>
           <div class="bar-days">${days.map(d=>`<div class="bar-day">${d}</div>`).join('')}</div>
