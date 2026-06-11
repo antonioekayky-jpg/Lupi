@@ -1735,8 +1735,20 @@
     loginScreen.classList.add("hide");
     setTimeout(() => { loginScreen.style.display = "none"; }, 450);
 
-    // Atualiza alertas de estoque
-    setTimeout(() => atualizarAlertas(), 600);
+    // Inicia dashboard SaaS
+    setTimeout(() => {
+      verificarAlertasAutomaticos();
+      switchView('dashboard');
+      // Atualiza avatar no topbar
+      const av = document.getElementById('userAvatarPlaceholder');
+      if (av && usuarioAtual) av.textContent = (usuarioAtual.nome||'?')[0].toUpperCase();
+      const avImg = document.getElementById('userAvatarImg');
+      if (avImg && usuarioAtual && usuarioAtual.foto) {
+        avImg.src = usuarioAtual.foto;
+        avImg.style.display = 'block';
+        if (av) av.style.display = 'none';
+      }
+    }, 500);
   }
 
   // Inicializa: verifica se já tem sessão salva
