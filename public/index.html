@@ -77,6 +77,7 @@
     gap: 6px;
     overflow-x: auto;
     flex: 1;
+    min-width: 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 2px;
@@ -1603,6 +1604,8 @@
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("loginScreen").classList.remove("hide");
     document.getElementById("userBadge").style.display = "none";
+    const headerInfoL = document.querySelector(".header-info");
+    if (headerInfoL) headerInfoL.style.display = "";
     // Limpa mensagens do chat
     const feed = document.getElementById("mensagens");
     feed.innerHTML = `<div class="welcome" id="welcome">
@@ -1677,6 +1680,9 @@
     }
     nome.textContent = usuarioAtual.nome.split(" ")[0];
     badge.style.display = "flex";
+    // Esconde o texto do header no mobile para dar espaço aos botões
+    const headerInfo = document.querySelector(".header-info");
+    if (headerInfo) headerInfo.style.display = "none";
 
     // Esconde tela de login com animação
     const loginScreen = document.getElementById("loginScreen");
