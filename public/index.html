@@ -1389,6 +1389,8 @@
       <option value="">Selecione o produto...</option>
     </select>
     <input type="number" id="vendaQtd" placeholder="Quantidade vendida" min="1">
+    <input type="text" id="vendaCliente" placeholder="Nome do cliente (opcional)">
+    <input type="date" id="vendaData">
     <div class="modal-btns">
       <button class="btn-salvar"   onclick="salvarVenda()">Registrar</button>
       <button class="btn-cancelar" onclick="fecharModalVenda()">Cancelar</button>
@@ -2052,6 +2054,8 @@ ${SYSTEM_PROMPT}`;
       sel.appendChild(opt);
     });
     document.getElementById("vendaQtd").value = "";
+    document.getElementById("vendaCliente").value = "";
+    document.getElementById("vendaData").value = new Date().toISOString().split("T")[0];
     document.getElementById("modalVenda").style.display = "flex";
   }
 
@@ -2060,21 +2064,23 @@ ${SYSTEM_PROMPT}`;
   }
 
   function salvarVenda() {
-    const idx = parseInt(document.getElementById("vendaProduto").value);
-    const qtd = parseInt(document.getElementById("vendaQtd").value);
+    const idx     = parseInt(document.getElementById("vendaProduto").value);
+    const qtd     = parseInt(document.getElementById("vendaQtd").value);
+    const cliente = (document.getElementById("vendaCliente").value || "").trim();
+    const dataVal = document.getElementById("vendaData").value;
     if (isNaN(idx) || isNaN(qtd) || qtd <= 0) return;
 
     const item = dbEstoque[idx];
     if (!item) return;
     if (!item.vendasDiarias) item.vendasDiarias = [];
 
-    // Registra venda com data de hoje
-    const hoje = new Date().toISOString().split("T")[0];
-    const registroHoje = item.vendasDiarias.find(v => v.data === hoje);
-    if (registroHoje) {
+    // Usa a data selecionada ou hoje
+    const hoje = dataVal || new Date().toISOString().split("T")[0];
+    const registroHoje = item.vendasDiarias.find(v => v.data === hoje && v.cliente === (cliente || undefined));
+    if (registroHoje && !cliente) {
       registroHoje.qtd += qtd;
     } else {
-      item.vendasDiarias.push({ data: hoje, qtd });
+      item.vendasDiarias.push({ data: hoje, qtd, ...(cliente ? { cliente } : {}) });
     }
 
     // Mantém apenas últimos 30 dias
@@ -2638,7 +2644,7 @@ ${SYSTEM_PROMPT}`;
     const estoqueRows = [
       [`LupiAI — Relatório de Estoque  |  Gerado em: ${hoje}`],
       [],
-      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)", "Ação Recomendada"]
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)"]
     ];
 
     dbEstoque.forEach(p => {
@@ -2648,10 +2654,6 @@ ${SYSTEM_PROMPT}`;
                       dias <= 1 ? "🔴 EMERGÊNCIA" :
                       dias <= 3 ? "🚨 Crítico" :
                       dias <= 7 ? "⚠️ Baixo" : "✅ OK";
-      const acao    = dias === null ? "Registre consumo/dia" :
-                      dias <= 1 ? "⚡ Compra URGENTE agora!" :
-                      dias <= 3 ? "🚨 Pedir hoje — crítico" :
-                      dias <= 7 ? "📦 Planejar reposição" : "👍 Sem ação necessária";
       const margem  = p.precoCusto && p.precoVenda
                       ? `${(((p.precoVenda - p.precoCusto) / p.precoVenda) * 100).toFixed(1)}%`
                       : "—";
@@ -2668,16 +2670,15 @@ ${SYSTEM_PROMPT}`;
         p.precoCusto ? `R$ ${p.precoCusto.toFixed(2)}` : "—",
         p.precoVenda ? `R$ ${p.precoVenda.toFixed(2)}` : "—",
         margem,
-        lucroU,
-        acao
+        lucroU
       ]);
     });
 
-    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", "", ""]);
+    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", ""]);
 
     const ws1 = XLSX.utils.aoa_to_sheet(estoqueRows);
-    ws1["!cols"] = [24,10,12,14,14,16,16,10,14,26].map(w => ({ wch: w }));
-    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }]; // merge título
+    ws1["!cols"] = [24,10,12,14,14,16,16,10,14].map(w => ({ wch: w }));
+    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }]; // merge título
     XLSX.utils.book_append_sheet(wb, ws1, "📦 Estoque Atual");
 
     // ── ABA 2: Alertas ────────────────────────────────────────────────────
@@ -2742,19 +2743,32 @@ ${SYSTEM_PROMPT}`;
     const vendaRows = [
       [`📈 Histórico de Vendas  |  ${hoje}`],
       [],
-      ["Produto", "Data", "Qtd Vendida"]
+      ["Produto", "Data", "Qtd Vendida", "Cliente"]
     ];
 
     dbEstoque.forEach(p => {
       (p.vendasDiarias || []).forEach(v => {
-        vendaRows.push([p.produto, v.data, v.qtd]);
+        const dataFormatada = v.data ? new Date(v.data + "T12:00:00").toLocaleDateString("pt-BR") : "—";
+        vendaRows.push([p.produto, dataFormatada, v.qtd, v.cliente || "—"]);
       });
     });
+    // Ordena por data mais recente
+    if (vendaRows.length > 3) {
+      const header = vendaRows.slice(0, 3);
+      const dados  = vendaRows.slice(3).sort((a, b) => {
+        const da = a[1].split("/").reverse().join("-");
+        const db = b[1].split("/").reverse().join("-");
+        return db.localeCompare(da);
+      });
+      vendaRows.length = 0;
+      header.forEach(r => vendaRows.push(r));
+      dados.forEach(r => vendaRows.push(r));
+    }
 
     if (vendaRows.length === 3) vendaRows.push(["Nenhuma venda registrada ainda."]);
 
     const ws4 = XLSX.utils.aoa_to_sheet(vendaRows);
-    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }];
+    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 24 }];
     XLSX.utils.book_append_sheet(wb, ws4, "📈 Histórico Vendas");
 
     // ── Download ──────────────────────────────────────────────────────────
