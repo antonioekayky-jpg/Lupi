@@ -77,7 +77,6 @@
     gap: 6px;
     overflow-x: auto;
     flex: 1;
-    min-width: 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 2px;
@@ -1294,27 +1293,100 @@
   </div>
 </div>
 
-<header>
-  <div class="logo">📦</div>
-  <div class="header-info">
-    <h1>LupiAI</h1>
-    <p>Evite perder dinheiro desnecessário</p>
+<!-- ── SIDEBAR ── -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z" opacity=".6"/></svg>
+    </div>
+    <div>
+      <div class="sb-logo-name">LupiAI</div>
+      <div class="sb-logo-sub">Gestão de estoque</div>
+    </div>
   </div>
-  <div class="header-btns">
-    <button class="hbtn hbtn-blue"   onclick="document.getElementById('modalRegistro').style.display='flex'">Produto</button>
-    <button class="hbtn hbtn-green"  onclick="abrirModalVenda()">Venda</button>
-    <button class="hbtn hbtn-purple" onclick="abrirModalContatos()">Contatos</button>
-    <button class="hbtn hbtn-wa"     onclick="abrirSeletorContato()">Mensagem</button>
-    <button class="hbtn hbtn-teal"   onclick="gerarPlanilha()">Planilha</button>
-    <button class="hbtn hbtn-cash"   onclick="abrirFluxo()">Caixa</button>
+
+  <div class="sb-section">
+    <button class="sb-item active" id="sb-dashboard" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="sb-item" id="sb-chat" onclick="switchView('chat')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      IA Assistente
+    </button>
   </div>
-  <div class="user-badge" id="userBadge" style="display:none;">
-    <div class="user-avatar-placeholder" id="userAvatarPlaceholder">👤</div>
-    <img class="user-avatar" id="userAvatarImg" style="display:none;" src="" alt="">
-    <span class="user-name-short" id="userNameShort"></span>
-    <button class="btn-logout" onclick="logout()">Sair</button>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">GESTÃO</div>
+    <button class="sb-item" onclick="document.getElementById('modalRegistro').style.display='flex'">
+      <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
+      Produtos
+      <span class="sb-badge" id="sb-badge-alertas" style="display:none">0</span>
+    </button>
+    <button class="sb-item" onclick="abrirModalVenda()">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.56L23 6H6"/></svg>
+      Vendas
+    </button>
+    <button class="sb-item" onclick="abrirModalContatos()">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Contatos
+    </button>
+    <button class="sb-item" onclick="abrirSeletorContato()">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.8 19.8 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72 12.8 12.8 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.8 12.8 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      Mensagem
+    </button>
   </div>
-</header>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">FINANCEIRO</div>
+    <button class="sb-item" onclick="abrirFluxo()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Caixa
+    </button>
+    <button class="sb-item" onclick="gerarPlanilha()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Relatórios
+    </button>
+  </div>
+
+  <div class="sb-divider"></div>
+  <div class="sb-section" style="margin-top:auto">
+    <button class="sb-item" onclick="logout()" id="userBadge" style="display:none;">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span id="userNameShort">Sair</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div id="main-content">
+
+<!-- ── TOPBAR ── -->
+<div id="topbar">
+  <span id="topbar-title">Dashboard</span>
+  <div class="tb-search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Buscar produtos, clientes...
+  </div>
+  <div class="tb-icon" onclick="verificarAlertasAutomaticos()">
+    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <span class="tb-notif-dot" id="notifDot" style="display:none"></span>
+  </div>
+  <div class="tb-avatar" id="userAvatarPlaceholder">?</div>
+  <img id="userAvatarImg" style="display:none;width:30px;height:30px;border-radius:50%;cursor:pointer;" src="" alt="">
+</div>
+
+<!-- ── DASHBOARD VIEW ── -->
+<div id="view-dashboard" style="display:flex;">
+  <div class="dash-content" id="dash-inner"></div>
+</div>
+
+<!-- ── CHAT VIEW ── -->
+<div id="view-chat">
 
 <div id="pendentes-bar">
   <div class="pendentes-inner">
@@ -1350,6 +1422,8 @@
   </div>
   <div class="hint">Powered by Groq · LLaMA 3.3 · LupiAI · <a href="politica.html" style="color:var(--accent);text-decoration:none;">Política de Privacidade</a></div>
 </div>
+</div><!-- end view-chat -->
+</div><!-- end main-content -->
 
 <div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;">
   <div class="modal-inner">
@@ -1389,8 +1463,6 @@
       <option value="">Selecione o produto...</option>
     </select>
     <input type="number" id="vendaQtd" placeholder="Quantidade vendida" min="1">
-    <input type="text" id="vendaCliente" placeholder="Nome do cliente (opcional)">
-    <input type="date" id="vendaData">
     <div class="modal-btns">
       <button class="btn-salvar"   onclick="salvarVenda()">Registrar</button>
       <button class="btn-cancelar" onclick="fecharModalVenda()">Cancelar</button>
@@ -1443,7 +1515,7 @@
   <div class="fluxo-sheet">
     <div class="fluxo-handle"></div>
     <div class="fluxo-header">
-      <div class="fluxo-titulo">Fluxo de Caixa</div>
+      <div class="fluxo-titulo">💵 Fluxo de Caixa</div>
       <div class="fluxo-sub" id="fluxoMesLabel">Carregando...</div>
     </div>
 
@@ -1461,52 +1533,31 @@
 
     <!-- Tabs -->
     <div class="fluxo-tabs">
-      <button class="fluxo-tab ativo" id="tabLancar"  onclick="fluxoTab('lancar')">Lançar</button>
-      <button class="fluxo-tab"       id="tabHistorico" onclick="fluxoTab('historico')">Histórico</button>
-      <button class="fluxo-tab"       id="tabResumo"  onclick="fluxoTab('resumo')">Resumo</button>
+      <button class="fluxo-tab ativo" id="tabLancar"  onclick="fluxoTab('lancar')">➕ Lançar</button>
+      <button class="fluxo-tab"       id="tabHistorico" onclick="fluxoTab('historico')">📋 Histórico</button>
+      <button class="fluxo-tab"       id="tabResumo"  onclick="fluxoTab('resumo')">📊 Resumo</button>
     </div>
 
     <!-- Painel Lançar -->
     <div id="painelLancar" class="fluxo-form">
       <div class="fluxo-tipo-btns">
-        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipoLanc('entrada')">↑ Entrada</button>
-        <button class="tipo-btn saida"         id="btnSaida"   onclick="setTipoLanc('saida')">↓ Saída</button>
+        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipoLanc('entrada')">📈 Entrada</button>
+        <button class="tipo-btn saida"         id="btnSaida"   onclick="setTipoLanc('saida')">📉 Saída</button>
       </div>
       <input type="text"   id="lancDesc"   placeholder="Descrição (ex: Venda de filtro, Aluguel...)">
       <input type="number" id="lancValor"  placeholder="Valor (R$)" step="0.01" min="0.01">
       <select id="lancCategoria">
-        <optgroup label="Entradas">
-          <option value="Venda">Venda de produto</option>
-          <option value="Devolução recebida">Devolução recebida</option>
-          <option value="Outro recebimento">Outro recebimento</option>
-        </optgroup>
-        <optgroup label="Saídas — Operacional">
-          <option value="Fornecedor">Fornecedor / Reposição</option>
-          <option value="Produto vencido">Produto vencido / perdido</option>
-          <option value="Estoque parado">Desconto p/ girar estoque parado</option>
-          <option value="Frete">Frete / Transporte</option>
-        </optgroup>
-        <optgroup label="Saídas — Fixas">
-          <option value="Aluguel">Aluguel</option>
-          <option value="Energia">Energia elétrica</option>
-          <option value="Salário">Salário / Pró-labore</option>
-          <option value="Sistema">Sistema / Software</option>
-        </optgroup>
-        <optgroup label="Saídas — Variáveis">
-          <option value="Marketing">Marketing / Anúncio</option>
-          <option value="Manutenção">Manutenção</option>
-          <option value="Imposto">Imposto / Taxa</option>
-          <option value="Outros">Outros</option>
-        </optgroup>
+        <option value="Venda">Venda</option>
+        <option value="Fornecedor">🏭 Fornecedor</option>
+        <option value="Aluguel">🏠 Aluguel</option>
+        <option value="Energia">⚡ Energia</option>
+        <option value="Salário">👷 Salário</option>
+        <option value="Transporte">🚚 Transporte</option>
+        <option value="Marketing">📣 Marketing</option>
+        <option value="Outros">📦 Outros</option>
       </select>
-      <button class="btn-salvar" style="margin-top:2px;padding:11px;" onclick="salvarLancamento()">Registrar lançamento</button>
-      <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0;"></div>
-      <div style="font-size:0.72rem;color:#8E8E93;margin-bottom:8px;font-weight:600;letter-spacing:0.03em;">METAS DO MÊS</div>
-      <input type="number" id="regGastos"       placeholder="Gastos mensais previstos (R$)" style="margin-bottom:8px;">
-      <input type="number" id="regLucros"       placeholder="Meta de lucro deste mês (R$)" style="margin-bottom:8px;">
-      <input type="number" id="regLucrosMesAnt" placeholder="Lucro real do mês passado (R$)" style="margin-bottom:8px;">
-      <button class="btn-salvar" style="padding:9px;font-size:0.8rem;background:#2C2C2E;color:#8E8E93;" onclick="salvarFinanceiro()">Salvar metas</button>
-      <button class="btn-cancelar" style="padding:9px;font-size:0.8rem;margin-top:6px;" onclick="fecharFluxo()">Fechar</button>
+      <button class="btn-salvar" style="margin-top:2px;padding:11px;" onclick="salvarLancamento()">Registrar</button>
+      <button class="btn-cancelar" style="padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
     </div>
 
     <!-- Painel Histórico -->
@@ -1517,8 +1568,6 @@
     <!-- Painel Resumo -->
     <div id="painelResumo" style="display:none;padding:0 16px;">
       <div id="resumoConteudo"></div>
-      <!-- Card de Alertas de Perda -->
-      <div id="alertasPerda" style="margin-top:14px;"></div>
       <button class="btn-cancelar" style="width:100%;margin-top:14px;padding:9px;font-size:0.8rem;" onclick="fecharFluxo()">Fechar</button>
     </div>
   </div>
@@ -1606,8 +1655,6 @@
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("loginScreen").classList.remove("hide");
     document.getElementById("userBadge").style.display = "none";
-    const headerInfoL = document.querySelector(".header-info");
-    if (headerInfoL) headerInfoL.style.display = "";
     // Limpa mensagens do chat
     const feed = document.getElementById("mensagens");
     feed.innerHTML = `<div class="welcome" id="welcome">
@@ -1647,23 +1694,28 @@
   }
 
   async function entrarNoApp() {
-    // Recarrega dados do usuário logado do Firebase
-    const [estoque, contatos, fluxo] = await Promise.all([
-      fbCarregar("estoque_db"),
-      fbCarregar("contatos_db"),
-      fbCarregar("fluxo_db"),
-    ]);
-    const [gastosFb, lucrosFb, lucrosAntFb] = await Promise.all([
-      fbCarregar("gastos_mensais"),
-      fbCarregar("lucros_mensais"),
-      fbCarregar("lucros_mes_anterior"),
-    ]);
-    dbEstoque  = estoque  || JSON.parse(localStorage.getItem(getStorageKey("estoque_db"))  || "[]");
-    dbContatos = contatos || JSON.parse(localStorage.getItem(getStorageKey("contatos_db")) || "[]");
-    dbFluxo    = fluxo    || JSON.parse(localStorage.getItem(getStorageKey("fluxo_db"))    || "[]");
-    if (gastosFb   !== null) localStorage.setItem(getStorageKey("gastos_mensais"), gastosFb);
-    if (lucrosFb   !== null) localStorage.setItem(getStorageKey("lucros_mensais"), lucrosFb);
-    if (lucrosAntFb !== null) localStorage.setItem(getStorageKey("lucros_mes_anterior"), lucrosAntFb);
+    // ── Modo demo: carrega dados fictícios sem ir ao Firebase ──
+    if (usuarioAtual && usuarioAtual.id === "demo") {
+      carregarDadosDemo();
+    } else {
+      // Recarrega dados do usuário logado do Firebase
+      const [estoque, contatos, fluxo] = await Promise.all([
+        fbCarregar("estoque_db"),
+        fbCarregar("contatos_db"),
+        fbCarregar("fluxo_db"),
+      ]);
+      const [gastosFb, lucrosFb, lucrosAntFb] = await Promise.all([
+        fbCarregar("gastos_mensais"),
+        fbCarregar("lucros_mensais"),
+        fbCarregar("lucros_mes_anterior"),
+      ]);
+      dbEstoque  = estoque  || JSON.parse(localStorage.getItem(getStorageKey("estoque_db"))  || "[]");
+      dbContatos = contatos || JSON.parse(localStorage.getItem(getStorageKey("contatos_db")) || "[]");
+      dbFluxo    = fluxo    || JSON.parse(localStorage.getItem(getStorageKey("fluxo_db"))    || "[]");
+      if (gastosFb   !== null) localStorage.setItem(getStorageKey("gastos_mensais"), gastosFb);
+      if (lucrosFb   !== null) localStorage.setItem(getStorageKey("lucros_mensais"), lucrosFb);
+      if (lucrosAntFb !== null) localStorage.setItem(getStorageKey("lucros_mes_anterior"), lucrosAntFb);
+    }
 
     // Atualiza badge no header
     const badge   = document.getElementById("userBadge");
@@ -1682,17 +1734,26 @@
     }
     nome.textContent = usuarioAtual.nome.split(" ")[0];
     badge.style.display = "flex";
-    // Esconde o texto do header no mobile para dar espaço aos botões
-    const headerInfo = document.querySelector(".header-info");
-    if (headerInfo) headerInfo.style.display = "none";
 
     // Esconde tela de login com animação
     const loginScreen = document.getElementById("loginScreen");
     loginScreen.classList.add("hide");
     setTimeout(() => { loginScreen.style.display = "none"; }, 450);
 
-    // Atualiza alertas de estoque
-    setTimeout(() => atualizarAlertas(), 600);
+    // Inicia dashboard SaaS
+    setTimeout(() => {
+      verificarAlertasAutomaticos();
+      switchView('dashboard');
+      // Atualiza avatar no topbar
+      const av = document.getElementById('userAvatarPlaceholder');
+      if (av && usuarioAtual) av.textContent = (usuarioAtual.nome||'?')[0].toUpperCase();
+      const avImg = document.getElementById('userAvatarImg');
+      if (avImg && usuarioAtual && usuarioAtual.foto) {
+        avImg.src = usuarioAtual.foto;
+        avImg.style.display = 'block';
+        if (av) av.style.display = 'none';
+      }
+    }, 500);
   }
 
   // Inicializa: verifica se já tem sessão salva
@@ -1756,10 +1817,322 @@ REGRAS CRÍTICAS:
   if (lpDemoBtn) lpDemoBtn.addEventListener('click', () => loginContainer.classList.add('active'));
   if (lpLoginBtn) lpLoginBtn.addEventListener('click', () => loginContainer.classList.remove('active'));
 
+
+  // ── SAAS LAYOUT ────────────────────────────────────────────────────────────
+  function switchView(view) {
+    const dash = document.getElementById('view-dashboard');
+    const chat = document.getElementById('view-chat');
+    const sbDash = document.getElementById('sb-dashboard');
+    const sbChat = document.getElementById('sb-chat');
+    const title = document.getElementById('topbar-title');
+    if (view === 'dashboard') {
+      dash.style.display = 'flex'; chat.style.display = 'none';
+      sbDash.classList.add('active'); sbChat.classList.remove('active');
+      if (title) title.textContent = 'Dashboard';
+      renderSaasDash();
+    } else {
+      dash.style.display = 'none'; chat.style.display = 'flex';
+      sbChat.classList.add('active'); sbDash.classList.remove('active');
+      if (title) title.textContent = 'IA Assistente';
+    }
+  }
+
+  function renderSaasDash() {
+    const el = document.getElementById('dash-inner');
+    if (!el) return;
+
+    const total = dbEstoque.length;
+    const criticos = dbEstoque.filter(p => {
+      const c = calcularConsumoDiario(p);
+      const d = c ? Math.floor(p.quantidade/c) : 999;
+      const minAlert = p.estoqueMinimo !== undefined ? p.quantidade <= p.estoqueMinimo : false;
+      return d <= 7 || minAlert;
+    });
+    const zerados = dbEstoque.filter(p => p.quantidade === 0);
+    const totalVendas = dbEstoque.reduce((s,p)=>(p.vendasDiarias||[]).reduce((a,v)=>a+v.qtd,0)+s,0);
+    const receitaMes = dbFluxo.filter(l=>l.tipo==='entrada').reduce((s,l)=>s+l.valor,0);
+    const gastosMes = parseFloat(localStorage.getItem(getStorageKey('gastos_mensais'))||'0');
+    const lucroMes = parseFloat(localStorage.getItem(getStorageKey('lucros_mensais'))||'0');
+    const comMargem = dbEstoque.filter(p=>p.precoCusto>0&&p.precoVenda>0);
+    const margem = comMargem.length>0 ? comMargem.reduce((s,p)=>s+((p.precoVenda-p.precoCusto)/p.precoVenda*100),0)/comMargem.length : null;
+
+    // Badge de alertas na sidebar
+    const badge = document.getElementById('sb-badge-alertas');
+    if (badge) { badge.textContent = criticos.length; badge.style.display = criticos.length > 0 ? '' : 'none'; }
+    const notifDot = document.getElementById('notifDot');
+    if (notifDot) notifDot.style.display = criticos.length > 0 ? '' : 'none';
+
+    // Vendas últimos 7 dias
+    const barVals = Array.from({length:7},(_,i)=>{
+      const d = new Date(); d.setDate(d.getDate()-(6-i));
+      const ds = d.toDateString();
+      return dbFluxo.filter(l=>l.tipo==='entrada'&&new Date(l.data).toDateString()===ds).reduce((s,l)=>s+l.valor,0);
+    });
+    const barMax = Math.max(...barVals, 1);
+    const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+
+    el.innerHTML = `
+      <div class="dash-row-label">RESUMO DO PERÍODO</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:#EFF6FF">
+              <svg viewBox="0 0 24 24" style="stroke:#2563EB"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:#DCFCE7;color:#16A34A">${dbFluxo.filter(l=>l.tipo==='entrada').length} lançamentos</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">R$ ${receitaMes.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="kpi-label">Receita registrada</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:#DCFCE7">
+              <svg viewBox="0 0 24 24" style="stroke:#16A34A"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:#DCFCE7;color:#16A34A">${lucroMes>0?'Meta definida':'Sem meta'}</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">R$ ${lucroMes.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>
+          <div class="kpi-label">Meta de lucro</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:#FEF3C7">
+              <svg viewBox="0 0 24 24" style="stroke:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:${criticos.length>0?'rgba(239,68,68,0.12)':'rgba(34,197,94,0.12)'};color:${criticos.length>0?'#EF4444':'#22C55E'}">${criticos.length>0?'Atenção':'OK'}</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">${criticos.length}</div>
+          <div class="kpi-label">Produtos em alerta</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:#F3F4F6">
+              <svg viewBox="0 0 24 24" style="stroke:#6B7280"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:#F3F4F6;color:#6B7280">${total} itens</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">${total}</div>
+          <div class="kpi-label">Produtos cadastrados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:#EFF6FF">
+              <svg viewBox="0 0 24 24" style="stroke:#2563EB"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.56L23 6H6"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:#EFF6FF;color:#2563EB">${totalVendas} unidades</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">${totalVendas}</div>
+          <div class="kpi-label">Vendas registradas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-ico" style="background:${margem!==null&&margem<25?'rgba(239,68,68,0.12)':'rgba(34,197,94,0.12)'}">
+              <svg viewBox="0 0 24 24" style="stroke:${margem!==null&&margem<25?'#EF4444':'#22C55E'}"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <span class="kpi-badge" style="background:${margem!==null?(margem>=40?'rgba(34,197,94,0.12)':margem>=25?'rgba(245,158,11,0.12)':'rgba(239,68,68,0.12)'):'rgba(255,255,255,0.06)'};color:${margem!==null?(margem>=40?'#22C55E':margem>=25?'#F59E0B':'#EF4444'):'#94A3B8'}">${margem!==null?(margem>=40?'Saudável':margem>=25?'Atenção':'Baixa'):'—'}</span>
+          </div>
+          <div class="kpi-val" style="color:#111827">${margem!==null?margem.toFixed(0)+'%':'—'}</div>
+          <div class="kpi-label">Margem média</div>
+        </div>
+      </div>
+
+      <div class="dash-bottom">
+        <div class="chart-card">
+          <div class="chart-title">Entradas no caixa</div>
+          <div class="chart-sub">Últimos 7 dias</div>
+          <div class="bar-chart">
+            ${barVals.map((v,i)=>{
+              const h = Math.max(6, Math.round(v/barMax*100));
+              const isToday = i===6;
+              return `<div class="bar-col" style="height:${h}%;background:${isToday?'#2563EB':'#E5E7EB'};border:none"></div>`;
+            }).join('')}
+          </div>
+          <div class="bar-days">${days.map(d=>`<div class="bar-day">${d}</div>`).join('')}</div>
+        </div>
+
+        <div class="alerts-card">
+          <div class="alerts-title">Alertas operacionais</div>
+          ${criticos.length === 0
+            ? `<div style="font-size:0.72rem;color:#22C55E;padding:8px;text-align:center;">Estoque saudável</div>`
+            : criticos.slice(0,5).map(p=>{
+                const c = calcularConsumoDiario(p);
+                const d = c ? Math.floor(p.quantidade/c) : null;
+                const isCrit = d !== null && d <= 3;
+                return `<div class="alert-row" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Analise o produto ${p.produto}'),100)">
+                  <div class="alert-row-dot" style="background:${isCrit?'#EF4444':'#F59E0B'}"></div>
+                  <div class="alert-row-txt">${p.produto} — ${p.quantidade} un.</div>
+                  <div class="alert-row-time">${d!==null?d+'d':'!'}</div>
+                </div>`;
+              }).join('')
+          }
+          ${zerados.length>0?`<div class="alert-row">
+            <div class="alert-row-dot" style="background:#EF4444"></div>
+            <div class="alert-row-txt">${zerados.length} produto(s) zerado(s)</div>
+            <div class="alert-row-time">Crítico</div>
+          </div>`:''}
+        </div>
+      </div>
+
+      <div class="ai-copilot">
+        <div class="ai-cop-header">
+          <span class="ai-cop-badge">IA Copiloto</span>
+          <span class="ai-cop-title">O que você quer analisar?</span>
+        </div>
+        <div class="ai-cop-chips">
+          <button class="ai-cop-chip" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Quais produtos vão acabar essa semana?'),100)">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+            Estoque crítico
+          </button>
+          <button class="ai-cop-chip" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Qual foi minha margem de lucro este mês?'),100)">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Margem do mês
+          </button>
+          <button class="ai-cop-chip" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Quais produtos estão parados há mais de 30 dias?'),100)">
+            <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Produtos parados
+          </button>
+          <button class="ai-cop-chip" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Gere um resumo financeiro do período'),100)">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            Resumo financeiro
+          </button>
+          <button class="ai-cop-chip" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Me dê dicas para melhorar minha margem de lucro'),100)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Dicas de gestão
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function usarChipTexto(texto) {
+    const input = document.getElementById('input') || document.getElementById('inputMsg');
+    if (input) { input.value = texto; input.focus(); }
+  }
+
   // ─── BANCO DE DADOS LOCAL ─────────────────────────────────────────────────
   // Os dados são inicializados vazios — serão carregados em entrarNoApp() com a chave do usuário
   let dbEstoque  = [];
   let dbContatos = [];
+
+  // ─── DADOS DE DEMO (pré-carregados para novos visitantes) ─────────────────
+  function carregarDadosDemo() {
+    // Gera datas dos últimos dias para o histórico de vendas parecer real
+    function diasAtras(n) {
+      const d = new Date();
+      d.setDate(d.getDate() - n);
+      return d.toISOString().split("T")[0];
+    }
+
+    dbEstoque = [
+      {
+        produto: "Café em pó 500g",
+        quantidade: 4,
+        precoCusto: 12.50,
+        precoVenda: 19.90,
+        vendasDiarias: [
+          { data: diasAtras(6), qtd: 8 },
+          { data: diasAtras(5), qtd: 6 },
+          { data: diasAtras(4), qtd: 7 },
+          { data: diasAtras(3), qtd: 9 },
+          { data: diasAtras(2), qtd: 7 },
+          { data: diasAtras(1), qtd: 8 },
+          { data: diasAtras(0), qtd: 3 },
+        ]
+      },
+      {
+        produto: "Açúcar cristal 1kg",
+        quantidade: 11,
+        precoCusto: 4.20,
+        precoVenda: 6.50,
+        vendasDiarias: [
+          { data: diasAtras(6), qtd: 5 },
+          { data: diasAtras(5), qtd: 4 },
+          { data: diasAtras(4), qtd: 6 },
+          { data: diasAtras(3), qtd: 5 },
+          { data: diasAtras(2), qtd: 4 },
+          { data: diasAtras(1), qtd: 5 },
+          { data: diasAtras(0), qtd: 2 },
+        ]
+      },
+      {
+        produto: "Leite integral 1L",
+        quantidade: 3,
+        precoCusto: 5.80,
+        precoVenda: 8.90,
+        vendasDiarias: [
+          { data: diasAtras(6), qtd: 12 },
+          { data: diasAtras(5), qtd: 10 },
+          { data: diasAtras(4), qtd: 11 },
+          { data: diasAtras(3), qtd: 13 },
+          { data: diasAtras(2), qtd: 10 },
+          { data: diasAtras(1), qtd: 12 },
+          { data: diasAtras(0), qtd: 5 },
+        ]
+      },
+      {
+        produto: "Farinha de trigo 1kg",
+        quantidade: 28,
+        precoCusto: 3.90,
+        precoVenda: 6.20,
+        vendasDiarias: [
+          { data: diasAtras(4), qtd: 4 },
+          { data: diasAtras(2), qtd: 3 },
+          { data: diasAtras(0), qtd: 2 },
+        ]
+      },
+      {
+        produto: "Óleo de soja 900ml",
+        quantidade: 0,
+        precoCusto: 8.50,
+        precoVenda: 13.90,
+        vendasDiarias: [
+          { data: diasAtras(5), qtd: 6 },
+          { data: diasAtras(3), qtd: 5 },
+          { data: diasAtras(1), qtd: 4 },
+        ]
+      },
+      {
+        produto: "Arroz agulhinha 5kg",
+        quantidade: 45,
+        precoCusto: 18.00,
+        precoVenda: 26.90,
+        vendasDiarias: [
+          { data: diasAtras(6), qtd: 3 },
+          { data: diasAtras(3), qtd: 4 },
+          { data: diasAtras(0), qtd: 2 },
+        ]
+      }
+    ];
+
+    dbContatos = [
+      { nome: "Carlos Distribuidor", cargo: "fornecedor", fone: "11999990001" },
+      { nome: "Maria Supervisora",   cargo: "supervisor",  fone: "11999990002" }
+    ];
+
+    // Dados financeiros de demo no localStorage
+    localStorage.setItem(getStorageKey("gastos_mensais"),       "3800");
+    localStorage.setItem(getStorageKey("lucros_mensais"),        "5200");
+    localStorage.setItem(getStorageKey("lucros_mes_anterior"),   "4750");
+
+    // Banner de aviso demo
+    setTimeout(() => {
+      const banner = document.createElement("div");
+      banner.style.cssText = `
+        position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+        background:#1C1C1E; border:1px solid rgba(10,132,255,0.4);
+        border-radius:14px; padding:12px 18px; z-index:999;
+        font-size:0.75rem; color:#8E8E93; max-width:310px; text-align:center;
+        box-shadow:0 4px 24px rgba(0,0,0,0.5); animation: up 0.4s ease both;
+      `;
+      banner.innerHTML = `
+        🧪 <strong style="color:#F5F5F7;">Modo demonstração</strong><br>
+        Esses são dados fictícios de uma padaria. Faça login para usar com seus produtos.
+        <br><button onclick="this.parentElement.remove()" style="margin-top:8px;background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);color:#0A84FF;border-radius:8px;padding:4px 14px;font-size:0.72rem;cursor:pointer;">Entendi</button>
+      `;
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 8000);
+    }, 1200);
+  }
 
   // ─── CONTATOS ─────────────────────────────────────────────────────────────
   const CARGO_EMOJIS = {
@@ -2054,8 +2427,6 @@ ${SYSTEM_PROMPT}`;
       sel.appendChild(opt);
     });
     document.getElementById("vendaQtd").value = "";
-    document.getElementById("vendaCliente").value = "";
-    document.getElementById("vendaData").value = new Date().toISOString().split("T")[0];
     document.getElementById("modalVenda").style.display = "flex";
   }
 
@@ -2064,23 +2435,21 @@ ${SYSTEM_PROMPT}`;
   }
 
   function salvarVenda() {
-    const idx     = parseInt(document.getElementById("vendaProduto").value);
-    const qtd     = parseInt(document.getElementById("vendaQtd").value);
-    const cliente = (document.getElementById("vendaCliente").value || "").trim();
-    const dataVal = document.getElementById("vendaData").value;
+    const idx = parseInt(document.getElementById("vendaProduto").value);
+    const qtd = parseInt(document.getElementById("vendaQtd").value);
     if (isNaN(idx) || isNaN(qtd) || qtd <= 0) return;
 
     const item = dbEstoque[idx];
     if (!item) return;
     if (!item.vendasDiarias) item.vendasDiarias = [];
 
-    // Usa a data selecionada ou hoje
-    const hoje = dataVal || new Date().toISOString().split("T")[0];
-    const registroHoje = item.vendasDiarias.find(v => v.data === hoje && v.cliente === (cliente || undefined));
-    if (registroHoje && !cliente) {
+    // Registra venda com data de hoje
+    const hoje = new Date().toISOString().split("T")[0];
+    const registroHoje = item.vendasDiarias.find(v => v.data === hoje);
+    if (registroHoje) {
       registroHoje.qtd += qtd;
     } else {
-      item.vendasDiarias.push({ data: hoje, qtd, ...(cliente ? { cliente } : {}) });
+      item.vendasDiarias.push({ data: hoje, qtd });
     }
 
     // Mantém apenas últimos 30 dias
@@ -2644,7 +3013,7 @@ ${SYSTEM_PROMPT}`;
     const estoqueRows = [
       [`LupiAI — Relatório de Estoque  |  Gerado em: ${hoje}`],
       [],
-      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)"]
+      ["Produto", "Qtd Atual", "Consumo/Dia", "Dias Restantes", "Status", "Preço Custo (R$)", "Preço Venda (R$)", "Margem (%)", "Lucro Unit. (R$)", "Ação Recomendada"]
     ];
 
     dbEstoque.forEach(p => {
@@ -2654,6 +3023,10 @@ ${SYSTEM_PROMPT}`;
                       dias <= 1 ? "🔴 EMERGÊNCIA" :
                       dias <= 3 ? "🚨 Crítico" :
                       dias <= 7 ? "⚠️ Baixo" : "✅ OK";
+      const acao    = dias === null ? "Registre consumo/dia" :
+                      dias <= 1 ? "⚡ Compra URGENTE agora!" :
+                      dias <= 3 ? "🚨 Pedir hoje — crítico" :
+                      dias <= 7 ? "📦 Planejar reposição" : "👍 Sem ação necessária";
       const margem  = p.precoCusto && p.precoVenda
                       ? `${(((p.precoVenda - p.precoCusto) / p.precoVenda) * 100).toFixed(1)}%`
                       : "—";
@@ -2670,15 +3043,16 @@ ${SYSTEM_PROMPT}`;
         p.precoCusto ? `R$ ${p.precoCusto.toFixed(2)}` : "—",
         p.precoVenda ? `R$ ${p.precoVenda.toFixed(2)}` : "—",
         margem,
-        lucroU
+        lucroU,
+        acao
       ]);
     });
 
-    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", ""]);
+    if (dbEstoque.length === 0) estoqueRows.push(["Nenhum produto cadastrado ainda.", "", "", "", "", "", "", "", "", ""]);
 
     const ws1 = XLSX.utils.aoa_to_sheet(estoqueRows);
-    ws1["!cols"] = [24,10,12,14,14,16,16,10,14].map(w => ({ wch: w }));
-    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }]; // merge título
+    ws1["!cols"] = [24,10,12,14,14,16,16,10,14,26].map(w => ({ wch: w }));
+    ws1["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }]; // merge título
     XLSX.utils.book_append_sheet(wb, ws1, "📦 Estoque Atual");
 
     // ── ABA 2: Alertas ────────────────────────────────────────────────────
@@ -2743,32 +3117,19 @@ ${SYSTEM_PROMPT}`;
     const vendaRows = [
       [`📈 Histórico de Vendas  |  ${hoje}`],
       [],
-      ["Produto", "Data", "Qtd Vendida", "Cliente"]
+      ["Produto", "Data", "Qtd Vendida"]
     ];
 
     dbEstoque.forEach(p => {
       (p.vendasDiarias || []).forEach(v => {
-        const dataFormatada = v.data ? new Date(v.data + "T12:00:00").toLocaleDateString("pt-BR") : "—";
-        vendaRows.push([p.produto, dataFormatada, v.qtd, v.cliente || "—"]);
+        vendaRows.push([p.produto, v.data, v.qtd]);
       });
     });
-    // Ordena por data mais recente
-    if (vendaRows.length > 3) {
-      const header = vendaRows.slice(0, 3);
-      const dados  = vendaRows.slice(3).sort((a, b) => {
-        const da = a[1].split("/").reverse().join("-");
-        const db = b[1].split("/").reverse().join("-");
-        return db.localeCompare(da);
-      });
-      vendaRows.length = 0;
-      header.forEach(r => vendaRows.push(r));
-      dados.forEach(r => vendaRows.push(r));
-    }
 
     if (vendaRows.length === 3) vendaRows.push(["Nenhuma venda registrada ainda."]);
 
     const ws4 = XLSX.utils.aoa_to_sheet(vendaRows);
-    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 24 }];
+    ws4["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }];
     XLSX.utils.book_append_sheet(wb, ws4, "📈 Histórico Vendas");
 
     // ── Download ──────────────────────────────────────────────────────────
