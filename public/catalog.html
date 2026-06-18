@@ -348,8 +348,10 @@
       }
 
       const dados = JSON.parse(snap.data().valor);
-      // Só produtos marcados como promoção com estoque > 0
-      todosOsProdutos = (dados || []).filter(p => p.emPromocao && p.quantidade > 0);
+      console.log("TODOS OS PRODUTOS:", JSON.stringify(dados));
+      // Mostra: emPromocao=true OU (tem preço de venda), desde que tenha estoque
+      todosOsProdutos = (dados || []).filter(p => p.quantidade > 0 && (p.emPromocao || p.precoVenda > 0));
+      console.log("FILTRADOS:", todosOsProdutos.length);
       renderGrid(todosOsProdutos);
 
     } catch(e) {
