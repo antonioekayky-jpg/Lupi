@@ -1994,6 +1994,22 @@
     <input type="number" id="regConsumoDiario"  placeholder="Quantas unidades vende por dia?" step="0.1">
     <input type="number" id="regPrecoCusto"     placeholder="Quanto custa para você? (R$)" step="0.01">
     <input type="number" id="regPrecoVenda"     placeholder="Por quanto você vende? (R$)" step="0.01">
+
+    <!-- Toggle promoção -->
+    <div onclick="togglePromocao()" id="promoBtnWrap" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .2s;margin-top:2px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <span style="font-size:15px">🏷️</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Incluir no catálogo público</div>
+          <div style="font-size:11px;color:var(--text-2);margin-top:1px">Aparece na página de promoções</div>
+        </div>
+      </div>
+      <div id="promoToggle" style="width:42px;height:24px;border-radius:12px;background:var(--surface);border:1px solid var(--border);position:relative;transition:background .2s;flex-shrink:0">
+        <div id="promoToggleKnob" style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#555;transition:transform .2s,background .2s"></div>
+      </div>
+    </div>
+    <input type="hidden" id="regEmPromocao" value="0">
+
     <div class="modal-btns">
       <button class="btn-salvar"   onclick="salvarRegistro()">Salvar</button>
       <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
@@ -2818,6 +2834,7 @@ ${SYSTEM_PROMPT}`;
     const consumoDiario = parseFloat(document.getElementById("regConsumoDiario").value);
     const precoCusto    = parseFloat(document.getElementById("regPrecoCusto").value);
     const precoVenda    = parseFloat(document.getElementById("regPrecoVenda").value);
+    const emPromocao    = document.getElementById("regEmPromocao").value === '1';
 
     if (!produto || isNaN(quantidade)) {
       alert("Informe ao menos o nome e a quantidade do produto.");
@@ -2832,6 +2849,7 @@ ${SYSTEM_PROMPT}`;
     if (!isNaN(precoCusto)   && precoCusto   > 0) item.precoCusto = precoCusto;
     if (!isNaN(precoVenda)   && precoVenda   > 0) item.precoVenda = precoVenda;
     if (_fotoBase64) item.imagemBase64 = _fotoBase64; // salva foto no produto
+    item.emPromocao = emPromocao; // salva flag de promoção
     if (!item.vendasDiarias) item.vendasDiarias = [];
     if (idx >= 0) dbEstoque[idx] = item; else dbEstoque.push(item);
     localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
@@ -2852,6 +2870,12 @@ ${SYSTEM_PROMPT}`;
     const fpw = document.getElementById('fotoPreviewWrap');   if (fpw) fpw.style.display = 'none';
     const fph = document.getElementById('fotoPlaceholder');   if (fph) fph.style.display = '';
     const frb = document.getElementById('fotoRemoverBtn');    if (frb) frb.style.display = 'none';
+    // reseta toggle promoção
+    const hidden = document.getElementById('regEmPromocao');  if (hidden) hidden.value = '0';
+    const knob   = document.getElementById('promoToggleKnob');
+    const track  = document.getElementById('promoToggle');
+    if (knob)  { knob.style.transform = 'translateX(0)'; knob.style.background = '#555'; }
+    if (track) { track.style.background = 'var(--surface)'; track.style.borderColor = 'var(--border)'; }
   }
 
   // ─── MODAL FINANCEIRO ─────────────────────────────────────────────────────
@@ -3781,6 +3805,25 @@ ${SYSTEM_PROMPT}`;
     reader.readAsDataURL(file);
   }
 
+  function togglePromocao() {
+    const hidden = document.getElementById('regEmPromocao');
+    const knob   = document.getElementById('promoToggleKnob');
+    const track  = document.getElementById('promoToggle');
+    const ativo  = hidden.value === '1';
+    hidden.value = ativo ? '0' : '1';
+    if (!ativo) {
+      track.style.background  = '#30D158';
+      track.style.borderColor = '#30D158';
+      knob.style.transform    = 'translateX(18px)';
+      knob.style.background   = '#fff';
+    } else {
+      track.style.background  = 'var(--surface)';
+      track.style.borderColor = 'var(--border)';
+      knob.style.transform    = 'translateX(0)';
+      knob.style.background   = '#555';
+    }
+  }
+
   function removerFoto(e) {
     e.stopPropagation();
     _fotoBase64 = null;
@@ -3804,12 +3847,12 @@ ${SYSTEM_PROMPT}`;
     const url   = getCatalogUrl();
     if (urlEl) urlEl.textContent = url || 'Faça login para ver seu link';
 
-    const produtos = (dbEstoque || []).filter(p => p.quantidade > 0 && p.precoVenda > 0);
+    const produtos = (dbEstoque || []).filter(p => p.emPromocao && p.quantidade > 0);
     if (!grid) return;
 
     if (produtos.length === 0) {
       grid.innerHTML = `<div style="font-size:12.5px;color:var(--text-2);padding:20px 0;grid-column:1/-1">
-        Nenhum produto com preço e estoque disponível. Cadastre produtos com preço de venda para aparecerem aqui.
+        Nenhum produto marcado como promoção. Ao cadastrar um produto, ative a opção "Incluir no catálogo público".
       </div>`;
       return;
     }
