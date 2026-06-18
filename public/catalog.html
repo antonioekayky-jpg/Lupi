@@ -217,6 +217,13 @@
     margin-top: 6px;
   }
 
+  .cat-card-estoque {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+    margin-top: 3px;
+  }
+
   /* ── EMPTY / LOADING ── */
   .cat-empty {
     text-align: center;
@@ -341,8 +348,8 @@
       }
 
       const dados = JSON.parse(snap.data().valor);
-      // Só produtos com preço de venda E quantidade > 0
-      todosOsProdutos = (dados || []).filter(p => p.precoVenda > 0 && p.quantidade > 0);
+      // Só produtos marcados como promoção com estoque > 0
+      todosOsProdutos = (dados || []).filter(p => p.emPromocao && p.quantidade > 0);
       renderGrid(todosOsProdutos);
 
     } catch(e) {
@@ -364,7 +371,11 @@
         }
         <div class="cat-card-body">
           <div class="cat-card-name">${p.produto}</div>
-          <div class="cat-card-price">R&nbsp;${(p.precoVenda).toFixed(2).replace('.', ',')}</div>
+          ${p.precoVenda > 0
+            ? `<div class="cat-card-price">R&nbsp;${(p.precoVenda).toFixed(2).replace('.', ',')}</div>`
+            : ''
+          }
+          <div class="cat-card-estoque">${p.quantidade} disponíve${p.quantidade !== 1 ? 'is' : 'l'}</div>
         </div>
       </div>
     `).join('');
