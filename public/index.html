@@ -3879,11 +3879,68 @@ ${SYSTEM_PROMPT}`;
         </div>
         <div style="padding:10px 12px">
           <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.produto}</div>
-          <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:3px">R$ ${(p.precoVenda).toFixed(2).replace('.',',')}</div>
-          <div style="font-size:11px;color:var(--text-2);margin-top:2px">${p.quantidade} em estoque</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:3px">R$ ${(p.precoVenda||0).toFixed(2).replace('.',',')}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+            <div style="font-size:11px;color:var(--text-2)">${p.quantidade} em estoque</div>
+            ${p.emPromocao ? '<span style="font-size:10px;font-weight:600;color:#fff;background:#e11d48;border-radius:4px;padding:2px 6px">PROMO</span>' : ''}
+          </div>
+          <button onclick="editarProduto('${p.produto.replace(/'/g,"\\'")}'" style="margin-top:8px;width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-family:inherit;cursor:pointer">✏️ Editar</button>
         </div>
       </div>
     `).join('');
+  }
+
+  function editarProduto(nomeProduto) {
+    const p = dbEstoque.find(x => x.produto === nomeProduto);
+    if (!p) return;
+
+    // Abre o modal de registro
+    document.getElementById('modalRegistro').style.display = 'flex';
+
+    // Preenche os campos com os dados existentes
+    document.getElementById('regProduto').value       = p.produto;
+    document.getElementById('regQuantidade').value    = p.quantidade;
+    document.getElementById('regConsumoDiario').value = p.consumoDiarioManual || '';
+    document.getElementById('regPrecoCusto').value    = p.precoCusto || '';
+    document.getElementById('regPrecoVenda').value    = p.precoVenda || '';
+
+    // Foto existente
+    if (p.imagemBase64) {
+      _fotoBase64 = p.imagemBase64;
+      const fp  = document.getElementById('fotoPreview');
+      const fpw = document.getElementById('fotoPreviewWrap');
+      const fph = document.getElementById('fotoPlaceholder');
+      const frb = document.getElementById('fotoRemoverBtn');
+      if (fp)  fp.src = p.imagemBase64;
+      if (fpw) fpw.style.display = '';
+      if (fph) fph.style.display = 'none';
+      if (frb) frb.style.display = '';
+    }
+
+    // Toggle promoção
+    const hidden = document.getElementById('regEmPromocao');
+    const knob   = document.getElementById('promoToggleKnob');
+    const track  = document.getElementById('promoToggle');
+    const descW  = document.getElementById('promoDescWrap');
+    const descI  = document.getElementById('regPromoDescricao');
+
+    if (p.emPromocao) {
+      hidden.value           = '1';
+      track.style.background  = '#30D158';
+      track.style.borderColor = '#30D158';
+      knob.style.transform    = 'translateX(18px)';
+      knob.style.background   = '#fff';
+      if (descW) descW.style.display = 'block';
+      if (descI) descI.value = p.promoDescricao || '';
+    } else {
+      hidden.value           = '0';
+      track.style.background  = 'var(--surface)';
+      track.style.borderColor = 'var(--border)';
+      knob.style.transform    = 'translateX(0)';
+      knob.style.background   = '#555';
+      if (descW) descW.style.display = 'none';
+      if (descI) descI.value = '';
+    }
   }
 
   function copiarUrlCatalogo() {
