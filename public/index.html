@@ -2340,6 +2340,12 @@
       entrarNoApp();
     }
     // Se não tiver sessão, loginScreen fica visível (já está no HTML)
+
+    // Delegação de evento para botões de editar produto
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-edit]');
+      if (btn) editarProduto(btn.dataset.edit);
+    });
   });
 </script>
 <script>
@@ -3884,7 +3890,7 @@ ${SYSTEM_PROMPT}`;
             <div style="font-size:11px;color:var(--text-2)">${p.quantidade} em estoque</div>
             ${p.emPromocao ? '<span style="font-size:10px;font-weight:600;color:#fff;background:#e11d48;border-radius:4px;padding:2px 6px">PROMO</span>' : ''}
           </div>
-          <button onclick="editarProduto('${p.produto.replace(/'/g,"\\'")}'" style="margin-top:8px;width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-family:inherit;cursor:pointer">✏️ Editar</button>
+          <button data-edit="${p.produto}" style="margin-top:8px;width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-family:inherit;cursor:pointer">✏️ Editar</button>
         </div>
       </div>
     `).join('');
