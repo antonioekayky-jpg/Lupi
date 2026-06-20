@@ -2010,6 +2010,11 @@
     </div>
     <input type="hidden" id="regEmPromocao" value="0">
 
+    <!-- Campo descrição da promoção (aparece só quando toggle ativo) -->
+    <div id="promoDescWrap" style="display:none;margin-top:2px">
+      <input type="text" id="regPromoDescricao" placeholder='Ex: Compre 2, leve 3 • Só hoje • 50% off' style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid #30D158;border-radius:10px;font-family:inherit;font-size:13px;color:var(--text);outline:none;">
+    </div>
+
     <div class="modal-btns">
       <button class="btn-salvar"   onclick="salvarRegistro()">Salvar</button>
       <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
@@ -2850,6 +2855,8 @@ ${SYSTEM_PROMPT}`;
     if (!isNaN(precoVenda)   && precoVenda   > 0) item.precoVenda = precoVenda;
     if (_fotoBase64) item.imagemBase64 = _fotoBase64; // salva foto no produto
     item.emPromocao = emPromocao; // salva flag de promoção
+    const promoDesc = document.getElementById('regPromoDescricao')?.value.trim() || '';
+    item.promoDescricao = emPromocao ? promoDesc : '';
     if (!item.vendasDiarias) item.vendasDiarias = [];
     if (idx >= 0) dbEstoque[idx] = item; else dbEstoque.push(item);
     localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque)); fbSalvar("estoque_db", dbEstoque);
@@ -2874,6 +2881,8 @@ ${SYSTEM_PROMPT}`;
     const hidden = document.getElementById('regEmPromocao');  if (hidden) hidden.value = '0';
     const knob   = document.getElementById('promoToggleKnob');
     const track  = document.getElementById('promoToggle');
+    const descI  = document.getElementById('regPromoDescricao'); if (descI) descI.value = '';
+    const descW  = document.getElementById('promoDescWrap');     if (descW) descW.style.display = 'none';
     if (knob)  { knob.style.transform = 'translateX(0)'; knob.style.background = '#555'; }
     if (track) { track.style.background = 'var(--surface)'; track.style.borderColor = 'var(--border)'; }
   }
@@ -3809,6 +3818,7 @@ ${SYSTEM_PROMPT}`;
     const hidden = document.getElementById('regEmPromocao');
     const knob   = document.getElementById('promoToggleKnob');
     const track  = document.getElementById('promoToggle');
+    const wrap   = document.getElementById('promoDescWrap');
     const ativo  = hidden.value === '1';
     hidden.value = ativo ? '0' : '1';
     if (!ativo) {
@@ -3816,11 +3826,13 @@ ${SYSTEM_PROMPT}`;
       track.style.borderColor = '#30D158';
       knob.style.transform    = 'translateX(18px)';
       knob.style.background   = '#fff';
+      if (wrap) wrap.style.display = 'block';
     } else {
       track.style.background  = 'var(--surface)';
       track.style.borderColor = 'var(--border)';
       knob.style.transform    = 'translateX(0)';
       knob.style.background   = '#555';
+      if (wrap) wrap.style.display = 'none';
     }
   }
 
