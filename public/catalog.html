@@ -317,8 +317,8 @@
 </header>
 
 <section class="cat-hero">
-  <div class="cat-hero-title" id="heroTitle">Nossos Produtos</div>
-  <div class="cat-hero-sub" id="heroSub">Confira o que temos disponível para você</div>
+  <div class="cat-hero-title" id="heroTitle">🔥 Promoções</div>
+  <div class="cat-hero-sub" id="heroSub">Ofertas por tempo limitado · Enquanto durar o estoque</div>
 </section>
 
 <main class="cat-main">
@@ -360,10 +360,8 @@
       }
 
       const dados = JSON.parse(snap.data().valor);
-      console.log("TODOS OS PRODUTOS:", JSON.stringify(dados));
-      // Mostra: emPromocao=true OU (tem preço de venda), desde que tenha estoque
+      // Só produtos marcados como promoção com estoque disponível
       todosOsProdutos = (dados || []).filter(p => p.emPromocao && p.quantidade > 0);
-      console.log("FILTRADOS:", todosOsProdutos.length);
       renderGrid(todosOsProdutos);
 
     } catch(e) {
