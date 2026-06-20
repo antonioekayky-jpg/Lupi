@@ -217,6 +217,18 @@
     margin-top: 6px;
   }
 
+  .cat-card-promo {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    background: #e11d48;
+    border-radius: 6px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-top: 6px;
+    letter-spacing: .01em;
+  }
+
   .cat-card-estoque {
     font-size: 11px;
     color: var(--green);
@@ -350,7 +362,7 @@
       const dados = JSON.parse(snap.data().valor);
       console.log("TODOS OS PRODUTOS:", JSON.stringify(dados));
       // Mostra: emPromocao=true OU (tem preço de venda), desde que tenha estoque
-      todosOsProdutos = (dados || []).filter(p => p.quantidade > 0 && (p.emPromocao || p.precoVenda > 0));
+      todosOsProdutos = (dados || []).filter(p => p.emPromocao && p.quantidade > 0);
       console.log("FILTRADOS:", todosOsProdutos.length);
       renderGrid(todosOsProdutos);
 
@@ -373,6 +385,10 @@
         }
         <div class="cat-card-body">
           <div class="cat-card-name">${p.produto}</div>
+          ${p.promoDescricao
+            ? `<div class="cat-card-promo">${p.promoDescricao}</div>`
+            : ''
+          }
           ${p.precoVenda > 0
             ? `<div class="cat-card-price">R&nbsp;${(p.precoVenda).toFixed(2).replace('.', ',')}</div>`
             : ''
