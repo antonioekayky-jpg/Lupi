@@ -1827,7 +1827,7 @@
 
   <div class="sb-section">
     <div class="sb-section-label">GESTÃO</div>
-    <button class="sb-item" onclick="document.getElementById('modalRegistro').style.display='flex'">
+    <button class="sb-item" id="sb-produtos" onclick="switchView('produtos')">
       <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
       Produtos
       <span class="sb-badge" id="sb-badge-alertas" style="display:none">0</span>
@@ -1892,6 +1892,23 @@
 </div>
 
 <!-- ── DASHBOARD VIEW ── -->
+<!-- ── PRODUTOS VIEW ── -->
+<div id="view-produtos" style="display:none;flex:1;overflow-y:auto;background:var(--bg);">
+  <div style="padding:20px 20px 40px;max-width:860px;width:100%;display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">Produtos</div>
+        <div style="font-size:13px;color:var(--text-2);margin-top:2px">Gerencie seu estoque e promoções</div>
+      </div>
+      <button onclick="document.getElementById('modalRegistro').style.display='flex'" style="display:flex;align-items:center;gap:7px;padding:10px 18px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo produto
+      </button>
+    </div>
+    <div id="produtos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;"></div>
+  </div>
+</div>
+
 <div id="view-dashboard" style="display:flex;">
   <div class="dash-content" id="dash-inner"></div>
 </div>
@@ -2402,18 +2419,21 @@ REGRAS CRÍTICAS:
 
   // ── SAAS LAYOUT ────────────────────────────────────────────────────────────
   function switchView(view) {
-    const dash = document.getElementById('view-dashboard');
-    const chat = document.getElementById('view-chat');
-    const cat  = document.getElementById('view-catalogo');
+    const dash    = document.getElementById('view-dashboard');
+    const chat    = document.getElementById('view-chat');
+    const cat     = document.getElementById('view-catalogo');
+    const prods   = document.getElementById('view-produtos');
     const sbDash    = document.getElementById('sb-dashboard');
     const sbChat    = document.getElementById('sb-chat');
     const sbCatalog = document.getElementById('sb-catalogo');
+    const sbProds   = document.getElementById('sb-produtos');
     const title = document.getElementById('topbar-title');
 
-    dash.style.display = 'none';
-    chat.style.display = 'none';
-    if (cat) cat.style.display = 'none';
-    [sbDash, sbChat, sbCatalog].forEach(b => b && b.classList.remove('active'));
+    dash.style.display  = 'none';
+    chat.style.display  = 'none';
+    if (cat)   cat.style.display   = 'none';
+    if (prods) prods.style.display = 'none';
+    [sbDash, sbChat, sbCatalog, sbProds].forEach(b => b && b.classList.remove('active'));
 
     if (view === 'dashboard') {
       dash.style.display = 'flex';
@@ -2429,6 +2449,11 @@ REGRAS CRÍTICAS:
       if (sbCatalog) sbCatalog.classList.add('active');
       if (title) title.textContent = 'Catálogo Público';
       renderCatalogoView();
+    } else if (view === 'produtos') {
+      if (prods) prods.style.display = 'flex';
+      if (sbProds) sbProds.classList.add('active');
+      if (title) title.textContent = 'Produtos';
+      renderProdutosView();
     }
   }
 
@@ -2852,7 +2877,7 @@ ${SYSTEM_PROMPT}`;
       return;
     }
 
-    const idx = dbEstoque.findIndex(p => p.produto.toLowerCase() === produto.toLowerCase());
+    const idx = _editandoIdx !== null ? _editandoIdx : dbEstoque.findIndex(p => p.produto.toLowerCase() === produto.toLowerCase());
     const item = idx >= 0 ? dbEstoque[idx] : { produto, vendasDiarias: [] };
     item.quantidade = quantidade;
     item.data = new Date().toISOString();
@@ -2871,6 +2896,8 @@ ${SYSTEM_PROMPT}`;
     ["regProduto","regQuantidade","regConsumoDiario","regPrecoCusto","regPrecoVenda"]
       .forEach(id => document.getElementById(id).value = "");
     verificarAlertasAutomaticos();
+    if (document.getElementById('view-produtos')?.style.display !== 'none') renderProdutosView();
+    if (document.getElementById('view-catalogo')?.style.display !== 'none') renderCatalogoView();
     adicionarMsg(`📦 "${produto}" adicionado!${_fotoBase64 ? ' Foto salva no catálogo.' : ''} ${!isNaN(consumoDiario) && consumoDiario > 0 ? `Com consumo de ${consumoDiario}/dia, o estoque dura ~${Math.floor(quantidade/consumoDiario)} dias.` : "Registre vendas para eu calcular a previsão de duração."}`, "ai");
   }
 
@@ -2891,6 +2918,7 @@ ${SYSTEM_PROMPT}`;
     const descW  = document.getElementById('promoDescWrap');     if (descW) descW.style.display = 'none';
     if (knob)  { knob.style.transform = 'translateX(0)'; knob.style.background = '#555'; }
     if (track) { track.style.background = 'var(--surface)'; track.style.borderColor = 'var(--border)'; }
+    _editandoIdx = null;
   }
 
   // ─── MODAL FINANCEIRO ─────────────────────────────────────────────────────
@@ -3859,6 +3887,42 @@ ${SYSTEM_PROMPT}`;
     return `${base}/catalog.html?uid=${usuarioAtual.id}`;
   }
 
+  function renderProdutosView() {
+    const grid = document.getElementById('produtos-grid');
+    if (!grid) return;
+
+    if (!dbEstoque || dbEstoque.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-2);font-size:14px">
+        Nenhum produto cadastrado ainda.<br><br>
+        <button onclick="document.getElementById('modalRegistro').style.display='flex'" style="padding:10px 20px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">+ Cadastrar primeiro produto</button>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = dbEstoque.map((p, i) => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+        ${p.imagemBase64
+          ? `<img src="${p.imagemBase64}" style="width:100%;aspect-ratio:1/1;object-fit:cover;">`
+          : `<div style="width:100%;aspect-ratio:1/1;background:var(--surface2);display:flex;align-items:center;justify-content:center;">
+               <svg viewBox="0 0 24 24" width="32" height="32" stroke="var(--border)" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+             </div>`
+        }
+        <div style="padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">${p.produto}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap;">
+            ${p.precoVenda > 0 ? `<span style="font-size:15px;font-weight:700;color:var(--text)">R$ ${(p.precoVenda).toFixed(2).replace('.',',')}</span>` : ''}
+            ${p.emPromocao ? `<span style="font-size:10px;font-weight:700;color:#fff;background:#e11d48;border-radius:4px;padding:2px 6px">🏷️ PROMO</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:2px">${p.quantidade} em estoque</div>
+          ${p.promoDescricao ? `<div style="font-size:11px;color:#e11d48;font-weight:500;margin-top:2px">${p.promoDescricao}</div>` : ''}
+          <button data-edit="${i}" style="margin-top:10px;width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:border-color .2s">
+            ✏️ Editar / Adicionar à promoção
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
   function renderCatalogoView() {
     const urlEl = document.getElementById('catalogUrlDisplay');
     const grid  = document.getElementById('catalogPreviewGrid');
@@ -3896,9 +3960,14 @@ ${SYSTEM_PROMPT}`;
     `).join('');
   }
 
-  function editarProduto(nomeProduto) {
-    const p = dbEstoque.find(x => x.produto === nomeProduto);
+  let _editandoIdx = null; // índice do produto sendo editado
+
+  function editarProduto(ref) {
+    // aceita índice numérico (nova aba) ou nome (legado)
+    const idx = isNaN(ref) ? dbEstoque.findIndex(x => x.produto === ref) : parseInt(ref);
+    const p = dbEstoque[idx];
     if (!p) return;
+    _editandoIdx = idx;
 
     // Abre o modal de registro
     document.getElementById('modalRegistro').style.display = 'flex';
