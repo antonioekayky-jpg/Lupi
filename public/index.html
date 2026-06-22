@@ -2271,6 +2271,7 @@
   async function fbSalvar(colecao, dados) {
     try {
       if (!window._db || !usuarioAtual?.id) return;
+      if (usuarioAtual.id === "demo") return; // modo demo: só localStorage
       await window._db
         .collection("usuarios").doc(usuarioAtual.id)
         .collection(colecao).doc("dados")
@@ -2282,6 +2283,7 @@
   async function fbCarregar(colecao) {
     try {
       if (!window._db || !usuarioAtual?.id) return null;
+      if (usuarioAtual.id === "demo") return null; // modo demo: só localStorage
       const snap = await window._db
         .collection("usuarios").doc(usuarioAtual.id)
         .collection(colecao).doc("dados")
