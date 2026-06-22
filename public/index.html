@@ -2358,10 +2358,12 @@
     }
     // Se não tiver sessão, loginScreen fica visível (já está no HTML)
 
-    // Delegação de evento para botões de editar produto
+    // Delegação de evento para botões de editar/excluir produto
     document.addEventListener('click', e => {
-      const btn = e.target.closest('[data-edit]');
-      if (btn) editarProduto(btn.dataset.edit);
+      const editBtn   = e.target.closest('[data-edit]');
+      const deleteBtn = e.target.closest('[data-delete]');
+      if (editBtn)   editarProduto(editBtn.dataset.edit);
+      if (deleteBtn) excluirProduto(parseInt(deleteBtn.dataset.delete));
     });
   });
 </script>
@@ -3917,9 +3919,14 @@ ${SYSTEM_PROMPT}`;
           </div>
           <div style="font-size:12px;color:var(--text-2);margin-top:2px">${p.quantidade} em estoque</div>
           ${p.promoDescricao ? `<div style="font-size:11px;color:#e11d48;font-weight:500;margin-top:2px">${p.promoDescricao}</div>` : ''}
-          <button data-edit="${i}" style="margin-top:10px;width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:border-color .2s">
-            ✏️ Editar / Adicionar à promoção
-          </button>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button data-edit="${i}" style="flex:1;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer">
+              ✏️ Editar
+            </button>
+            <button data-delete="${i}" style="padding:8px 12px;background:transparent;border:1px solid #e11d48;border-radius:8px;color:#e11d48;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer">
+              🗑️
+            </button>
+          </div>
         </div>
       </div>
     `).join('');
@@ -3962,7 +3969,18 @@ ${SYSTEM_PROMPT}`;
     `).join('');
   }
 
-  let _editandoIdx = null; // índice do produto sendo editado
+  let _editandoIdx = null;
+
+  function excluirProduto(idx) {
+    const p = dbEstoque[idx];
+    if (!p) return;
+    if (!confirm(`Excluir "${p.produto}"? Esta ação não pode ser desfeita.`)) return;
+    dbEstoque.splice(idx, 1);
+    salvarEstoque();
+    fbSalvar('estoque_db', dbEstoque);
+    renderProdutosView();
+    renderCatalogoView();
+  } // índice do produto sendo editado
 
   function editarProduto(ref) {
     // aceita índice numérico (nova aba) ou nome (legado)
