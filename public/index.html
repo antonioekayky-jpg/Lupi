@@ -3940,6 +3940,15 @@ ${SYSTEM_PROMPT}`;
     const url   = getCatalogUrl();
     if (urlEl) urlEl.textContent = url || 'Faça login para ver seu link';
 
+    // Modo demo: catálogo público não funciona (sem Firestore)
+    if (usuarioAtual?.id === 'demo') {
+      if (grid) grid.innerHTML = `<div style="font-size:12.5px;color:var(--text-2);padding:20px 0;grid-column:1/-1;line-height:1.7">
+        ⚠️ O catálogo público não está disponível no modo demonstração.<br>
+        <strong style="color:var(--text)">Faça login com seu e-mail</strong> para ativar o catálogo e compartilhar com seus clientes.
+      </div>`;
+      return;
+    }
+
     const produtos = (dbEstoque || []).filter(p => p.emPromocao && p.quantidade > 0);
     if (!grid) return;
 
