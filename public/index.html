@@ -2919,6 +2919,8 @@ ${SYSTEM_PROMPT}`;
     if (knob)  { knob.style.transform = 'translateX(0)'; knob.style.background = '#555'; }
     if (track) { track.style.background = 'var(--surface)'; track.style.borderColor = 'var(--border)'; }
     _editandoIdx = null;
+    const modalTitle = document.querySelector('#modalRegistro h3');
+    if (modalTitle) modalTitle.textContent = '📦 Novo Produto';
   }
 
   // ─── MODAL FINANCEIRO ─────────────────────────────────────────────────────
@@ -3954,7 +3956,7 @@ ${SYSTEM_PROMPT}`;
             <div style="font-size:11px;color:var(--text-2)">${p.quantidade} em estoque</div>
             ${p.emPromocao ? '<span style="font-size:10px;font-weight:600;color:#fff;background:#e11d48;border-radius:4px;padding:2px 6px">PROMO</span>' : ''}
           </div>
-          <button data-edit="${p.produto}" style="margin-top:8px;width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-family:inherit;cursor:pointer">✏️ Editar</button>
+          <button data-edit="${dbEstoque.findIndex(x => x === p)}" style="margin-top:8px;width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-2);font-size:12px;font-family:inherit;cursor:pointer">✏️ Editar</button>
         </div>
       </div>
     `).join('');
@@ -3969,8 +3971,10 @@ ${SYSTEM_PROMPT}`;
     if (!p) return;
     _editandoIdx = idx;
 
-    // Abre o modal de registro
+    // Abre o modal de registro e muda título
     document.getElementById('modalRegistro').style.display = 'flex';
+    const modalTitle = document.querySelector('#modalRegistro h3');
+    if (modalTitle) modalTitle.textContent = '✏️ Editar Produto';
 
     // Preenche os campos com os dados existentes
     document.getElementById('regProduto').value       = p.produto;
