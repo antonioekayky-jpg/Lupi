@@ -3976,8 +3976,8 @@ ${SYSTEM_PROMPT}`;
     if (!p) return;
     if (!confirm(`Excluir "${p.produto}"? Esta ação não pode ser desfeita.`)) return;
     dbEstoque.splice(idx, 1);
-    salvarEstoque();
-    fbSalvar('estoque_db', dbEstoque);
+    localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque));
+    fbSalvar("estoque_db", dbEstoque);
     renderProdutosView();
     renderCatalogoView();
   } // índice do produto sendo editado
