@@ -22,7 +22,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     window._db = firebase.firestore();
-    console.log("Firebase inicializado com sucesso!");
+    
   </script>
 <style>
   :root {
@@ -1713,130 +1713,119 @@
 
   /* Responsive: collapse sidebar on small screens */
   @media (max-width: 768px) {
-    /* Sidebar vira drawer deslizável */
-    #sidebar {
-      transform: translateX(-100%);
-      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-      z-index: 300;
-      box-shadow: 4px 0 32px rgba(0,0,0,0.5);
-    }
-    #sidebar.open {
-      transform: translateX(0);
-    }
-    /* Overlay escurecido atrás do drawer */
-    #sidebar-overlay {
-      display: block;
-    }
+    #sidebar { display: none; }
     #main-content { margin-left: 0; }
     .dash-bottom { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    /* Espaço para bottom nav */
-    #main-content { padding-bottom: 64px; }
-    /* Botão hamburguer visível */
-    #btn-menu-mobile { display: flex; }
-    /* Bottom nav visível */
-    #bottom-nav { display: flex; }
   }
 
   @media (max-width: 480px) {
     .kpi-grid { grid-template-columns: 1fr 1fr; }
     .dash-content { padding: 16px; gap: 14px; }
     .kpi-val { font-size: 1.2rem; }
+    #main-content { padding-bottom: 72px; }
   }
 
-  /* ── OVERLAY DO DRAWER ── */
-  #sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 200;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-  }
-
-  /* ── BOTÃO HAMBURGUER NO TOPBAR ── */
-  #btn-menu-mobile {
-    display: none;
-    width: 34px; height: 34px;
-    align-items: center; justify-content: center;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  #btn-menu-mobile svg {
-    width: 16px; height: 16px;
-    stroke: #A1A1AA;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-  }
-
-  /* ── BOTTOM NAVIGATION BAR ── */
+  /* ── BOTTOM NAV (mobile) ── */
   #bottom-nav {
     display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: calc(64px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-    background: rgba(17,17,19,0.97);
-    border-top: 1px solid rgba(255,255,255,0.07);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    z-index: 150;
-    align-items: flex-start;
-    justify-content: space-around;
-    padding-top: 0;
+  }
+  @media (max-width: 768px) {
+    #bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: #18181b;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      z-index: 100;
+      align-items: stretch;
+      padding: 0 4px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    #main-content { padding-bottom: 72px; }
   }
 
-  .bnav-item {
+  .bn-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    flex: 1;
-    padding: 10px 4px 6px;
     background: none;
     border: none;
-    cursor: pointer;
-    color: #48484A;
-    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    font-size: 0.58rem;
+    color: #71717a;
+    font-family: inherit;
+    font-size: 10px;
     font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: color 0.15s;
-    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    padding: 8px 2px;
+    border-radius: 10px;
+    transition: color .15s;
     position: relative;
   }
-  .bnav-item svg {
-    width: 22px; height: 22px;
+  .bn-item svg {
+    width: 20px; height: 20px;
     stroke: currentColor;
     fill: none;
-    stroke-width: 1.7;
+    stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
     flex-shrink: 0;
   }
-  .bnav-item.active { color: #F5F5F7; }
-  .bnav-item.active svg { stroke: var(--accent); }
-  .bnav-item:active { opacity: 0.6; }
-
-  .bnav-badge {
+  .bn-item.active { color: #F5F5F7; }
+  .bn-item .bn-badge {
     position: absolute;
     top: 6px;
-    right: calc(50% - 18px);
-    background: #EF4444;
+    right: calc(50% - 16px);
+    background: #e11d48;
     color: #fff;
-    font-size: 0.52rem;
+    font-size: 9px;
     font-weight: 700;
-    border-radius: 20px;
+    border-radius: 99px;
     padding: 1px 5px;
-    min-width: 14px;
+    min-width: 16px;
     text-align: center;
-    border: 1.5px solid #111113;
+    display: none;
+  }
+
+  /* botão "mais" — abre menu extra */
+  #bn-more-menu {
+    display: none;
+    position: fixed;
+    bottom: 68px;
+    left: 0; right: 0;
+    background: #18181b;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    z-index: 99;
+    padding: 8px 12px 12px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  #bn-more-menu.open { display: flex; }
+  .bn-more-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    color: #a1a1aa;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, color .15s;
+  }
+  .bn-more-item:hover { background: rgba(255,255,255,0.05); color: #F5F5F7; }
+  .bn-more-item svg {
+    width: 18px; height: 18px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
   }
 </style>
 </head>
@@ -1914,9 +1903,6 @@
   </div>
 </div>
 
-<!-- ── OVERLAY DRAWER MOBILE ── -->
-<div id="sidebar-overlay" onclick="fecharDrawer()"></div>
-
 <!-- ── SIDEBAR ── -->
 <nav id="sidebar">
   <div class="sb-logo">
@@ -1990,14 +1976,64 @@
   </div>
 </nav>
 
+<!-- ── BOTTOM NAV (mobile) ── -->
+<nav id="bottom-nav">
+  <button class="bn-item active" id="bn-dashboard" onclick="switchView('dashboard');closeBnMore()">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Início
+  </button>
+  <button class="bn-item" id="bn-produtos" onclick="switchView('produtos');closeBnMore()">
+    <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
+    Produtos
+    <span class="bn-badge" id="bn-badge-alertas"></span>
+  </button>
+  <button class="bn-item" onclick="abrirModalVenda();closeBnMore()">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Vender
+  </button>
+  <button class="bn-item" id="bn-catalogo" onclick="switchView('catalogo');closeBnMore()">
+    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+    Catálogo
+  </button>
+  <button class="bn-item" id="bn-more-btn" onclick="toggleBnMore()">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    Mais
+  </button>
+</nav>
+
+<!-- menu "Mais" do bottom nav -->
+<div id="bn-more-menu">
+  <button class="bn-more-item" id="bn-chat" onclick="switchView('chat');closeBnMore()">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    IA Assistente
+  </button>
+  <button class="bn-more-item" onclick="abrirModalContatos();closeBnMore()">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Contatos
+  </button>
+  <button class="bn-more-item" onclick="abrirFluxo();closeBnMore()">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Caixa
+  </button>
+  <button class="bn-more-item" onclick="switchView('relatorios');closeBnMore()">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Relatórios
+  </button>
+  <button class="bn-more-item" onclick="gerarPlanilha();closeBnMore()">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Exportar planilha
+  </button>
+  <button class="bn-more-item" onclick="logout();closeBnMore()" style="color:#e11d48">
+    <svg viewBox="0 0 24 24" stroke="#e11d48"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Sair
+  </button>
+</div>
+
 <!-- ── MAIN ── -->
 <div id="main-content">
 
 <!-- ── TOPBAR ── -->
 <div id="topbar">
-  <button id="btn-menu-mobile" onclick="abrirDrawer()" aria-label="Menu">
-    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
   <span id="topbar-title">Dashboard</span>
   <div class="tb-search">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2104,31 +2140,6 @@
 </div>
 </div><!-- end view-chat -->
 </div><!-- end main-content -->
-
-<!-- ── BOTTOM NAVIGATION (mobile only) ── -->
-<nav id="bottom-nav">
-  <button class="bnav-item active" id="bnav-dashboard" onclick="switchView('dashboard');fecharDrawer()">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard
-  </button>
-  <button class="bnav-item" id="bnav-chat" onclick="switchView('chat');fecharDrawer()">
-    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    IA
-  </button>
-  <button class="bnav-item" id="bnav-produtos" onclick="switchView('produtos');fecharDrawer()">
-    <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg>
-    Produtos
-    <span class="bnav-badge" id="bnav-badge-alertas" style="display:none">!</span>
-  </button>
-  <button class="bnav-item" onclick="abrirModalVenda()">
-    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.56L23 6H6"/></svg>
-    Vender
-  </button>
-  <button class="bnav-item" onclick="abrirFluxo()">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    Caixa
-  </button>
-</nav>
 
 <div id="modalRegistro" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;">
   <div class="modal-inner" style="max-height:92dvh;overflow-y:auto">
@@ -2567,17 +2578,36 @@ REGRAS CRÍTICAS:
 
 
   // ── SAAS LAYOUT ────────────────────────────────────────────────────────────
-  /* ── DRAWER MOBILE ── */
-  function abrirDrawer() {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sidebar-overlay').style.display = 'block';
-    document.body.style.overflow = 'hidden';
+  function toggleBnMore() {
+    const menu = document.getElementById('bn-more-menu');
+    if (menu) menu.classList.toggle('open');
   }
-  function fecharDrawer() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').style.display = 'none';
-    document.body.style.overflow = '';
+
+  function closeBnMore() {
+    const menu = document.getElementById('bn-more-menu');
+    if (menu) menu.classList.remove('open');
   }
+
+  function syncBnActive(view) {
+    ['bn-dashboard','bn-produtos','bn-catalogo','bn-chat'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    });
+    const map = { dashboard:'bn-dashboard', produtos:'bn-produtos', catalogo:'bn-catalogo', chat:'bn-chat' };
+    if (map[view]) {
+      const el = document.getElementById(map[view]);
+      if (el) el.classList.add('active');
+    }
+  }
+
+  // Fechar menu "mais" ao clicar fora
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('bn-more-menu');
+    const btn  = document.getElementById('bn-more-btn');
+    if (menu && menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+      menu.classList.remove('open');
+    }
+  });
 
   function switchView(view) {
     const dash    = document.getElementById('view-dashboard');
@@ -2590,29 +2620,20 @@ REGRAS CRÍTICAS:
     const sbProds   = document.getElementById('sb-produtos');
     const title = document.getElementById('topbar-title');
 
-    // Bottom nav items
-    const bnavDash  = document.getElementById('bnav-dashboard');
-    const bnavChat  = document.getElementById('bnav-chat');
-    const bnavProds = document.getElementById('bnav-produtos');
-    const allBnav   = [bnavDash, bnavChat, bnavProds];
-
     dash.style.display  = 'none';
     chat.style.display  = 'none';
     if (cat)   cat.style.display   = 'none';
     if (prods) prods.style.display = 'none';
     [sbDash, sbChat, sbCatalog, sbProds].forEach(b => b && b.classList.remove('active'));
-    allBnav.forEach(b => b && b.classList.remove('active'));
 
     if (view === 'dashboard') {
       dash.style.display = 'flex';
       if (sbDash) sbDash.classList.add('active');
-      if (bnavDash) bnavDash.classList.add('active');
       if (title) title.textContent = 'Dashboard';
       renderSaasDash();
     } else if (view === 'chat') {
       chat.style.display = 'flex';
       if (sbChat) sbChat.classList.add('active');
-      if (bnavChat) bnavChat.classList.add('active');
       if (title) title.textContent = 'IA Assistente';
     } else if (view === 'catalogo') {
       if (cat) cat.style.display = 'flex';
@@ -2622,10 +2643,10 @@ REGRAS CRÍTICAS:
     } else if (view === 'produtos') {
       if (prods) prods.style.display = 'flex';
       if (sbProds) sbProds.classList.add('active');
-      if (bnavProds) bnavProds.classList.add('active');
       if (title) title.textContent = 'Produtos';
       renderProdutosView();
     }
+    syncBnActive(view);
   }
 
   function renderSaasDash() {
@@ -2647,11 +2668,9 @@ REGRAS CRÍTICAS:
     const comMargem = dbEstoque.filter(p=>p.precoCusto>0&&p.precoVenda>0);
     const margem = comMargem.length>0 ? comMargem.reduce((s,p)=>s+((p.precoVenda-p.precoCusto)/p.precoVenda*100),0)/comMargem.length : null;
 
-    // Badge de alertas na sidebar e bottom nav
+    // Badge de alertas na sidebar
     const badge = document.getElementById('sb-badge-alertas');
     if (badge) { badge.textContent = criticos.length; badge.style.display = criticos.length > 0 ? '' : 'none'; }
-    const bnavBadge = document.getElementById('bnav-badge-alertas');
-    if (bnavBadge) { bnavBadge.style.display = criticos.length > 0 ? '' : 'none'; }
     const notifDot = document.getElementById('notifDot');
     if (notifDot) notifDot.style.display = criticos.length > 0 ? '' : 'none';
 
