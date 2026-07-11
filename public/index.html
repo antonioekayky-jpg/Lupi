@@ -111,15 +111,16 @@
     width:100%; height:100%;
     background: rgba(0,0,0,0.92);
     z-index: 1200;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .fluxo-sheet {
     background: #1C1C1E;
-    border-radius: 22px 22px 0 0;
+    border-radius: 22px;
     border: 1px solid rgba(255,255,255,0.08);
-    border-bottom: none;
     width: 100%;
     max-width: 500px;
     max-height: 92vh;
@@ -361,130 +362,234 @@
   #mensagens {
     flex: 1;
     overflow-y: auto;
-    padding: 18px 14px;
+    overflow-x: hidden;
+    padding: 30px 22px 26px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 24px;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
   }
 
-  #mensagens::-webkit-scrollbar { width: 2px; }
-  #mensagens::-webkit-scrollbar-thumb { background: var(--border); }
+  #mensagens::-webkit-scrollbar { width: 5px; }
+  #mensagens::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
   .welcome {
     text-align: center;
-    padding: 24px 8px 8px;
-    animation: up 0.5s ease both;
+    padding: 42px 8px 8px;
+    animation: up 0.55s cubic-bezier(0.16,1,0.3,1) both;
   }
 
   .welcome-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
 
   .welcome h2 {
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
   }
 
   .welcome p {
-    font-size: 0.78rem;
+    font-size: 0.83rem;
     color: var(--text-2);
-    line-height: 1.6;
-    margin-bottom: 18px;
+    line-height: 1.65;
+    margin-bottom: 26px;
   }
 
   .chips {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    max-width: 310px;
+    gap: 9px;
+    max-width: 360px;
     margin: 0 auto;
   }
 
   .chip {
     background: var(--surface);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 11px 15px;
-    font-size: 0.8rem;
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-size: 0.81rem;
     color: var(--text-2);
     text-align: left;
     cursor: pointer;
-    transition: all 0.15s;
-    line-height: 1.4;
+    transition: all 0.2s ease;
+    line-height: 1.5;
     letter-spacing: -0.01em;
   }
 
-  .chip:active { background: var(--accent-dim); border-color: rgba(10,132,255,0.3); color: var(--accent); opacity: 0.8; }
+  .chip:hover { background: var(--surface2); border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
+  .chip:active { background: var(--accent-dim); border-color: rgba(10,132,255,0.3); color: var(--accent); opacity: 0.85; transform: translateY(0); }
 
   .msg {
     display: flex;
     flex-direction: column;
-    max-width: 86%;
-    animation: up 0.28s ease both;
+    max-width: min(84%, 640px);
+    animation: up 0.4s cubic-bezier(0.16,1,0.3,1) both;
   }
 
   @keyframes up {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; }
+  .msg.ai { align-self: flex-start; align-items: flex-start; max-width: min(94%, 640px); }
 
   .msg-label {
-    font-size: 0.62rem;
+    font-size: 0.64rem;
     color: var(--text-3);
-    margin-bottom: 3px;
+    margin-bottom: 6px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0 3px;
+    letter-spacing: 0.07em;
+    font-weight: 600;
+    padding: 0 4px;
   }
 
   .bubble {
-    padding: 10px 13px;
-    border-radius: 14px;
-    font-size: 0.85rem;
-    line-height: 1.6;
+    padding: 13px 17px;
+    border-radius: 18px;
+    font-size: 0.87rem;
+    line-height: 1.65;
     white-space: pre-wrap;
     word-break: break-word;
+    letter-spacing: -0.005em;
   }
 
   .msg.user .bubble {
     background: #0A84FF;
     color: #ffffff;
     border: none;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 6px;
   }
 
   .msg.ai .bubble {
-    background: #2C2C2E;
-    border: none;
-    border-bottom-left-radius: 4px;
+    background: #1C1C1E;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-bottom-left-radius: 6px;
+    white-space: normal;
+    width: 100%;
+  }
+
+  /* ── Formatação de respostas da IA (títulos, listas, destaques) ── */
+  .bubble-content > *:first-child { margin-top: 0 !important; }
+  .bubble-content > *:last-child  { margin-bottom: 0 !important; }
+
+  .bubble-p {
+    margin: 0 0 10px;
+    line-height: 1.65;
+  }
+
+  .bubble-heading {
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 0.93rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin: 16px 0 8px;
+  }
+
+  .bubble-subtitle {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 14px 0 6px;
+  }
+
+  .bubble-list, .bubble-steps {
+    margin: 2px 0 14px;
+    padding-left: 2px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .bubble-list li {
+    position: relative;
+    padding-left: 18px;
+    line-height: 1.55;
+  }
+  .bubble-list li::before {
+    content: "•";
+    position: absolute;
+    left: 2px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .bubble-steps { counter-reset: step; }
+  .bubble-steps li {
+    position: relative;
+    padding-left: 30px;
+    line-height: 1.55;
+    min-height: 20px;
+  }
+  .bubble-steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 0.66rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bubble strong, .bubble-content strong { color: var(--text); font-weight: 700; }
+
+  .bubble code, .bubble-content code {
+    background: rgba(255,255,255,0.09);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    font-family: 'SF Mono', 'Menlo', monospace;
+  }
+
+  .metric-badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: #64B5F6;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 6px;
+    font-size: 0.94em;
+    letter-spacing: -0.01em;
   }
 
   .action-card {
     align-self: flex-start;
     width: 100%;
-    max-width: 320px;
+    max-width: 360px;
     background: var(--surface2);
     border: 1px solid rgba(10,132,255,0.25);
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    animation: up 0.35s ease both;
-    margin-top: 2px;
+    animation: up 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    margin-top: 4px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
   }
 
   .action-header {
-    padding: 10px 13px 8px;
+    padding: 12px 15px 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     border-bottom: 1px solid var(--border);
   }
 
   .action-icon {
     width: 28px; height: 28px;
-    border-radius: 7px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     flex-shrink: 0;
@@ -496,7 +601,7 @@
 
   .action-title {
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.79rem;
     font-weight: 700;
     flex: 1;
   }
@@ -514,21 +619,21 @@
   .urgencia-badge.media { background: var(--yellow-dim); color: var(--yellow); }
   .urgencia-badge.baixa { background: var(--green-dim); color: var(--green); }
 
-  .action-body { padding: 10px 13px; }
+  .action-body { padding: 11px 15px; }
 
   .action-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 0;
-    font-size: 0.76rem;
+    padding: 5px 0;
+    font-size: 0.77rem;
   }
 
   .action-row .label { color: var(--text-2); }
   .action-row .val { font-weight: 500; color: var(--text); }
 
   .action-footer {
-    padding: 10px 13px;
+    padding: 11px 15px;
     display: flex;
     gap: 8px;
     border-top: 1px solid var(--border);
@@ -536,8 +641,8 @@
 
   .btn-aprovar, .btn-recusar {
     flex: 1;
-    padding: 8px;
-    border-radius: 8px;
+    padding: 9px;
+    border-radius: 9px;
     border: none;
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.78rem;
@@ -589,7 +694,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 13px 16px;
+    padding: 15px 18px;
   }
 
   .dot {
@@ -607,8 +712,9 @@
   }
 
   .input-area {
-    padding: 10px 14px 18px;
-    background: rgba(28,28,30,0.92);
+    padding: 14px 20px 22px;
+    background: rgba(20,20,22,0.95);
+    backdrop-filter: blur(14px);
     border-top: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -616,15 +722,20 @@
   .input-row {
     display: flex;
     align-items: flex-end;
-    gap: 9px;
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto;
     background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 13px;
-    padding: 9px 9px 9px 13px;
-    transition: border-color 0.2s;
+    border-radius: 18px;
+    padding: 12px 12px 12px 18px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .input-row:focus-within { border-color: rgba(10,132,255,0.3); }
+  .input-row:focus-within {
+    border-color: rgba(10,132,255,0.4);
+    box-shadow: 0 0 0 3px rgba(10,132,255,0.1);
+  }
 
   textarea {
     flex: 1;
@@ -633,36 +744,46 @@
     outline: none;
     color: var(--text);
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     resize: none;
-    max-height: 90px;
-    min-height: 20px;
-    line-height: 1.5;
+    max-height: 140px;
+    min-height: 24px;
+    line-height: 1.6;
   }
 
   textarea::placeholder { color: var(--text-3); }
 
   #btnEnviar {
-    width: 34px; height: 34px;
-    border-radius: 9px;
+    width: 38px; height: 38px;
+    border-radius: 12px;
     background: var(--accent);
     border: none;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.15s;
+    transition: all 0.15s ease;
     color: #fff;
+    box-shadow: 0 3px 10px rgba(10,132,255,0.35);
   }
 
-  #btnEnviar:active { transform: scale(0.9); }
-  #btnEnviar:disabled { background: var(--text-3); cursor: not-allowed; }
-  #btnEnviar svg { width: 15px; height: 15px; }
+  #btnEnviar:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(10,132,255,0.45); }
+  #btnEnviar:active { transform: scale(0.92); }
+  #btnEnviar:disabled { background: var(--text-3); cursor: not-allowed; box-shadow: none; transform: none; }
+  #btnEnviar svg { width: 16px; height: 16px; }
 
   .hint {
     text-align: center;
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     color: var(--text-3);
-    margin-top: 6px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 480px) {
+    #mensagens { padding: 22px 14px 18px; gap: 20px; }
+    .msg { max-width: 92%; }
+    .msg.ai { max-width: 96%; }
+    .input-area { padding: 12px 14px 18px; }
+    .input-row { padding: 10px 10px 10px 15px; }
   }
 
   /* Modal */
@@ -1372,30 +1493,6 @@
     flex-shrink: 0;
   }
 
-  .tb-search {
-    flex: 1;
-    max-width: 320px;
-    margin-left: 16px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-size: 0.75rem;
-    color: #48484A;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    cursor: text;
-  }
-  .tb-search svg {
-    width: 13px; height: 13px;
-    stroke: #48484A;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    flex-shrink: 0;
-  }
-
   .tb-icon {
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
@@ -2035,10 +2132,6 @@
 <!-- ── TOPBAR ── -->
 <div id="topbar">
   <span id="topbar-title">Dashboard</span>
-  <div class="tb-search">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    Buscar produtos, clientes...
-  </div>
   <div class="tb-icon" onclick="verificarAlertasAutomaticos()">
     <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
     <span class="tb-notif-dot" id="notifDot" style="display:none"></span>
@@ -2128,7 +2221,7 @@
 
 <div class="input-area">
   <div class="input-row">
-    <textarea id="inputMsg" placeholder="Descreva a situação do estoque..." rows="1"></textarea>
+    <textarea id="inputMsg" placeholder="Pergunte algo sobre seu estoque, vendas ou fluxo de caixa..." rows="1"></textarea>
     <button id="btnEnviar" onclick="enviar()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -2668,8 +2761,6 @@ REGRAS CRÍTICAS:
     const receitaMes = fluxoComVendas.filter(l=>l && l.tipo==='entrada').reduce((s,l)=>s+(l.valor||0),0);
     const gastosMes = parseFloat(localStorage.getItem(getStorageKey('gastos_mensais'))||'0');
     const lucroMes = parseFloat(localStorage.getItem(getStorageKey('lucros_mensais'))||'0');
-    const comMargem = dbEstoque.filter(p=>p.precoCusto>0&&p.precoVenda>0);
-    const margem = comMargem.length>0 ? comMargem.reduce((s,p)=>s+((p.precoVenda-p.precoCusto)/p.precoVenda*100),0)/comMargem.length : null;
 
     // Badge de alertas na sidebar
     const badge = document.getElementById('sb-badge-alertas');
@@ -2735,16 +2826,6 @@ REGRAS CRÍTICAS:
           </div>
           <div class="kpi-val">${totalVendas}</div>
           <div class="kpi-label">Vendas registradas</div>
-        </div>
-        <div class="kpi-card" style="cursor:pointer" onclick="switchView('chat');setTimeout(()=>usarChipTexto('Qual foi minha margem de lucro este mês?'),100)">
-          <div class="kpi-top">
-            <div class="kpi-ico" style="background:${margem!==null&&margem<25?'rgba(239,68,68,0.15)':'rgba(34,197,94,0.15)'}">
-              <svg viewBox="0 0 24 24" style="stroke:${margem!==null&&margem<25?'#f87171':'#4ade80'}"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <span class="kpi-badge" style="background:${margem!==null?(margem>=40?'rgba(34,197,94,0.15)':margem>=25?'rgba(245,158,11,0.15)':'rgba(239,68,68,0.15)'):'rgba(255,255,255,0.06)'};color:${margem!==null?(margem>=40?'#4ade80':margem>=25?'#fbbf24':'#f87171'):'#94A3B8'}">${margem!==null?(margem>=40?'Saudável':margem>=25?'Atenção':'Baixa'):'—'}</span>
-          </div>
-          <div class="kpi-val">${margem!==null?margem.toFixed(0)+'%':'—'}</div>
-          <div class="kpi-label">Margem média</div>
         </div>
       </div>
 
@@ -3540,6 +3621,94 @@ ${SYSTEM_PROMPT}`;
   }
 
   // ─── MENSAGENS ────────────────────────────────────────────────────────────
+  // ─── FORMATAÇÃO VISUAL DAS RESPOSTAS DA IA ─────────────────────────────────
+  // Puramente apresentacional: transforma o texto puro devolvido pela API em
+  // HTML organizado (títulos, listas, etapas, negrito, destaque de métricas).
+  // Não altera dados, fluxo de envio, parsing do JSON ou qualquer integração.
+  function escapeHtmlChat(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function formatarInlineChat(s) {
+    s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/R\$\s?\d[\d.,]*/g, m => `<span class="metric-badge">${m}</span>`);
+    s = s.replace(/\b\d+(?:[.,]\d+)?\s?%/g, m => `<span class="metric-badge">${m}</span>`);
+    return s;
+  }
+
+  function formatarRespostaIA(texto) {
+    const bulletRe = /^[-•*]\s+(.*)$/;
+    const numRe = /^(\d+)[.)]\s+(.*)$/;
+    const headRe = /^#{1,3}\s+(.*)$/;
+    const blocos = String(texto).replace(/\r\n/g, "\n").split(/\n{2,}/);
+
+    const partes = blocos.map(bloco => {
+      const linhas = bloco.split("\n").map(l => l.trim()).filter(l => l.length);
+      if (!linhas.length) return "";
+
+      let out = "";
+      let i = 0;
+      while (i < linhas.length) {
+        const l = linhas[i];
+
+        const hMatch = l.match(headRe);
+        if (hMatch) {
+          out += `<div class="bubble-heading">${formatarInlineChat(escapeHtmlChat(hMatch[1]))}</div>`;
+          i++; continue;
+        }
+
+        if (bulletRe.test(l)) {
+          let itens = [];
+          while (i < linhas.length && bulletRe.test(linhas[i])) {
+            itens.push(`<li>${formatarInlineChat(escapeHtmlChat(linhas[i].match(bulletRe)[1]))}</li>`);
+            i++;
+          }
+          out += `<ul class="bubble-list">${itens.join("")}</ul>`;
+          continue;
+        }
+
+        if (numRe.test(l)) {
+          let itens = [];
+          while (i < linhas.length && numRe.test(linhas[i])) {
+            itens.push(`<li>${formatarInlineChat(escapeHtmlChat(linhas[i].match(numRe)[2]))}</li>`);
+            i++;
+          }
+          out += `<ol class="bubble-steps">${itens.join("")}</ol>`;
+          continue;
+        }
+
+        const proxima = linhas[i + 1];
+        const ehSubtitulo = /:\s*$/.test(l) && l.length < 60 && proxima && (bulletRe.test(proxima) || numRe.test(proxima));
+        if (ehSubtitulo) {
+          out += `<div class="bubble-subtitle">${formatarInlineChat(escapeHtmlChat(l))}</div>`;
+          i++; continue;
+        }
+
+        let paragrafo = [];
+        while (
+          i < linhas.length &&
+          !bulletRe.test(linhas[i]) &&
+          !numRe.test(linhas[i]) &&
+          !headRe.test(linhas[i]) &&
+          !(/:\s*$/.test(linhas[i]) && linhas[i].length < 60 && linhas[i + 1] && (bulletRe.test(linhas[i + 1]) || numRe.test(linhas[i + 1])))
+        ) {
+          paragrafo.push(formatarInlineChat(escapeHtmlChat(linhas[i])));
+          i++;
+        }
+        out += `<p class="bubble-p">${paragrafo.join("<br>")}</p>`;
+      }
+      return out;
+    });
+
+    return `<div class="bubble-content">${partes.join("")}</div>`;
+  }
+
   function adicionarMsg(texto, remetente, sugestoes) {
     const welcome = document.getElementById("welcome");
     if (welcome) welcome.remove();
@@ -3553,7 +3722,11 @@ ${SYSTEM_PROMPT}`;
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.textContent = texto;
+    if (remetente === "ai") {
+      bubble.innerHTML = formatarRespostaIA(texto);
+    } else {
+      bubble.textContent = texto;
+    }
 
     wrap.appendChild(label);
     wrap.appendChild(bubble);
@@ -3561,13 +3734,13 @@ ${SYSTEM_PROMPT}`;
     // Sugestões clicáveis
     if (remetente === "ai" && sugestoes && sugestoes.length) {
       const sugsWrap = document.createElement("div");
-      sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:0 4px;";
+      sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:0 4px;";
       sugestoes.forEach(s => {
         const sbtn = document.createElement("button");
-        sbtn.style.cssText = "background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:10px;padding:9px 13px;color:#64B5F6;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;transition:background 0.15s;";
+        sbtn.style.cssText = "background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:12px;padding:10px 14px;color:#64B5F6;font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;font-size:0.79rem;font-weight:500;cursor:pointer;text-align:left;transition:background 0.15s ease, border-color 0.15s ease;";
         sbtn.textContent = s;
-        sbtn.onmouseenter = () => sbtn.style.background = "rgba(10,132,255,0.16)";
-        sbtn.onmouseleave = () => sbtn.style.background = "rgba(10,132,255,0.08)";
+        sbtn.onmouseenter = () => { sbtn.style.background = "rgba(10,132,255,0.16)"; sbtn.style.borderColor = "rgba(10,132,255,0.3)"; };
+        sbtn.onmouseleave = () => { sbtn.style.background = "rgba(10,132,255,0.08)"; sbtn.style.borderColor = "rgba(10,132,255,0.2)"; };
         sbtn.onclick = () => {
           input.value = s;
           sugsWrap.remove();
