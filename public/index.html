@@ -362,234 +362,130 @@
   #mensagens {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
-    padding: 30px 22px 26px;
+    padding: 18px 14px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    max-width: 760px;
-    width: 100%;
-    margin: 0 auto;
+    gap: 14px;
   }
 
-  #mensagens::-webkit-scrollbar { width: 5px; }
-  #mensagens::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  #mensagens::-webkit-scrollbar { width: 2px; }
+  #mensagens::-webkit-scrollbar-thumb { background: var(--border); }
 
   .welcome {
     text-align: center;
-    padding: 42px 8px 8px;
-    animation: up 0.55s cubic-bezier(0.16,1,0.3,1) both;
+    padding: 24px 8px 8px;
+    animation: up 0.5s ease both;
   }
 
   .welcome-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
 
   .welcome h2 {
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
+    margin-bottom: 6px;
   }
 
   .welcome p {
-    font-size: 0.83rem;
+    font-size: 0.78rem;
     color: var(--text-2);
-    line-height: 1.65;
-    margin-bottom: 26px;
+    line-height: 1.6;
+    margin-bottom: 18px;
   }
 
   .chips {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    max-width: 360px;
+    gap: 7px;
+    max-width: 310px;
     margin: 0 auto;
   }
 
   .chip {
     background: var(--surface);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 13px 16px;
-    font-size: 0.81rem;
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-size: 0.8rem;
     color: var(--text-2);
     text-align: left;
     cursor: pointer;
-    transition: all 0.2s ease;
-    line-height: 1.5;
+    transition: all 0.15s;
+    line-height: 1.4;
     letter-spacing: -0.01em;
   }
 
-  .chip:hover { background: var(--surface2); border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
-  .chip:active { background: var(--accent-dim); border-color: rgba(10,132,255,0.3); color: var(--accent); opacity: 0.85; transform: translateY(0); }
+  .chip:active { background: var(--accent-dim); border-color: rgba(10,132,255,0.3); color: var(--accent); opacity: 0.8; }
 
   .msg {
     display: flex;
     flex-direction: column;
-    max-width: min(84%, 640px);
-    animation: up 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    max-width: 86%;
+    animation: up 0.28s ease both;
   }
 
   @keyframes up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; max-width: min(94%, 640px); }
+  .msg.ai { align-self: flex-start; align-items: flex-start; }
 
   .msg-label {
-    font-size: 0.64rem;
+    font-size: 0.62rem;
     color: var(--text-3);
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    font-weight: 600;
-    padding: 0 4px;
+    letter-spacing: 0.06em;
+    padding: 0 3px;
   }
 
   .bubble {
-    padding: 13px 17px;
-    border-radius: 18px;
-    font-size: 0.87rem;
-    line-height: 1.65;
+    padding: 10px 13px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
-    letter-spacing: -0.005em;
   }
 
   .msg.user .bubble {
     background: #0A84FF;
     color: #ffffff;
     border: none;
-    border-bottom-right-radius: 6px;
+    border-bottom-right-radius: 4px;
   }
 
   .msg.ai .bubble {
-    background: #1C1C1E;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-bottom-left-radius: 6px;
-    white-space: normal;
-    width: 100%;
-  }
-
-  /* ── Formatação de respostas da IA (títulos, listas, destaques) ── */
-  .bubble-content > *:first-child { margin-top: 0 !important; }
-  .bubble-content > *:last-child  { margin-bottom: 0 !important; }
-
-  .bubble-p {
-    margin: 0 0 10px;
-    line-height: 1.65;
-  }
-
-  .bubble-heading {
-    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 0.93rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.01em;
-    margin: 16px 0 8px;
-  }
-
-  .bubble-subtitle {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--text-2);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 14px 0 6px;
-  }
-
-  .bubble-list, .bubble-steps {
-    margin: 2px 0 14px;
-    padding-left: 2px;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .bubble-list li {
-    position: relative;
-    padding-left: 18px;
-    line-height: 1.55;
-  }
-  .bubble-list li::before {
-    content: "•";
-    position: absolute;
-    left: 2px;
-    color: var(--accent);
-    font-weight: 700;
-  }
-
-  .bubble-steps { counter-reset: step; }
-  .bubble-steps li {
-    position: relative;
-    padding-left: 30px;
-    line-height: 1.55;
-    min-height: 20px;
-  }
-  .bubble-steps li::before {
-    counter-increment: step;
-    content: counter(step);
-    position: absolute;
-    left: 0; top: 0;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-size: 0.66rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .bubble strong, .bubble-content strong { color: var(--text); font-weight: 700; }
-
-  .bubble code, .bubble-content code {
-    background: rgba(255,255,255,0.09);
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-size: 0.85em;
-    font-family: 'SF Mono', 'Menlo', monospace;
-  }
-
-  .metric-badge {
-    display: inline-block;
-    background: var(--accent-dim);
-    color: #64B5F6;
-    font-weight: 600;
-    padding: 1px 7px;
-    border-radius: 6px;
-    font-size: 0.94em;
-    letter-spacing: -0.01em;
+    background: #2C2C2E;
+    border: none;
+    border-bottom-left-radius: 4px;
   }
 
   .action-card {
     align-self: flex-start;
     width: 100%;
-    max-width: 360px;
+    max-width: 320px;
     background: var(--surface2);
     border: 1px solid rgba(10,132,255,0.25);
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
-    animation: up 0.4s cubic-bezier(0.16,1,0.3,1) both;
-    margin-top: 4px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+    animation: up 0.35s ease both;
+    margin-top: 2px;
   }
 
   .action-header {
-    padding: 12px 15px 10px;
+    padding: 10px 13px 8px;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
     border-bottom: 1px solid var(--border);
   }
 
   .action-icon {
     width: 28px; height: 28px;
-    border-radius: 8px;
+    border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     flex-shrink: 0;
@@ -601,7 +497,7 @@
 
   .action-title {
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-size: 0.79rem;
+    font-size: 0.78rem;
     font-weight: 700;
     flex: 1;
   }
@@ -619,21 +515,21 @@
   .urgencia-badge.media { background: var(--yellow-dim); color: var(--yellow); }
   .urgencia-badge.baixa { background: var(--green-dim); color: var(--green); }
 
-  .action-body { padding: 11px 15px; }
+  .action-body { padding: 10px 13px; }
 
   .action-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 0;
-    font-size: 0.77rem;
+    padding: 4px 0;
+    font-size: 0.76rem;
   }
 
   .action-row .label { color: var(--text-2); }
   .action-row .val { font-weight: 500; color: var(--text); }
 
   .action-footer {
-    padding: 11px 15px;
+    padding: 10px 13px;
     display: flex;
     gap: 8px;
     border-top: 1px solid var(--border);
@@ -641,8 +537,8 @@
 
   .btn-aprovar, .btn-recusar {
     flex: 1;
-    padding: 9px;
-    border-radius: 9px;
+    padding: 8px;
+    border-radius: 8px;
     border: none;
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     font-size: 0.78rem;
@@ -694,7 +590,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 15px 18px;
+    padding: 13px 16px;
   }
 
   .dot {
@@ -712,9 +608,8 @@
   }
 
   .input-area {
-    padding: 14px 20px 22px;
-    background: rgba(20,20,22,0.95);
-    backdrop-filter: blur(14px);
+    padding: 10px 14px 18px;
+    background: rgba(28,28,30,0.92);
     border-top: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -722,20 +617,15 @@
   .input-row {
     display: flex;
     align-items: flex-end;
-    gap: 10px;
-    max-width: 760px;
-    margin: 0 auto;
+    gap: 9px;
     background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 12px 12px 12px 18px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 13px;
+    padding: 9px 9px 9px 13px;
+    transition: border-color 0.2s;
   }
 
-  .input-row:focus-within {
-    border-color: rgba(10,132,255,0.4);
-    box-shadow: 0 0 0 3px rgba(10,132,255,0.1);
-  }
+  .input-row:focus-within { border-color: rgba(10,132,255,0.3); }
 
   textarea {
     flex: 1;
@@ -744,46 +634,36 @@
     outline: none;
     color: var(--text);
     font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     resize: none;
-    max-height: 140px;
-    min-height: 24px;
-    line-height: 1.6;
+    max-height: 90px;
+    min-height: 20px;
+    line-height: 1.5;
   }
 
   textarea::placeholder { color: var(--text-3); }
 
   #btnEnviar {
-    width: 38px; height: 38px;
-    border-radius: 12px;
+    width: 34px; height: 34px;
+    border-radius: 9px;
     background: var(--accent);
     border: none;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    transition: all 0.15s;
     color: #fff;
-    box-shadow: 0 3px 10px rgba(10,132,255,0.35);
   }
 
-  #btnEnviar:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(10,132,255,0.45); }
-  #btnEnviar:active { transform: scale(0.92); }
-  #btnEnviar:disabled { background: var(--text-3); cursor: not-allowed; box-shadow: none; transform: none; }
-  #btnEnviar svg { width: 16px; height: 16px; }
+  #btnEnviar:active { transform: scale(0.9); }
+  #btnEnviar:disabled { background: var(--text-3); cursor: not-allowed; }
+  #btnEnviar svg { width: 15px; height: 15px; }
 
   .hint {
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--text-3);
-    margin-top: 10px;
-  }
-
-  @media (max-width: 480px) {
-    #mensagens { padding: 22px 14px 18px; gap: 20px; }
-    .msg { max-width: 92%; }
-    .msg.ai { max-width: 96%; }
-    .input-area { padding: 12px 14px 18px; }
-    .input-row { padding: 10px 10px 10px 15px; }
+    margin-top: 6px;
   }
 
   /* Modal */
@@ -2221,7 +2101,7 @@
 
 <div class="input-area">
   <div class="input-row">
-    <textarea id="inputMsg" placeholder="Pergunte algo sobre seu estoque, vendas ou fluxo de caixa..." rows="1"></textarea>
+    <textarea id="inputMsg" placeholder="Descreva a situação do estoque..." rows="1"></textarea>
     <button id="btnEnviar" onclick="enviar()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -2635,10 +2515,11 @@ SCHEMA OBRIGATÓRIO:
   "resposta": "Sua mensagem aqui — conversacional, com emojis moderados",
   "sugestoes": ["ação rápida 1", "ação rápida 2"],
   "acao": {
-    "tipo": "pedido" | "alerta" | "comunicado" | "mensagem",
+    "tipo": "pedido" | "alerta" | "comunicado" | "mensagem" | "cadastro_produto" | "venda",
     "titulo": "Título curto",
     "urgencia": "alta" | "media" | "baixa",
-    "detalhes": { "campo": "valor" }
+    "detalhes": { "campo": "valor" },
+    "dados": { "campo_estruturado": "valor" }
   }
 }
 
@@ -2648,7 +2529,37 @@ REGRAS CRÍTICAS:
 - "acao": inclua só quando houver algo concreto a fazer. Para WhatsApp, use tipo "mensagem". Se não precisar, coloque null.
 - NUNCA coloque texto fora do JSON. NUNCA repita o JSON. NUNCA use markdown fora do JSON.
 - Se não tiver dados suficientes, trabalhe com o que tem e peça no máximo UMA informação específica — nunca várias de uma vez.
-- NUNCA entre em loop de perguntas. Máximo de 1 pergunta por resposta, e só se for absolutamente necessário.`;
+- NUNCA entre em loop de perguntas. Máximo de 1 pergunta por resposta, e só se for absolutamente necessário.
+
+⚠️ CADASTRO DE PRODUTO E ENTRADA DE MERCADORIA (tipo "cadastro_produto"):
+Sempre que o usuário disser algo que signifique dar entrada de produto no estoque — mesmo de forma informal — identifique isso como um comando de cadastro. Isso inclui frases com verbos/expressões como: "cadastre", "cadastrar", "registre", "registrar", "adicione", "adicionar", "coloque", "colocar", "incluir", "incluir produto", "entrou", "entraram", "chegou", "chegaram", "acabou de chegar", "recebi", "recebemos", "estoque novo", "lançar no estoque", "entrada de mercadoria", ou qualquer variação parecida.
+Quando identificar isso:
+1. Extraia da frase, com a máxima atenção: quantidade, nome do produto, cor (se houver), tamanho (se houver), marca (se houver), categoria (infira com base no tipo de produto, ex.: "Vestuário", "Calçados", "Acessórios"), valor de compra (precoCusto, se informado), valor de venda (precoVenda, se informado), fornecedor (se informado) e observações (se houver algo relevante que não se encaixe nos outros campos).
+2. Se faltar a quantidade OU o nome do produto (campos indispensáveis), NÃO monte a "acao" — em vez disso pergunte no campo "resposta" apenas o dado que falta, de forma direta e curta (ex.: "Qual é a cor das camisas?" ou "Quantas unidades você quer cadastrar?"). Cor, tamanho, marca, preço de compra, preço de venda e fornecedor são opcionais: se não forem mencionados, siga em frente sem eles e apenas informe no "detalhes" que ficaram em branco (não pergunte todos de uma vez).
+3. Se tiver o essencial (produto + quantidade), monte a "acao" assim:
+{
+  "tipo": "cadastro_produto",
+  "titulo": "Cadastrar produto no estoque",
+  "urgencia": "media",
+  "detalhes": { "Produto": "...", "Cor": "... ou —", "Tamanho": "... ou —", "Marca": "... ou —", "Quantidade": "...", "Categoria": "...", "Valor de compra": "R$ ... ou —", "Valor de venda": "R$ ... ou —", "Fornecedor": "... ou —" },
+  "dados": { "produto": "...", "quantidade": 0, "cor": "" , "tamanho": "", "marca": "", "categoria": "", "precoCusto": null, "precoVenda": null, "fornecedor": "", "observacoes": "", "tipoOperacao": "entrada" }
+}
+- "dados.tipoOperacao" deve ser "entrada" quase sempre (o produto pode já existir no estoque e a quantidade nova deve SOMAR à existente — isso é uma reposição/chegada de mercadoria). Use "novo" apenas se o usuário deixar claro que está corrigindo/substituindo o total do estoque (ex.: "o estoque de camisas pretas é 20", "corrige para 20 unidades").
+- Na "resposta", faça um resumo curto do que foi entendido e pergunte algo como "Encontrei estas informações. Posso registrar no estoque?" — NUNCA cadastre sem essa confirmação explícita do usuário. O cadastro só acontece de fato depois que o usuário responder algo como "sim", "pode cadastrar", "confirmar", "confirmo", "ok" ou "isso mesmo" (ou clicar em Aprovar no card).
+
+⚠️ REGISTRO DE VENDA (tipo "venda"):
+Sempre que o usuário disser algo que signifique que um produto saiu do estoque por venda — "vendi", "vendemos", "venda de", "saiu", "saiu uma/um", "o cliente levou", "levaram" — identifique como comando de venda.
+1. Extraia: nome do produto (o mais específico possível, incluindo cor/marca se citados), quantidade vendida (padrão 1 se o usuário disser "uma"/"um"/não especificar), e valor total da venda (se informado).
+2. Se faltar o nome do produto, pergunte no "resposta" qual produto foi vendido — não adivinhe.
+3. Monte a "acao":
+{
+  "tipo": "venda",
+  "titulo": "Registrar venda",
+  "urgencia": "media",
+  "detalhes": { "Produto": "...", "Quantidade": "...", "Valor": "R$ ... ou —" },
+  "dados": { "produto": "...", "quantidade": 0, "valorTotal": null }
+}
+- Confirme antes de registrar, do mesmo jeito que no cadastro de produto: resuma e pergunte se pode registrar a venda.`;
 
 
   // ─── ELEMENTOS ────────────────────────────────────────────────────────────
@@ -3490,14 +3401,7 @@ ${SYSTEM_PROMPT}`;
 
   // ─── SISTEMA DE VENDAS ────────────────────────────────────────────────────
   function abrirModalVenda() {
-    const sel = document.getElementById("vendaProduto");
-    sel.innerHTML = '<option value="">Selecione o produto...</option>';
-    dbEstoque.forEach((p, i) => {
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = `${p.produto} (${p.quantidade} un.)`;
-      sel.appendChild(opt);
-    });
+    popularSelectVendaIA();
     document.getElementById("vendaQtd").value = "";
     document.getElementById("modalVenda").style.display = "flex";
   }
@@ -3621,94 +3525,6 @@ ${SYSTEM_PROMPT}`;
   }
 
   // ─── MENSAGENS ────────────────────────────────────────────────────────────
-  // ─── FORMATAÇÃO VISUAL DAS RESPOSTAS DA IA ─────────────────────────────────
-  // Puramente apresentacional: transforma o texto puro devolvido pela API em
-  // HTML organizado (títulos, listas, etapas, negrito, destaque de métricas).
-  // Não altera dados, fluxo de envio, parsing do JSON ou qualquer integração.
-  function escapeHtmlChat(s) {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  function formatarInlineChat(s) {
-    s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
-    s = s.replace(/R\$\s?\d[\d.,]*/g, m => `<span class="metric-badge">${m}</span>`);
-    s = s.replace(/\b\d+(?:[.,]\d+)?\s?%/g, m => `<span class="metric-badge">${m}</span>`);
-    return s;
-  }
-
-  function formatarRespostaIA(texto) {
-    const bulletRe = /^[-•*]\s+(.*)$/;
-    const numRe = /^(\d+)[.)]\s+(.*)$/;
-    const headRe = /^#{1,3}\s+(.*)$/;
-    const blocos = String(texto).replace(/\r\n/g, "\n").split(/\n{2,}/);
-
-    const partes = blocos.map(bloco => {
-      const linhas = bloco.split("\n").map(l => l.trim()).filter(l => l.length);
-      if (!linhas.length) return "";
-
-      let out = "";
-      let i = 0;
-      while (i < linhas.length) {
-        const l = linhas[i];
-
-        const hMatch = l.match(headRe);
-        if (hMatch) {
-          out += `<div class="bubble-heading">${formatarInlineChat(escapeHtmlChat(hMatch[1]))}</div>`;
-          i++; continue;
-        }
-
-        if (bulletRe.test(l)) {
-          let itens = [];
-          while (i < linhas.length && bulletRe.test(linhas[i])) {
-            itens.push(`<li>${formatarInlineChat(escapeHtmlChat(linhas[i].match(bulletRe)[1]))}</li>`);
-            i++;
-          }
-          out += `<ul class="bubble-list">${itens.join("")}</ul>`;
-          continue;
-        }
-
-        if (numRe.test(l)) {
-          let itens = [];
-          while (i < linhas.length && numRe.test(linhas[i])) {
-            itens.push(`<li>${formatarInlineChat(escapeHtmlChat(linhas[i].match(numRe)[2]))}</li>`);
-            i++;
-          }
-          out += `<ol class="bubble-steps">${itens.join("")}</ol>`;
-          continue;
-        }
-
-        const proxima = linhas[i + 1];
-        const ehSubtitulo = /:\s*$/.test(l) && l.length < 60 && proxima && (bulletRe.test(proxima) || numRe.test(proxima));
-        if (ehSubtitulo) {
-          out += `<div class="bubble-subtitle">${formatarInlineChat(escapeHtmlChat(l))}</div>`;
-          i++; continue;
-        }
-
-        let paragrafo = [];
-        while (
-          i < linhas.length &&
-          !bulletRe.test(linhas[i]) &&
-          !numRe.test(linhas[i]) &&
-          !headRe.test(linhas[i]) &&
-          !(/:\s*$/.test(linhas[i]) && linhas[i].length < 60 && linhas[i + 1] && (bulletRe.test(linhas[i + 1]) || numRe.test(linhas[i + 1])))
-        ) {
-          paragrafo.push(formatarInlineChat(escapeHtmlChat(linhas[i])));
-          i++;
-        }
-        out += `<p class="bubble-p">${paragrafo.join("<br>")}</p>`;
-      }
-      return out;
-    });
-
-    return `<div class="bubble-content">${partes.join("")}</div>`;
-  }
-
   function adicionarMsg(texto, remetente, sugestoes) {
     const welcome = document.getElementById("welcome");
     if (welcome) welcome.remove();
@@ -3722,11 +3538,7 @@ ${SYSTEM_PROMPT}`;
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    if (remetente === "ai") {
-      bubble.innerHTML = formatarRespostaIA(texto);
-    } else {
-      bubble.textContent = texto;
-    }
+    bubble.textContent = texto;
 
     wrap.appendChild(label);
     wrap.appendChild(bubble);
@@ -3734,13 +3546,13 @@ ${SYSTEM_PROMPT}`;
     // Sugestões clicáveis
     if (remetente === "ai" && sugestoes && sugestoes.length) {
       const sugsWrap = document.createElement("div");
-      sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:0 4px;";
+      sugsWrap.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:0 4px;";
       sugestoes.forEach(s => {
         const sbtn = document.createElement("button");
-        sbtn.style.cssText = "background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:12px;padding:10px 14px;color:#64B5F6;font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;font-size:0.79rem;font-weight:500;cursor:pointer;text-align:left;transition:background 0.15s ease, border-color 0.15s ease;";
+        sbtn.style.cssText = "background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:10px;padding:9px 13px;color:#64B5F6;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;text-align:left;transition:background 0.15s;";
         sbtn.textContent = s;
-        sbtn.onmouseenter = () => { sbtn.style.background = "rgba(10,132,255,0.16)"; sbtn.style.borderColor = "rgba(10,132,255,0.3)"; };
-        sbtn.onmouseleave = () => { sbtn.style.background = "rgba(10,132,255,0.08)"; sbtn.style.borderColor = "rgba(10,132,255,0.2)"; };
+        sbtn.onmouseenter = () => sbtn.style.background = "rgba(10,132,255,0.16)";
+        sbtn.onmouseleave = () => sbtn.style.background = "rgba(10,132,255,0.08)";
         sbtn.onclick = () => {
           input.value = s;
           sugsWrap.remove();
@@ -3786,11 +3598,17 @@ ${SYSTEM_PROMPT}`;
 
   // ─── ACTION CARD ──────────────────────────────────────────────────────────
   const tipoIcons = {
-    pedido:     { icon: "🛒", label: "Pedido de Reposição" },
-    alerta:     { icon: "⚠️", label: "Alerta de Estoque" },
-    comunicado: { icon: "📢", label: "Comunicado à Equipe" },
-    mensagem:   { icon: "📲", label: "Mensagem WhatsApp" }
+    pedido:            { icon: "🛒", label: "Pedido de Reposição" },
+    alerta:            { icon: "⚠️", label: "Alerta de Estoque" },
+    comunicado:        { icon: "📢", label: "Comunicado à Equipe" },
+    mensagem:          { icon: "📲", label: "Mensagem WhatsApp" },
+    cadastro_produto:  { icon: "📦", label: "Cadastrar Produto no Estoque" },
+    venda:             { icon: "💰", label: "Registrar Venda" }
   };
+
+  // Guarda a última ação de cadastro/venda pendente de confirmação por texto
+  // (ex.: usuário digitar "sim" / "pode cadastrar" em vez de clicar no botão)
+  let acaoPendenteAtual = null;
 
   function adicionarActionCard(acao) {
     const meta = tipoIcons[acao.tipo] || { icon: "📋", label: acao.tipo };
@@ -3860,15 +3678,35 @@ ${SYSTEM_PROMPT}`;
     ultimoPendente = card;
     pendentes++;
     atualizarBarPendentes();
+
+    // Se for cadastro de produto ou venda, guarda como ação confirmável por texto
+    if (acao && (acao.tipo === "cadastro_produto" || acao.tipo === "venda")) {
+      acaoPendenteAtual = { acao, card, footer };
+    }
   }
 
   function resolverAcao(card, footer, aprovado, acao) {
+    // Se essa era a ação pendente de confirmação por texto, limpa a referência
+    if (acaoPendenteAtual && acaoPendenteAtual.card === card) acaoPendenteAtual = null;
+
     footer.remove();
     card.className = `action-card ${aprovado ? "aprovado" : "recusado"}`;
 
     const status = document.createElement("div");
     status.className = `status-final ${aprovado ? "ok" : "no"}`;
     status.textContent = aprovado ? "✓ Ação aprovada e registrada" : "✕ Ação recusada";
+
+    // Execução real do cadastro/venda usando exatamente as mesmas funções do sistema
+    if (aprovado && acao && acao.tipo === "cadastro_produto") {
+      const resultado = executarCadastroProdutoIA(acao.dados || {});
+      status.textContent = resultado.ok ? `✓ ${resultado.msg}` : `⚠️ ${resultado.msg}`;
+      if (!resultado.ok) card.className = `action-card recusado`;
+    } else if (aprovado && acao && acao.tipo === "venda") {
+      const resultado = executarVendaIA(acao.dados || {});
+      status.textContent = resultado.ok ? `✓ ${resultado.msg}` : `⚠️ ${resultado.msg}`;
+      if (!resultado.ok) card.className = `action-card recusado`;
+    }
+
     card.appendChild(status);
 
     pendentes = Math.max(0, pendentes - 1);
@@ -3879,6 +3717,116 @@ ${SYSTEM_PROMPT}`;
     if (aprovado && acao && acao.tipo === "mensagem") {
       setTimeout(() => abrirSeletorContato(), 400);
     }
+  }
+
+  // ─── EXECUÇÃO DE COMANDOS DA IA (cadastro/venda) ──────────────────────────
+  // Estas funções NÃO reimplementam a lógica de estoque: elas apenas preenchem
+  // os mesmos campos usados pelo formulário e chamam salvarRegistro()/salvarVenda(),
+  // exatamente como o cadastro manual faz.
+
+  function montarNomeProdutoIA(d) {
+    let nome = (d.produto || "").trim();
+    if (d.cor) nome += ` ${d.cor}`.trim();
+    if (d.marca) nome += ` ${d.marca}`.trim();
+    if (d.tamanho) nome += ` Tam ${d.tamanho}`.trim();
+    return nome.replace(/\s+/g, " ").trim();
+  }
+
+  function encontrarProdutoIdxIA(nomeBusca) {
+    if (!nomeBusca) return -1;
+    const alvo = nomeBusca.toLowerCase().trim();
+    // 1) match exato
+    let idx = dbEstoque.findIndex(p => p.produto.toLowerCase() === alvo);
+    if (idx >= 0) return idx;
+    // 2) match por inclusão (em qualquer direção)
+    idx = dbEstoque.findIndex(p =>
+      p.produto.toLowerCase().includes(alvo) || alvo.includes(p.produto.toLowerCase())
+    );
+    if (idx >= 0) return idx;
+    // 3) match por palavras em comum
+    const palavras = alvo.split(/\s+/).filter(Boolean);
+    idx = dbEstoque.findIndex(p => {
+      const nomeP = p.produto.toLowerCase();
+      return palavras.some(w => w.length > 2 && nomeP.includes(w));
+    });
+    return idx;
+  }
+
+  function executarCadastroProdutoIA(d) {
+    const nome = montarNomeProdutoIA(d);
+    const quantidade = parseInt(d.quantidade);
+    if (!nome || isNaN(quantidade)) {
+      return { ok: false, msg: "Faltam dados para cadastrar (produto e/ou quantidade)." };
+    }
+
+    // Verifica se já existe produto com esse nome — se for entrada, soma ao estoque atual
+    const idxExistente = dbEstoque.findIndex(p => p.produto.toLowerCase() === nome.toLowerCase());
+    let quantidadeFinal = quantidade;
+    if (idxExistente >= 0 && d.tipoOperacao !== "novo") {
+      quantidadeFinal = (dbEstoque[idxExistente].quantidade || 0) + quantidade;
+    }
+
+    // Preenche os mesmos campos do formulário de cadastro
+    if (typeof _editandoIdx !== "undefined") _editandoIdx = idxExistente >= 0 ? idxExistente : null;
+    document.getElementById("regProduto").value = nome;
+    document.getElementById("regQuantidade").value = quantidadeFinal;
+    document.getElementById("regConsumoDiario").value = "";
+    document.getElementById("regPrecoCusto").value = d.precoCusto || "";
+    document.getElementById("regPrecoVenda").value = d.precoVenda || "";
+
+    // Chama exatamente a mesma função usada pelo formulário manual
+    salvarRegistro();
+
+    // Enriquece o item salvo com os campos estruturados extras (cor, tamanho, marca, etc.)
+    const idxFinal = dbEstoque.findIndex(p => p.produto.toLowerCase() === nome.toLowerCase());
+    if (idxFinal >= 0) {
+      const item = dbEstoque[idxFinal];
+      if (d.cor) item.cor = d.cor;
+      if (d.tamanho) item.tamanho = d.tamanho;
+      if (d.marca) item.marca = d.marca;
+      if (d.categoria) item.categoria = d.categoria;
+      if (d.fornecedor) item.fornecedor = d.fornecedor;
+      if (d.observacoes) item.observacoes = d.observacoes;
+      item.dataEntrada = item.dataEntrada || new Date().toISOString();
+      dbEstoque[idxFinal] = item;
+      localStorage.setItem(getStorageKey("estoque_db"), JSON.stringify(dbEstoque));
+      fbSalvar("estoque_db", dbEstoque);
+    }
+
+    return { ok: true, msg: `"${nome}" cadastrado com ${quantidadeFinal} unidade(s) em estoque.` };
+  }
+
+  function executarVendaIA(d) {
+    const idx = encontrarProdutoIdxIA(d.produto);
+    if (idx === -1) {
+      return { ok: false, msg: `Não encontrei "${d.produto || "esse produto"}" no estoque. Cadastre-o antes de vender.` };
+    }
+    const quantidade = parseInt(d.quantidade) > 0 ? parseInt(d.quantidade) : 1;
+    if (dbEstoque[idx].quantidade < quantidade) {
+      return { ok: false, msg: `Estoque insuficiente de "${dbEstoque[idx].produto}" (disponível: ${dbEstoque[idx].quantidade}).` };
+    }
+
+    // Preenche o mesmo select/campo usados pelo modal manual de venda
+    popularSelectVendaIA();
+    document.getElementById("vendaProduto").value = idx;
+    document.getElementById("vendaQtd").value = quantidade;
+
+    const nomeProduto = dbEstoque[idx].produto;
+    // Chama exatamente a mesma função usada pelo fluxo manual de venda
+    salvarVenda();
+
+    return { ok: true, msg: `Venda de ${quantidade} un. de "${nomeProduto}" registrada.` };
+  }
+
+  function popularSelectVendaIA() {
+    const sel = document.getElementById("vendaProduto");
+    sel.innerHTML = '<option value="">Selecione o produto...</option>';
+    dbEstoque.forEach((p, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${p.produto} (${p.quantidade} un.)`;
+      sel.appendChild(opt);
+    });
   }
 
   function atualizarBarPendentes() {
@@ -4375,9 +4323,31 @@ ${SYSTEM_PROMPT}`;
   }
 
   // ─── ENVIAR ───────────────────────────────────────────────────────────────
+  const CONFIRMACOES_TEXTO = ["sim","s","pode cadastrar","pode confirmar","pode registrar","confirmar","confirmo","ok","okay","beleza","isso mesmo","exato","correto","pode","manda ver","pode sim"];
+  const NEGACOES_TEXTO = ["não","nao","cancelar","cancela","errado","pera","espera","calma"];
+
   async function enviar() {
     const texto = input.value.trim();
     if (!texto || btn.disabled) return;
+
+    // ── Confirmação/cancelamento por texto de uma ação pendente (cadastro/venda) ──
+    // Evita chamar a API quando o usuário só está respondendo "sim"/"ok"/"não" a um resumo já mostrado.
+    if (acaoPendenteAtual) {
+      const textoNorm = texto.toLowerCase().trim().replace(/[.!]+$/, "");
+      const { card, footer, acao } = acaoPendenteAtual;
+      if (CONFIRMACOES_TEXTO.includes(textoNorm)) {
+        adicionarMsg(texto, "user");
+        input.value = ""; input.style.height = "auto";
+        resolverAcao(card, footer, true, acao);
+        return;
+      }
+      if (NEGACOES_TEXTO.includes(textoNorm)) {
+        adicionarMsg(texto, "user");
+        input.value = ""; input.style.height = "auto";
+        resolverAcao(card, footer, false, acao);
+        return;
+      }
+    }
 
     // ── Verifica trial ──
     if (!isUsuarioLiberado()) {
