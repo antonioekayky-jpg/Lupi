@@ -4953,5 +4953,32 @@ ${SYSTEM_PROMPT}`;
   renderHistoricoConversas();
 })();
 </script>
+<!-- Sincronização final: garante atualização imediata após operações do chat. -->
+<script>
+(() => {
+  const sincronizarTelasLupi = () => {
+    try {
+      verificarAlertasAutomaticos();
+      renderSaasDash();
+      renderProdutosView();
+      renderCatalogoView();
+      if (typeof renderMetaDoMes === 'function') renderMetaDoMes();
+      if (document.getElementById('saldoCard')) atualizarSaldoCard();
+    } catch (erro) { console.error('Falha ao sincronizar telas:', erro); }
+  };
+  const cadastroIaComSincronizacao = executarCadastroProdutoIA;
+  executarCadastroProdutoIA = function(dados) {
+    const resultado = cadastroIaComSincronizacao(dados);
+    if (resultado?.ok) requestAnimationFrame(sincronizarTelasLupi);
+    return resultado;
+  };
+  const vendaIaComSincronizacao = executarVendaIA;
+  executarVendaIA = function(dados) {
+    const resultado = vendaIaComSincronizacao(dados);
+    if (resultado?.ok) requestAnimationFrame(sincronizarTelasLupi);
+    return resultado;
+  };
+})();
+</script>
 </body>
-</html>
+</h
