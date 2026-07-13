@@ -4876,5 +4876,82 @@ ${SYSTEM_PROMPT}`;
   };
 })();
 </script>
+<!-- Histórico persistente e sincronização visual: complemento da arquitetura existente. -->
+<script>
+(() => {
+  const chaveHistorico = () => getStorageKey('lupiai_historico_conversas');
+  let restaurandoHistorico = false;
+  let historico = (() => { try { return JSON.parse(localStorage.getItem(chaveHistorico()) || '{"conversas":[],"atual":null}'); } catch { return { conversas:[], atual:null }; } })();
+  const salvarHistorico = () => localStorage.setItem(chaveHistorico(), JSON.stringify(historico));
+  const dataTitulo = texto => {
+    const t = String(texto || '').replace(/[^\p{L}\p{N}\s]/gu,'').trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1, 46) : 'Nova conversa';
+  };
+  const conversaAtual = () => historico.conversas.find(c => c.id === historico.atual);
+  const criarConversa = () => {
+    const agora = new Date();
+    const c = { id:`conv-${agora.getTime()}-${Math.random().toString(36).slice(2,7)}`, criadaEm:agora.toISOString(), atualizadaEm:agora.toISOString(), titulo:'Nova conversa', mensagens:[] };
+    historico.conversas.unshift(c); historico.atual=c.id; salvarHistorico(); return c;
+  };
+  const registrarMensagem = (texto, remetente, sugestoes) => {
+    if (restaurandoHistorico || !texto) return;
+    const c = conversaAtual() || criarConversa();
+    c.mensagens.push({ id:`msg-${Date.now()}-${Math.random().toString(36).slice(2,5)}`, texto:String(texto), remetente, sugestoes:sugestoes || [], data:new Date().toISOString() });
+    if (remetente === 'user' && (c.titulo === 'Nova conversa' || !c.titulo)) c.titulo = dataTitulo(texto);
+    c.atualizadaEm = new Date().toISOString(); salvarHistorico(); renderHistoricoConversas();
+  };
+  const adicionarMsgBaseHistorico = adicionarMsg;
+  adicionarMsg = function(texto, remetente, sugestoes) {
+    const retorno = adicionarMsgBaseHistorico(texto, remetente, sugestoes);
+    registrarMensagem(texto, remetente, sugestoes);
+    return retorno;
+  };
+
+  const estilo = document.createElement('style');
+  estilo.textContent = `
+    #view-historico{display:none;flex:1;overflow-y:auto;background:var(--bg);padding:20px}
+    .hist-wrap{max-width:860px;width:100%;margin:auto}.hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .hist-title{font-size:18px;font-weight:700}.hist-new{border:0;border-radius:9px;padding:9px 13px;background:var(--accent);color:#fff;font:600 12px inherit;cursor:pointer}
+    .hist-day{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-3);margin:18px 0 8px}.hist-item{width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:12px 14px;color:var(--text);cursor:pointer;margin:6px 0;font-family:inherit}
+    .hist-item:hover{border-color:rgba(10,132,255,.6)}.hist-row{display:flex;justify-content:space-between;gap:10px}.hist-name{font-size:13px;font-weight:600}.hist-meta{font-size:11px;color:var(--text-2);margin-top:4px}.recent-products{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:14px}.recent-title{font-size:12px;font-weight:700;letter-spacing:.03em}.recent-product{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}.recent-product:last-child{border-bottom:0}.recent-time{color:var(--text-2);font-size:11px;white-space:nowrap}
+  `;
+  document.head.appendChild(estilo);
+  const view = document.createElement('div'); view.id='view-historico'; view.innerHTML='<div class="hist-wrap"><div class="hist-head"><div><div class="hist-title">Histórico</div><div style="font-size:12px;color:var(--text-2);margin-top:3px">Suas conversas ficam salvas neste dispositivo.</div></div><button class="hist-new" onclick="novaConversaLupi()">+ Nova conversa</button></div><div id="historico-lista"></div></div>';
+  document.getElementById('main-content').appendChild(view);
+  const botao = document.createElement('button'); botao.className='sb-item'; botao.id='sb-historico'; botao.onclick=()=>switchView('historico'); botao.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13a9 9 0 103-6.7L3 8"/><path d="M12 7v5l3 2"/></svg>Histórico';
+  document.querySelector('#sidebar .sb-section')?.appendChild(botao);
+  const tempoRelativo = iso => { const d=Math.max(0,Date.now()-new Date(iso).getTime()), m=Math.floor(d/60000); if(m<1)return 'agora'; if(m<60)return `há ${m} min`; const h=Math.floor(m/60); if(h<24)return `há ${h} h`; return new Date(iso).toLocaleDateString('pt-BR'); };
+  renderHistoricoConversas = function() {
+    const lista=document.getElementById('historico-lista'); if(!lista)return;
+    const grupos={Hoje:[],Ontem:[],Anteriores:[]}; const hoje=new Date(); hoje.setHours(0,0,0,0); const ontem=new Date(hoje); ontem.setDate(ontem.getDate()-1);
+    historico.conversas.sort((a,b)=>new Date(b.atualizadaEm)-new Date(a.atualizadaEm)).forEach(c=>{ const d=new Date(c.atualizadaEm); d.setHours(0,0,0,0); grupos[d.getTime()===hoje.getTime()?'Hoje':d.getTime()===ontem.getTime()?'Ontem':'Anteriores'].push(c); });
+    lista.innerHTML=Object.entries(grupos).filter(([,cs])=>cs.length).map(([dia,cs])=>`<div class="hist-day">${dia}</div>${cs.map(c=>`<button class="hist-item" onclick="abrirConversaLupi('${c.id}')"><div class="hist-row"><span class="hist-name">${c.titulo}</span><span class="recent-time">${tempoRelativo(c.atualizadaEm)}</span></div><div class="hist-meta">${c.mensagens.length} mensagem(ns) · atualizado ${tempoRelativo(c.atualizadaEm)}</div></button>`).join('')}`).join('') || '<div style="color:var(--text-2);font-size:13px;padding:24px 0">Nenhuma conversa salva ainda.</div>';
+  };
+  window.novaConversaLupi = () => { criarConversa(); const feed=document.getElementById('mensagens'); feed.innerHTML=''; adicionarMsgBaseHistorico('Olá! Como posso ajudar você com o estoque hoje?', 'ai'); switchView('chat'); renderHistoricoConversas(); };
+  window.abrirConversaLupi = id => { const c=historico.conversas.find(x=>x.id===id); if(!c)return; historico.atual=id; salvarHistorico(); const feed=document.getElementById('mensagens'); feed.innerHTML=''; restaurandoHistorico=true; c.mensagens.forEach(m=>adicionarMsgBaseHistorico(m.texto,m.remetente,m.sugestoes)); restaurandoHistorico=false; switchView('chat'); };
+  const switchViewBaseHistorico = switchView;
+  switchView = function(v) { if(v==='historico'){ ['view-dashboard','view-chat','view-catalogo','view-produtos'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';}); view.style.display='flex'; document.getElementById('topbar-title').textContent='Histórico'; document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active')); botao.classList.add('active'); renderHistoricoConversas(); return; } view.style.display='none'; return switchViewBaseHistorico(v); };
+
+  const renderSaasDashBaseHistorico = renderSaasDash;
+  renderSaasDash = function() {
+    renderSaasDashBaseHistorico();
+    const destino=document.getElementById('dash-inner'); if(!destino)return;
+    const itens=[...dbEstoque].filter(p=>p.dataEntrada || p.data).sort((a,b)=>new Date(b.dataEntrada||b.data)-new Date(a.dataEntrada||a.data)).slice(0,5);
+    const card=document.createElement('section'); card.className='recent-products';
+    card.innerHTML=`<div class="recent-title">Últimos Produtos Cadastrados</div>${itens.length ? itens.map(p=>`<div class="recent-product"><span>${p.produto}</span><span class="recent-time">${tempoRelativo(p.dataEntrada||p.data)}</span></div>`).join('') : '<div class="hist-meta" style="padding-top:10px">Nenhum produto cadastrado ainda.</div>'}`;
+    destino.appendChild(card);
+  };
+
+  // Ajusta somente a instrução da IA: naturalidade e revisão antes do envio, sem trocar o serviço de IA.
+  const fetchBaseNatural = window.fetch.bind(window);
+  window.fetch = (url, opcoes={}) => {
+    if (url === API_URL && opcoes.body) {
+      try { const corpo=JSON.parse(opcoes.body); if(Array.isArray(corpo.messages) && corpo.messages[0]?.role==='system') { corpo.messages[0].content += '\n\nESTILO OBRIGATÓRIO: escreva em português brasileiro natural, profissional, amigável e objetivo. Varie aberturas; não repita "Claro", "Perfeito" ou "Entendido". Antes de responder, revise silenciosamente ortografia, acentuação, pontuação, concordância, repetições e frases incompletas. Entregue apenas a resposta revisada.'; opcoes={...opcoes,body:JSON.stringify(corpo)}; } } catch(_) {}
+    }
+    return fetchBaseNatural(url,opcoes);
+  };
+  renderHistoricoConversas();
+})();
+</script>
 </body>
 </html>
