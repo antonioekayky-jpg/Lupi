@@ -4686,5 +4686,195 @@ ${SYSTEM_PROMPT}`;
     if (url) window.open(url, '_blank');
   }
 </script>
+<!-- Camada operacional do chat: usa as rotinas existentes de cadastro e venda. -->
+<script>
+(() => {
+  const chaveContexto = () => getStorageKey('lupiai_contexto_operacional');
+  let contextoConversa = (() => {
+    try { return JSON.parse(localStorage.getItem(chaveContexto()) || '{"historico":[]}'); }
+    catch { return { historico: [] }; }
+  })();
+  let ultimaOperacaoReversivel = null;
+  let valorVendaInformadoIA = null;
+  let executandoLote = false;
+
+  const normalizar = v => String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const salvarContexto = () => {
+    contextoConversa.historico = (contextoConversa.historico || []).slice(-10);
+    localStorage.setItem(chaveContexto(), JSON.stringify(contextoConversa));
+  };
+  const limparContextoOperacional = () => {
+    contextoConversa = { historico: [] };
+    salvarContexto();
+  };
+  const lembrar = (role, content) => {
+    contextoConversa.historico ||= [];
+    contextoConversa.historico.push({ role, content: String(content).slice(0, 900) });
+    salvarContexto();
+  };
+  const salvarEstoqueOperacional = () => {
+    localStorage.setItem(getStorageKey('estoque_db'), JSON.stringify(dbEstoque));
+    fbSalvar('estoque_db', dbEstoque);
+    verificarAlertasAutomaticos();
+    if (typeof renderSaasDash === 'function') renderSaasDash();
+    if (typeof renderProdutosView === 'function') renderProdutosView();
+    if (typeof renderCatalogoView === 'function') renderCatalogoView();
+    if (document.getElementById('saldoCard')) atualizarSaldoCard();
+  };
+  const tirarSnapshot = tipo => {
+    ultimaOperacaoReversivel = { tipo, estoque: JSON.parse(JSON.stringify(dbEstoque)), quando: Date.now() };
+  };
+  const desfazerUltimaOperacao = () => {
+    if (!ultimaOperacaoReversivel) return adicionarMsg('Não há uma operação desta conversa para desfazer.', 'ai');
+    dbEstoque = ultimaOperacaoReversivel.estoque;
+    salvarEstoqueOperacional();
+    adicionarMsg(`↩️ Última ${ultimaOperacaoReversivel.tipo} desfeita. Estoque, indicadores e Firebase foram atualizados.`, 'ai');
+    ultimaOperacaoReversivel = null;
+    limparContextoOperacional();
+  };
+  const fmt = n => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const resumoDados = d => ({
+    Produto: montarNomeProdutoIA(d), Quantidade: d.quantidade,
+    Cor: d.cor || '—', Tamanho: d.tamanho || '—', Marca: d.marca || '—',
+    Categoria: d.categoria || '—', Fornecedor: d.fornecedor || '—',
+    'Preço de compra': d.precoCusto ? fmt(d.precoCusto) : '—',
+    'Preço de venda': d.precoVenda ? fmt(d.precoVenda) : '—'
+  });
+  const candidatosVenda = nome => {
+    const termos = normalizar(nome).split(/\s+/).filter(t => t.length > 2);
+    return dbEstoque.map((p, i) => ({ p, i, score: termos.reduce((s, t) => s + (normalizar(p.produto).includes(t) ? 1 : 0), 0) }))
+      .filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+  };
+
+  // Preserva o preço realmente praticado; sem valor informado, mantém o cálculo pelo preço cadastrado.
+  salvarVenda = function salvarVendaOperacional() {
+    const idx = parseInt(document.getElementById('vendaProduto').value);
+    const qtd = parseInt(document.getElementById('vendaQtd').value);
+    if (isNaN(idx) || isNaN(qtd) || qtd <= 0 || !dbEstoque[idx]) return;
+    const item = dbEstoque[idx];
+    if (item.quantidade < qtd) return;
+    item.vendasDiarias ||= [];
+    const hoje = new Date().toISOString().split('T')[0];
+    const registro = item.vendasDiarias.find(v => v.data === hoje && (valorVendaInformadoIA == null || v.valorTotal == null));
+    if (registro) { registro.qtd += qtd; if (valorVendaInformadoIA != null) registro.valorTotal = (registro.valorTotal || 0) + valorVendaInformadoIA; }
+    else item.vendasDiarias.push({ data: hoje, qtd, ...(valorVendaInformadoIA != null ? { valorTotal: valorVendaInformadoIA } : {}) });
+    item.vendasDiarias = item.vendasDiarias.slice(-30);
+    item.quantidade -= qtd;
+    dbEstoque[idx] = item;
+    salvarEstoqueOperacional();
+    fecharModalVenda();
+    const valor = valorVendaInformadoIA != null ? ` por ${fmt(valorVendaInformadoIA)}` : '';
+    valorVendaInformadoIA = null;
+    adicionarMsg(`Venda de ${qtd} un. de "${item.produto}"${valor} registrada. Estoque atual: ${item.quantidade} un.`, 'ai');
+  };
+  vendasComoLancamentos = function vendasComoLancamentosOperacional() {
+    return dbEstoque.flatMap(p => (p.vendasDiarias || []).map(v => ({
+      id: `venda-${p.produto}-${v.data}-${v.valorTotal ?? 'tabela'}`,
+      tipo: 'entrada', descricao: `Venda: ${p.produto}`,
+      valor: v.valorTotal != null ? v.valorTotal : v.qtd * (p.precoVenda || 0),
+      categoria: 'Venda', data: v.data, auto: true
+    })));
+  };
+  executarVendaIA = function executarVendaIAOperacional(d) {
+    const encontrados = candidatosVenda(d.produto);
+    const exatos = encontrados.filter(x => normalizar(x.p.produto) === normalizar(d.produto));
+    const escolhido = exatos.length === 1 ? exatos[0] : (encontrados.length === 1 ? encontrados[0] : null);
+    if (!escolhido) return { ok: false, ambigua: encontrados.length > 1, candidatos: encontrados.map(x => x.p.produto), msg: encontrados.length > 1 ? 'Há mais de um produto compatível; escolha qual foi vendido.' : `Não encontrei "${d.produto || 'esse produto'}" no estoque.` };
+    const qtd = parseInt(d.quantidade) > 0 ? parseInt(d.quantidade) : 1;
+    if (escolhido.p.quantidade < qtd) return { ok: false, msg: `Estoque insuficiente de "${escolhido.p.produto}".` };
+    tirarSnapshot('venda');
+    popularSelectVendaIA();
+    document.getElementById('vendaProduto').value = escolhido.i;
+    document.getElementById('vendaQtd').value = qtd;
+    valorVendaInformadoIA = Number.isFinite(Number(d.valorTotal)) ? Number(d.valorTotal) : null;
+    salvarVenda();
+    return { ok: true, msg: `Venda de ${qtd} un. de "${escolhido.p.produto}" registrada.` };
+  };
+  // Adaptador de IA: preenche o formulário e chama salvarRegistro(), a rotina oficial.
+  executarCadastroProdutoIA = function(d) {
+    const nome = montarNomeProdutoIA(d), quantidade = parseInt(d.quantidade);
+    if (!nome || isNaN(quantidade)) return { ok:false, msg:'Faltam produto ou quantidade.' };
+    if (!executandoLote) tirarSnapshot('cadastro');
+    const idx = dbEstoque.findIndex(p => normalizar(p.produto) === normalizar(nome));
+    const final = idx >= 0 && d.tipoOperacao !== 'novo' ? Number(dbEstoque[idx].quantidade || 0) + quantidade : quantidade;
+    _editandoIdx = idx >= 0 ? idx : null;
+    document.getElementById('regProduto').value = nome;
+    document.getElementById('regQuantidade').value = final;
+    document.getElementById('regConsumoDiario').value = '';
+    document.getElementById('regPrecoCusto').value = d.precoCusto || '';
+    document.getElementById('regPrecoVenda').value = d.precoVenda || '';
+    salvarRegistro();
+    const salvo = dbEstoque.find(p => normalizar(p.produto) === normalizar(nome));
+    if (salvo) Object.assign(salvo, ['cor','tamanho','marca','categoria','fornecedor','observacoes'].reduce((o,k) => (d[k] ? (o[k]=d[k],o) : o), {}), { dataEntrada: salvo.dataEntrada || new Date().toISOString() });
+    salvarEstoqueOperacional();
+    return { ok:true, msg:`"${nome}" cadastrado com ${final} unidade(s) em estoque.` };
+  };
+
+  resolverAcao = function(card, footer, aprovado, acao) {
+    if (acaoPendenteAtual?.card === card) acaoPendenteAtual = null;
+    footer?.remove(); card.className = `action-card ${aprovado ? 'aprovado' : 'recusado'}`;
+    const status = document.createElement('div'); status.className = `status-final ${aprovado ? 'ok' : 'no'}`;
+    let resultado = { ok:true, msg:'Ação aprovada e registrada.' };
+    if (aprovado && acao?.tipo === 'cadastro_produto') resultado = executarCadastroProdutoIA(acao.dados || {});
+    if (aprovado && acao?.tipo === 'venda') resultado = executarVendaIA(acao.dados || {});
+    if (aprovado && acao?.tipo === 'lote_cadastro') {
+      tirarSnapshot('cadastro em lote'); executandoLote = true;
+      const rs = (acao.dados?.operacoes || []).map(executarCadastroProdutoIA);
+      executandoLote = false;
+      resultado = { ok:rs.every(r=>r.ok), msg:rs.map(r=>r.msg).join(' ') };
+    }
+    status.textContent = aprovado ? (resultado.ok ? `✓ ${resultado.msg}` : `⚠️ ${resultado.msg}`) : '✕ Ação recusada';
+    if (!resultado.ok) card.className = 'action-card recusado';
+    card.appendChild(status); pendentes = Math.max(0, pendentes - 1); atualizarBarPendentes(); scrollBaixo();
+    if (aprovado && resultado.ok) limparContextoOperacional();
+  };
+  const adicionarActionCardBase = adicionarActionCard;
+  adicionarActionCard = function(acao) {
+    // Uma resposta complementar/correção substitui o resumo anterior, nunca reinicia a operação.
+    if (acaoPendenteAtual && (acao?.tipo === 'cadastro_produto' || acao?.tipo === 'venda' || acao?.operacoes?.length)) {
+      const anterior = acaoPendenteAtual;
+      anterior.footer?.remove(); anterior.card.className = 'action-card recusado';
+      const aviso = document.createElement('div'); aviso.className = 'status-final no'; aviso.textContent = 'Resumo atualizado com a correção.';
+      anterior.card.appendChild(aviso); acaoPendenteAtual = null; pendentes = Math.max(0, pendentes - 1); atualizarBarPendentes();
+    }
+    if (acao?.tipo === 'venda') {
+      const c = candidatosVenda(acao.dados?.produto);
+      if (c.length > 1 && c.filter(x => normalizar(x.p.produto) === normalizar(acao.dados?.produto)).length !== 1) {
+        contextoConversa.operacao = { tipo:'venda', dados:acao.dados, candidatos:c.map(x=>x.p.produto) }; salvarContexto();
+        adicionarMsg(`Encontrei mais de um produto: ${c.map(x=>`• ${x.p.produto}`).join('\n')}. Qual deles foi vendido?`, 'ai'); return;
+      }
+    }
+    if (acao?.operacoes?.length) {
+      acao = { tipo:'lote_cadastro', titulo:'Cadastrar produtos encontrados', urgencia:'media', detalhes:{ Produtos: acao.operacoes.map(x => `${x.quantidade} ${montarNomeProdutoIA(x)}`).join(' • ') }, dados:{ operacoes:acao.operacoes } };
+    }
+    // constrói com o componente existente, que permanece responsável pelo visual.
+    return adicionarActionCardBase(acao);
+  };
+
+  const promptOperacional = () => `${getSystemPromptComDados()}\n\nMODO OPERACIONAL: responda JSON determinístico. Contexto persistente: ${JSON.stringify(contextoConversa)}.\nQuando a conversa estiver completando/corrigindo uma operação pendente, devolva a ação inteira atualizada, mantendo os campos já conhecidos. Nunca execute: só proponha uma ação confirmável. Em um cadastro, colete uma informação útil por vez; para roupas, se cor ou preço de venda ainda forem desconhecidos, pergunte primeiro só um deles antes de montar o resumo. Não pergunte atributos que não se aplicam e aceite quando o usuário disser que não sabe. Para vários produtos, use acao.tipo='lote_cadastro' e acao.operacoes=[{produto,quantidade,cor,tamanho,marca,categoria,fornecedor,precoCusto,precoVenda,observacoes,tipoOperacao}]. Para venda, use valorTotal quando o usuário informar o total. Se houver mais de uma correspondência no estoque, não escolha: pergunte qual produto.`;
+  enviar = async function enviarOperacional() {
+    const texto = input.value.trim(); if (!texto || btn.disabled) return;
+    const n = normalizar(texto);
+    if (/^(desfazer|cancelar ultima (venda|operacao|operação|cadastro)|reverter ultima (venda|operacao|operação|cadastro))/.test(n)) { adicionarMsg(texto,'user'); input.value=''; desfazerUltimaOperacao(); return; }
+    if (acaoPendenteAtual) {
+      if (['sim','s','confirmar','confirmo','ok','pode cadastrar','pode registrar','pode confirmar','isso mesmo'].includes(n)) { adicionarMsg(texto,'user'); input.value=''; resolverAcao(acaoPendenteAtual.card, acaoPendenteAtual.footer, true, acaoPendenteAtual.acao); return; }
+      if (['cancelar','cancela','nao','não'].includes(n)) { adicionarMsg(texto,'user'); input.value=''; resolverAcao(acaoPendenteAtual.card, acaoPendenteAtual.footer, false, acaoPendenteAtual.acao); limparContextoOperacional(); return; }
+    }
+    adicionarMsg(texto,'user'); lembrar('user',texto); input.value=''; input.style.height='auto'; btn.disabled=true; mostrarTyping();
+    try {
+      const res = await fetch(API_URL,{ method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`}, body:JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'system',content:promptOperacional()}, ...(contextoConversa.historico || []), {role:'user',content:texto}], temperature:0.15, max_tokens:1100 }) });
+      const data = await res.json(); removerTyping(); const raw=data?.choices?.[0]?.message?.content; if (!raw) throw new Error('Resposta inesperada');
+      const bloco=raw.match(/```(?:json)?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/); const parsed=JSON.parse((bloco?bloco[1]:raw).trim());
+      if (parsed.resposta) { adicionarMsg(parsed.resposta,'ai',parsed.sugestoes); lembrar('assistant',parsed.resposta); }
+      const acao=parsed.acao;
+      if (acao?.tipo) {
+        if (acao.tipo==='cadastro_produto') { contextoConversa.operacao={tipo:acao.tipo,dados:acao.dados}; salvarContexto(); }
+        setTimeout(()=>adicionarActionCard(acao),150);
+      }
+    } catch(err) { removerTyping(); console.error(err); adicionarMsg('⚠️ Não consegui interpretar a ação. Tente informar produto e quantidade novamente.','ai'); }
+    finally { btn.disabled=false; input.focus(); }
+  };
+})();
+</script>
 </body>
 </html>
